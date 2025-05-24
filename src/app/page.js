@@ -13,22 +13,12 @@ import CTA from "@/components/Landing/CTA";
 export default function Home() {
   return (
     <main className="min-h-screen bg-white w-full flex flex-col justify-center items-center">
-      {/* Navigation */}
       <AppHeader />
-      {/* Hero Section */}
       <Hero />
-      {/* Features Section */}
       <Fearures />
-
-      {/* Demo Section */}
       <Demo />
-
-      {/* Testimonials Section */}
       <Testimonials />
-
-      {/* Final CTA Section */}
       <CTA />
-
       <Footer />
     </main>
   );

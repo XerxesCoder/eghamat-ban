@@ -1,5 +1,7 @@
 import { Vazirmatn } from "next/font/google";
 import "./globals.css";
+import { ClerkProvider } from "@clerk/nextjs";
+import { persianClerk } from "@/lib/clerkLocal";
 
 const Vazir = Vazirmatn({
   variable: "--font-vazir",
@@ -13,8 +15,10 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="fa-IR" dir="rtl">
-      <body className={`${Vazir.variable}`}>{children}</body>
-    </html>
+    <ClerkProvider localization={persianClerk}>
+      <html lang="fa-IR" dir="rtl">
+        <body className={`${Vazir.variable}`}>{children}</body>
+      </html>
+    </ClerkProvider>
   );
 }

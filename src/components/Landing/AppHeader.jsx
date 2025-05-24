@@ -59,12 +59,16 @@ export default function AppHeader() {
           ))}
         </motion.nav>
 
-
         {/* Desktop Buttons */}
         <div className="hidden md:flex items-center gap-4">
-          <Button variant="outline">ورود</Button>
-          <Button className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90">
-            ثبت‌نام رایگان
+          <Button variant="outline" asChild>
+            <Link href={"/sign-in"}>ورود</Link>
+          </Button>
+          <Button
+            className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
+            asChild
+          >
+            <Link href={"/sign-up"}>ثبت‌نام رایگان</Link>
           </Button>
         </div>
       </div>

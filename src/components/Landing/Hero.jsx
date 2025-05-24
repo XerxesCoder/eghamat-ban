@@ -35,7 +35,7 @@ export default function Hero() {
         >
           سیستم یکپارچه مدیریت اتاق‌ها، رزرواسیون و مالی اقامتگاه شما
         </motion.p>
-        <motion.div 
+{/*         <motion.div 
           className="flex flex-col gap-2 sm:flex-row"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -50,7 +50,7 @@ export default function Hero() {
           >
             مشاهده دمو
           </Button>
-        </motion.div>
+        </motion.div> */}
       </motion.div>
     </section>
   );
