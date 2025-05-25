@@ -1,12 +1,9 @@
-import { createClient } from "@/lib/supabase/server";
-import { supabaseClient } from "@/lib/supabse";
+import { supabaseClient as supabase } from "@/lib/supabse";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
   try {
-    const { data: users, error } = await supabaseClient
-      .from("users")
-      .select("*")
+    const { data: users, error } = await supabase.from("users").select("*");
 
     if (error) {
       throw error;

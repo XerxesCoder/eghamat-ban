@@ -32,7 +32,7 @@ export default function QuickActions() {
   const [exportData, setExportData] = useState("");
   const exportTextAreaRef = useRef(null);
   return (
-    <Card className="mt-4">
+    <Card className="mt-4 shadow-xl">
       <CardHeader>
         <CardTitle className="text-lg">عملیات سریع</CardTitle>
       </CardHeader>
@@ -40,7 +40,7 @@ export default function QuickActions() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Button
             variant="outline"
-            className="flex flex-col h-24 items-center justify-center"
+            className="flex flex-col h-24 items-center justify-center shadow-lg"
             asChild
           >
             <Link href="/dashboard/rooms">
@@ -51,7 +51,7 @@ export default function QuickActions() {
 
           <Button
             variant="outline"
-            className="flex flex-col h-24 items-center justify-center"
+            className="flex flex-col h-24 items-center justify-center shadow-lg"
             asChild
           >
             <Link href="/dashboard/reservation">
@@ -62,7 +62,7 @@ export default function QuickActions() {
 
           <Button
             variant="outline"
-            className="flex flex-col h-24 items-center justify-center"
+            className="flex flex-col h-24 items-center justify-center shadow-lg"
             //onClick={handleExport}
           >
             <Download className="h-5 w-5 mb-1" />
@@ -71,7 +71,7 @@ export default function QuickActions() {
 
           <Button
             variant="outline"
-            className="flex flex-col h-24 items-center justify-center"
+            className="flex flex-col h-24 items-center justify-center shadow-lg"
             asChild
           >
             <Link href="/dashboard/lodge">

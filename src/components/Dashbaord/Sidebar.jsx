@@ -39,10 +39,12 @@ import { usePathname } from "next/navigation";
 import {
   persianDate,
   persianMonthName,
+  persianTime,
   persianTodayName,
   persianTodayNumber,
 } from "@/lib/jalali";
 import { SignedIn, UserButton } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
 
 // Menu items.
 const items = [
@@ -81,11 +83,23 @@ export function AppSidebar() {
   } = useSidebar();
 
   const pathname = usePathname();
-  const { setTheme, theme } = useTheme();
-  console.log(theme);
+
+  const [currentTime, setCurrentTime] = useState("");
+  useEffect(() => {
+    const updateTime = () => {
+      const formatter = new Intl.DateTimeFormat("fa-IR", {
+        timeStyle: "full",
+      });
+      setCurrentTime(formatter.format(new Date()).split(" ")[0]);
+    };
+    updateTime();
+    const intervalId = setInterval(updateTime, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <Sidebar side="right" collapsible="icon" variant="sidebar">
-      <SidebarHeader className="pb-2">
+      <SidebarHeader className="pb-2 ">
         <SidebarMenu>
           <SidebarMenuItem onClick={toggleSidebar} className={"cursor-pointer"}>
             <SidebarMenuButton size="lg" asChild>
@@ -102,10 +116,11 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
         {open && (
-          <div className="flex  gap-5 justify-center items-center">
-            <Clock className="h-8 w-8" />
+          <div className="flex  gap-5 justify-start items-center">
+            <Clock className="h-6 w-6" />
             <div>
-              <p>{persianDate}</p>
+{/*               <p>{persianDate}</p> */}
+              <p>{currentTime}</p>
               <p>
                 {`${persianTodayName}, ${persianTodayNumber} ${persianMonthName}`}
               </p>
@@ -124,8 +139,9 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     asChild
                     tooltip={item.title}
-                    className={`${
-                      pathname === item.url ? "bg-aqua-spark " : ""
+                    className={` hover:bg-aqua-spark/50 ${
+                      pathname === item.url &&
+                      "bg-aqua-spark border-l-2 border-deep-ocean"
                     }`}
                     size="md"
                   >

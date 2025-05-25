@@ -19,9 +19,16 @@ export const persianTodayName = new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
 export const persianMonthName = new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
   month: "short",
 }).format();
-export const persianMonthNumber = new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
-  month: "numeric",
-}).format();
+export const persianMonthNumber = new Intl.DateTimeFormat(
+  "fa-IR-u-ca-persian",
+  {
+    month: "numeric",
+  }
+).format();
 export const persianYear = new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
   year: "numeric",
+}).format();
+
+export const persianTime = new Intl.DateTimeFormat("fa-IR-u-nu-latn", {
+  timeStyle: "full",
 }).format();
