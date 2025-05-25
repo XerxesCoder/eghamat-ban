@@ -9,34 +9,34 @@ export const completeOnboarding = async (formData) => {
   if (!userId) {
     return { message: "No Logged In User" };
   }
-
   const user = await currentUser();
   if (!user) {
     return { message: "No User Found" };
   }
-  const { data, error } = await supabase
-    .from("users")
-    .insert([
-      {
-        name: formData.firstName,
-        lastname: formData.lastName,
-        phone: formData.phone,
-        email: user.emailAddresses[0].emailAddress,
-        username: user.username,
-        clerk: userId,
-      },
-    ])
-    .select();
 
   const client = await clerkClient();
 
   try {
+    const { data, error } = await supabase
+      .from("users")
+      .insert([
+        {
+          name: formData.firstName,
+          lastname: formData.lastName,
+          phone: formData.phone,
+          email: user.emailAddresses[0].emailAddress,
+          username: user.username,
+          clerk: userId,
+        },
+      ])
+      .select();
+
     const res = await client.users.updateUser(userId, {
       publicMetadata: {
         onboardingComplete: true,
       },
     });
-    return { message: res.publicMetadata };
+    return { success: true, message: res.publicMetadata };
   } catch (err) {
     return { error: "There was an error updating the user metadata." };
   }

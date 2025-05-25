@@ -27,7 +27,7 @@ export default function OnboardingComponent() {
     try {
       const res = await completeOnboarding(data);
 
-      if (res?.message) {
+      if (res?.message && res.success) {
         toast.dismiss();
         toast.success("ثبت نام با موفقیت انجام شد");
         await user?.reload();
