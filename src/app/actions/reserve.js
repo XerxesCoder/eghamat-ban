@@ -1,0 +1,161 @@
+"use server";
+import { auth } from "@clerk/nextjs/server";
+import { supabaseClient as supabase } from "@/lib/supabse";
+
+export async function addNewReserve(reserveData) {
+  const { userId } = await auth();
+
+  if (!userId) return { error: "User ID is required" };
+
+  try {
+    const { data, error } = await supabase
+      .from("reservations")
+      .insert([
+        {
+          room_id: reserveData.roomId,
+          guest_name: reserveData.guestName,
+          guest_phone: reserveData.guestPhone,
+          check_in: reserveData.checkIn,
+          check_out: reserveData.checkOut,
+          special_requests: reserveData.notes,
+          adults: reserveData.adults,
+          total_price: reserveData.totalAmount,
+          status: "CONFIRMED",
+          owner_id: userId,
+        },
+      ])
+      .select();
+
+    const { data: roomData, error: roomErr } = await supabase
+      .from("rooms")
+      .update([
+        {
+          enter_date: reserveData.checkIn,
+          exit_date: reserveData.checkOut,
+        },
+      ])
+      .eq("id", reserveData.roomId)
+      .eq("owner_id", userId)
+      .select();
+
+    if (error || roomErr) {
+      console.error("Supabase error:", error || roomErr);
+      return { error: error.message || roomErr.message };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.error("Server error:", err);
+    return { error: "Failed to create motel" };
+  }
+}
+
+export async function editReservation(reserveData, reserveID) {
+  const { userId } = await auth();
+
+  if (!userId) return { error: "User ID is required" };
+
+  try {
+    const { data, error } = await supabase
+      .from("reservations")
+      .update([
+        {
+          room_id: reserveData.roomId,
+          guest_name: reserveData.guestName,
+          guest_phone: reserveData.guestPhone,
+          check_in: reserveData.checkIn,
+          check_out: reserveData.checkOut,
+          special_requests: reserveData.notes,
+          adults: reserveData.adults,
+          total_price: reserveData.totalAmount,
+          status: String(reserveData.status).toUpperCase(),
+          owner_id: userId,
+        },
+      ])
+      .eq("owner_id", userId)
+      .eq("id", reserveID)
+      .select();
+
+    const { data: roomData, error: roomErr } = await supabase
+      .from("rooms")
+      .update([
+        {
+          enter_date: reserveData.checkIn,
+          exit_date: reserveData.checkOut,
+        },
+      ])
+      .eq("id", reserveData.roomId)
+      .eq("owner_id", userId)
+      .select();
+
+    if (error || roomErr) {
+      console.error("Supabase error:", error || roomErr);
+      return { error: error.message || roomErr.message };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.error("Server error:", err);
+    return { error: "Failed to create motel" };
+  }
+}
+
+export async function deleteReservation(reserveID, roomID) {
+  const { userId } = await auth();
+
+  if (!userId) return { error: "User ID is required" };
+
+  try {
+    const { data, error } = await supabase
+      .from("reservations")
+      .delete()
+      .eq("owner_id", userId)
+      .eq("id", reserveID)
+      .select();
+
+    const { data: roomData, error: roomErr } = await supabase
+      .from("rooms")
+      .update([
+        {
+          enter_date: null,
+          exit_date: null,
+        },
+      ])
+      .eq("id", roomID)
+      .eq("owner_id", userId)
+      .select();
+
+    if (error || roomErr) {
+      console.error("Supabase error:", error || roomErr);
+      return { error: error.message || roomErr.message };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.error("Server error:", err);
+    return { error: "Failed to create motel" };
+  }
+}
+
+export async function getUserReservations() {
+  const { userId } = await auth();
+
+  if (!userId) return { error: "User ID is required" };
+
+  try {
+    const { data, error } = await supabase
+      .from("reservations")
+      .select()
+      .eq("owner_id", userId);
+
+    if (error) {
+      console.error("DB error:", error);
+      return { error: error.message };
+    }
+
+    return { success: true, data };
+  } catch (err) {
+    console.error("Server error:", err);
+    return { error: "Failed to fetch reserves" };
+  }
+}

@@ -37,11 +37,10 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  persianDate,
   persianMonthName,
-  persianTime,
   persianTodayName,
   persianTodayNumber,
+  persianYear,
 } from "@/lib/jalali";
 import { SignedIn, UserButton } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
@@ -119,11 +118,10 @@ export function AppSidebar() {
           <div className="flex  gap-5 justify-start items-center">
             <Clock className="h-6 w-6" />
             <div>
-{/*               <p>{persianDate}</p> */}
-              <p>{currentTime}</p>
               <p>
-                {`${persianTodayName}, ${persianTodayNumber} ${persianMonthName}`}
+                {`${persianTodayName}, ${persianTodayNumber} ${persianMonthName} ${persianYear}`}
               </p>
+              <p>{currentTime}</p>
             </div>
           </div>
         )}
@@ -139,9 +137,9 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     asChild
                     tooltip={item.title}
-                    className={` hover:bg-aqua-spark/50 ${
+                    className={` hover:bg-aqua-spark/20 ${
                       pathname === item.url &&
-                      "bg-aqua-spark border-l-2 border-deep-ocean"
+                      "bg-aqua-spark border-l-2 border-deep-ocean pointer-events-none"
                     }`}
                     size="md"
                   >

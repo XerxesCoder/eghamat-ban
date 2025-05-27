@@ -14,7 +14,7 @@ export const persianClerk = {
   formFieldLabel__firstName: "نام",
   formFieldLabel__lastName: "نام خانوادگی",
   backButton: "بازگشت",
-  formButtonPrimary: "ورود",
+  formButtonPrimary: "ادامه",
   formButtonPrimary__verify: "تایید",
   footerActionLink__useAnotherMethod: "با روش دیگری وارد شوید",
   unstable__errors: {

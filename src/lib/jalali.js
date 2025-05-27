@@ -1,9 +1,18 @@
 import moment from "moment-jalaali";
-moment.loadPersian({
-  usePersianDigits: true,
-});
+
 export const persianDate = moment().format("jYYYY/jM/jD");
 export const persianDateWithTime = moment().format("jYYYY/jM/jD HH:mm:ss");
+
+export function getJalaliDateDifference(startDate, endDate) {
+  const mStart = moment(startDate, "jYYYY/jMM/jDD");
+  const mEnd = moment(endDate, "jYYYY/jMM/jDD");
+
+  return mEnd.diff(mStart, "days");
+}
+
+/*
+  ??? Date Formats
+*/
 export const fullPersianDate = new Intl.DateTimeFormat("fa-IR-u-nu-latn", {
   dateStyle: "full",
   timeStyle: "short",

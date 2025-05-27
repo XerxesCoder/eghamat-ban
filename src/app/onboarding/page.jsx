@@ -21,8 +21,33 @@ export default function OnboardingComponent() {
     const data = {
       firstName: formData.get("firstName"),
       lastName: formData.get("lastName"),
+      lodge: formData.get("lodge"),
       phone: formData.get("phone"),
     };
+    if (!data.firstName) {
+      setError("لطفا نام خود را وارد کنید");
+      toast.error("لطفا نام خود را وارد کنید");
+      setIsSubmitting(false);
+      return;
+    }
+    if (!data.lastName) {
+      setError("لطفا نام خانوادگی خود را وارد کنید");
+      toast.error("لطفا نام خانوادگی خود را وارد کنید");
+      setIsSubmitting(false);
+      return;
+    }
+    if (!data.lodge) {
+      setError("لطفا نام اقامتگاه خود را وارد کنید");
+      toast.error("لطفا نام اقامتگاه خود را وارد کنید");
+      setIsSubmitting(false);
+      return;
+    }
+    if (!data.phone) {
+      setError("لطفا شماره تماس خود را وارد کنید");
+      toast.error("لطفا شماره تماس خود را وارد کنید");
+      setIsSubmitting(false);
+      return;
+    }
     toast.loading("در حال تکمیل ثبت نام..");
     try {
       const res = await completeOnboarding(data);
@@ -86,10 +111,27 @@ export default function OnboardingComponent() {
 
           <div>
             <label
+              htmlFor="lodge"
+              className="block text-sm font-medium text-deep-ocean mb-1"
+            >
+              نام اقامتگاه<span className="text-coral-pulse">*</span>
+            </label>
+            <input
+              type="text"
+              id="lodge"
+              name="lodge"
+              required
+              className="w-full px-4 py-2 border border-sky-glint rounded-lg focus:ring-2 focus:ring-aqua-spark focus:border-transparent"
+              placeholder="نام اقامتگاه خود را وارد کنید"
+            />
+          </div>
+
+          <div>
+            <label
               htmlFor="phone"
               className="block text-sm font-medium text-deep-ocean mb-1"
             >
-              شماره تلفن <span className="text-coral-pulse">*</span>
+              شماره تماس <span className="text-coral-pulse">*</span>
             </label>
             <input
               type="tel"
@@ -114,7 +156,7 @@ export default function OnboardingComponent() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className={`w-full py-3 px-4 rounded-lg font-medium cursor-pointer text-white ${
+            className={`w-full py-3 px-4 rounded-lg font-medium cursor-pointer text-white disabled:pointer-events-none ${
               isSubmitting
                 ? "bg-aqua-spark animate-pulse"
                 : "bg-aqua-spark hover:bg-aqua-spark/90"
