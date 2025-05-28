@@ -14,7 +14,6 @@ import {
 } from "@/lib/jalali";
 
 export default function Overview({ overviewData, rooms, reservations }) {
-  console.log(overviewData);
   const OverviewData = [
     {
       title: "تعداد اتاق ها",

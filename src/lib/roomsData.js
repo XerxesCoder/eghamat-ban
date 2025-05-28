@@ -34,4 +34,6 @@ export const reserveStatus = [
   { value: "confirmed", label: "تایید شده" },
   { value: "outdated", label: "منقضی شده" },
   { value: "ended", label: "تخلیه امروز" },
+  { value: "checked_in", label: "ورود امروز" },
+  ,
 ];

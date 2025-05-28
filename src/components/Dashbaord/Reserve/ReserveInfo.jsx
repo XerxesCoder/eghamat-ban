@@ -40,6 +40,7 @@ import {
   getJalaliDateDifference,
   persianDate,
   updateEndedReservations,
+  updateReservationStatuses,
   validateReservationDates,
 } from "@/lib/jalali";
 import {
@@ -79,7 +80,7 @@ export default function ReservationsPage({ rooms, reservations }) {
   }, [formData.checkIn, formData.checkOut]);
 
   const filteredReservations = useMemo(() => {
-    const rawData = updateEndedReservations(reservations);
+    const rawData = updateReservationStatuses(reservations);
     let filtered = rawData;
 
     if (searchTerm) {
@@ -116,19 +117,6 @@ export default function ReservationsPage({ rooms, reservations }) {
       notes: "",
       status: "pending",
     });
-  };
-
-  const calculateTotalAmount = (roomId, checkIn, checkOut, adults) => {
-    const room = rooms.find((r) => String(r.id) === String(roomId));
-    if (!room || !checkIn || !checkOut) return 0;
-    const roomPrice = room.price_per_night;
-
-    const nights =
-      room.price_tag == "night"
-        ? dateDifference
-        : Number(adults) * dateDifference;
-
-    return nights * roomPrice;
   };
 
   const handleCalendarDatePick = (value) => {
@@ -186,7 +174,9 @@ export default function ReservationsPage({ rooms, reservations }) {
       case "outdated":
         return "bg-red-100 text-red-800";
       case "ended":
-        return "bg-blue-100 text-blue-800 animate-pulse";
+        return "bg-orange-100 text-orange-800 animate-pulse";
+      case "checked_in":
+        return "bg-cyan-100 text-cyan-800 animate-pulse";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -410,30 +400,6 @@ export default function ReservationsPage({ rooms, reservations }) {
                         }
                       </Badge>
                       <div className="flex space-x-1">
-                        {/*                         {reservation.status === "confirmed" && (
-                          <Button
-                            size="sm"
-                            onClick={() =>
-                              handleStatusChange(reservation, "checked-in")
-                            }
-                            className="bg-green-600 hover:bg-green-700"
-                          >
-                            <CheckCircle className="w-4 h-4 mr-1" />
-                            Check In
-                          </Button>
-                        )}
-                        {reservation.status === "checked-in" && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() =>
-                              handleStatusChange(reservation, "checked-out")
-                            }
-                          >
-                            <CheckCircle className="w-4 h-4 mr-1" />
-                            Check Out
-                          </Button>
-                        )} */}
                         <Button
                           size="sm"
                           variant="outline"

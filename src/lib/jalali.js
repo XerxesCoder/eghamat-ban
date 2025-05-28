@@ -186,30 +186,41 @@ export const generateMonthlyAvailability = (
   };
 };
 
-export const updateEndedReservations = (reservations) => {
+export const updateReservationStatuses = (reservations) => {
   const today = moment().format("jYYYY/jM/jD");
+  const todayMoment = moment(today, "jYYYY/jM/jD");
 
   return reservations.map((reservation) => {
-    if (reservation.status === "ENDED" || reservation.status === "OUTDATED") {
+    if (["ENDED", "OUTDATED", "CHECKED_IN"].includes(reservation.status)) {
       return reservation;
     }
 
-    const checkoutDate = moment(reservation.check_out, "jYYYY/jMM/jDD").format(
+    // Parse dates
+    const checkInDate = moment(reservation.check_in, "jYYYY/jMM/jDD").format(
       "jYYYY/jM/jD"
     );
-    const todayMoment = moment(today, "jYYYY/jM/jD");
-    const checkoutMoment = moment(checkoutDate, "jYYYY/jM/jD");
+    const checkOutDate = moment(reservation.check_out, "jYYYY/jMM/jDD").format(
+      "jYYYY/jM/jD"
+    );
+    const checkInMoment = moment(checkInDate, "jYYYY/jM/jD");
+    const checkOutMoment = moment(checkOutDate, "jYYYY/jM/jD");
 
-    if (checkoutMoment.isBefore(todayMoment, "day")) {
+    if (checkInMoment.isSame(todayMoment, "day")) {
       return {
         ...reservation,
-        status: "OUTDATED",
+        status: "CHECKED_IN",
         updated_at: new Date().toISOString(),
       };
-    } else if (checkoutMoment.isSame(todayMoment, "day")) {
+    } else if (checkOutMoment.isSame(todayMoment, "day")) {
       return {
         ...reservation,
         status: "ENDED",
+        updated_at: new Date().toISOString(),
+      };
+    } else if (checkOutMoment.isBefore(todayMoment, "day")) {
+      return {
+        ...reservation,
+        status: "OUTDATED",
         updated_at: new Date().toISOString(),
       };
     }
@@ -220,29 +231,29 @@ export const updateEndedReservations = (reservations) => {
 
 export function getDetailedTodayMovements(reservations) {
   const today = moment().format("jYYYY/jM/jD");
-  
+
   const result = {
     checkingIn: {
       count: 0,
       reservations: [],
-      guests: 0
+      guests: 0,
     },
     checkingOut: {
       count: 0,
       reservations: [],
-      guests: 0
-    }
+      guests: 0,
+    },
   };
 
-  reservations.forEach(reservation => {
+  reservations.forEach((reservation) => {
     const adults = reservation.adults || 1;
-    
+
     if (reservation.check_in === today) {
       result.checkingIn.count++;
       result.checkingIn.guests += adults;
       result.checkingIn.reservations.push(reservation);
     }
-    
+
     if (reservation.check_out === today) {
       result.checkingOut.count++;
       result.checkingOut.guests += adults;

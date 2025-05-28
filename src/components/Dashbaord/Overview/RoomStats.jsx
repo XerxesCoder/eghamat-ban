@@ -6,8 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { reserveStatus, roomTypes } from "@/lib/roomsData";
 import { HomeIcon } from "lucide-react";
+import { useMemo } from "react";
+import { updateReservationStatuses } from "@/lib/jalali";
 
 export default function RoomStats({ rooms, reservations }) {
+  const filteredReservations = useMemo(() => {
+    const rawData = updateReservationStatuses(reservations);
+
+    return rawData;
+  }, [reservations]);
+
   const getStatusColor = (status) => {
     switch (status.toLowerCase()) {
       case "confirmed":
@@ -15,7 +23,9 @@ export default function RoomStats({ rooms, reservations }) {
       case "outdated":
         return "bg-red-100 text-red-800";
       case "ended":
-        return "bg-blue-100 text-blue-800 animate-pulse";
+        return "bg-orange-100 text-orange-800 animate-pulse";
+      case "checked_in":
+        return "bg-cyan-100 text-cyan-800 animate-pulse";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -65,9 +75,9 @@ export default function RoomStats({ rooms, reservations }) {
         <CardContent>
           <div className="space-y-4">
             {reservations.length > 0 ? (
-              reservations.map((reservation) => {
+              filteredReservations.map((reservation) => {
                 const room = rooms.find(
-                  (r) => String(r.id).toLowerCase() === reservation.roomId
+                  (r) => String(r.id) === String(reservation.room_id)
                 );
                 return (
                   <div
@@ -78,14 +88,7 @@ export default function RoomStats({ rooms, reservations }) {
                       <p className="font-medium text-deep-ocean">
                         {reservation.guest_name} -{" "}
                         <span className="font-normal text-sm">
-                          ( اتاق{" "}
-                          {
-                            rooms.find(
-                              (r) =>
-                                String(r.id) === String(reservation.room_id)
-                            ).room_number
-                          }
-                          )
+                          ( اتاق {room.room_number})
                         </span>
                       </p>
                       <p className="text-sm ">
