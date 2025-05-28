@@ -32,7 +32,6 @@ export const roomAmenities = [
 
 export const reserveStatus = [
   { value: "confirmed", label: "تایید شده" },
-  { value: "reserve", label: "رزرو شده" },
-  //{ value: "empty", label: "تخلیه شده" },
-  { value: "cancelled", label: "کنسل شده" },
+  { value: "outdated", label: "منقضی شده" },
+  { value: "ended", label: "تخلیه امروز" },
 ];

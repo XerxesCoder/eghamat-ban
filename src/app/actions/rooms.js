@@ -18,6 +18,7 @@ export async function addNewRoom(roomData) {
           price_per_night: roomData.price,
           amenities: roomData.amenities,
           owner_id: userId,
+          price_tag: roomData.priceTag,
         },
       ])
       .select();
@@ -49,6 +50,7 @@ export async function editRoom(roomData, roomID) {
           capacity: roomData.capacity,
           price_per_night: roomData.price,
           amenities: roomData.amenities,
+          price_tag: roomData.pricaTag,
         },
       ])
       .eq("owner_id", userId)

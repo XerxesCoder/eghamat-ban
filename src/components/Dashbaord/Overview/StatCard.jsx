@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function StatCard({ title, icon, value, description }) {
   return (
-    <Card className={' shadow-xl'}>
+    <Card className={' shadow-xl gap-2'}>
       <CardHeader className="flex flex-row items-center justify-start gap-2 pb-2">
         {icon}
         <CardTitle className="text-sm font-medium">{title}</CardTitle>

@@ -1,36 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  PlusCircle,
-  Calendar,
-  Download,
-  Upload,
-  RefreshCw,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { useState, useRef } from "react";
-import { Textarea } from "@/components/ui/textarea";
+import { PlusCircle, Calendar, Upload, CalendarDays, Hotel } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 
 export default function QuickActions() {
-  const router = useRouter();
-
-  const [importDialogOpen, setImportDialogOpen] = useState(false);
-  const [exportDialogOpen, setExportDialogOpen] = useState(false);
-  const [importData, setImportData] = useState("");
-  const [exportData, setExportData] = useState("");
-  const exportTextAreaRef = useRef(null);
   return (
     <Card className="mt-4 shadow-xl">
       <CardHeader>
@@ -55,7 +30,7 @@ export default function QuickActions() {
             asChild
           >
             <Link href="/dashboard/reservation">
-              <Calendar className="h-5 w-5 mb-1" />
+              <CalendarDays className="h-5 w-5 mb-1" />
               <span>رزرو جدید</span>
             </Link>
           </Button>
@@ -63,10 +38,12 @@ export default function QuickActions() {
           <Button
             variant="outline"
             className="flex flex-col h-24 items-center justify-center shadow-lg"
-            //onClick={handleExport}
+            asChild
           >
-            <Download className="h-5 w-5 mb-1" />
-            <span>دانلود دیتا</span>
+            <Link href="/dashboard/calendar">
+              <Calendar className="h-5 w-5 mb-1" />
+              <span>تقویم سکونت</span>
+            </Link>
           </Button>
 
           <Button
@@ -75,7 +52,7 @@ export default function QuickActions() {
             asChild
           >
             <Link href="/dashboard/lodge">
-              <Upload className="h-5 w-5 mb-1" />
+              <Hotel className="h-5 w-5 mb-1" />
               <span>اقامتگاه</span>
             </Link>
           </Button>

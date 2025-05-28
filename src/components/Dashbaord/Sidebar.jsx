@@ -1,19 +1,11 @@
 "use client";
 
 import {
-  Calendar,
-  Clipboard,
-  Home,
   HomeIcon,
   Hotel,
-  Inbox,
-  Search,
-  Settings,
+  Calendar,
   LayoutDashboard,
   CalendarDays,
-  Moon,
-  Sun,
-  SunIcon,
   Clock,
 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -64,6 +56,11 @@ const items = [
     icon: CalendarDays,
   },
   {
+    title: "تقویم سکونت",
+    url: "/dashboard/calendar",
+    icon: Calendar,
+  },
+  {
     title: " اقامتگاه من",
     url: "/dashboard/lodge",
     icon: Hotel,
@@ -97,7 +94,7 @@ export function AppSidebar() {
   }, []);
 
   return (
-    <Sidebar side="right" collapsible="icon" variant="sidebar">
+    <Sidebar side="right" collapsible="icon" variant="inset">
       <SidebarHeader className="pb-2 ">
         <SidebarMenu>
           <SidebarMenuItem onClick={toggleSidebar} className={"cursor-pointer"}>

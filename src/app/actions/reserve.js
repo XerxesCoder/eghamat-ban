@@ -26,7 +26,7 @@ export async function addNewReserve(reserveData) {
       ])
       .select();
 
-    const { data: roomData, error: roomErr } = await supabase
+    /*     const { data: roomData, error: roomErr } = await supabase
       .from("rooms")
       .update([
         {
@@ -36,11 +36,11 @@ export async function addNewReserve(reserveData) {
       ])
       .eq("id", reserveData.roomId)
       .eq("owner_id", userId)
-      .select();
+      .select(); */
 
-    if (error || roomErr) {
-      console.error("Supabase error:", error || roomErr);
-      return { error: error.message || roomErr.message };
+    if (error) {
+      console.error("Supabase error:", error);
+      return { error: error.message };
     }
 
     return { success: true, data };
@@ -76,7 +76,7 @@ export async function editReservation(reserveData, reserveID) {
       .eq("id", reserveID)
       .select();
 
-    const { data: roomData, error: roomErr } = await supabase
+    /*     const { data: roomData, error: roomErr } = await supabase
       .from("rooms")
       .update([
         {
@@ -86,11 +86,11 @@ export async function editReservation(reserveData, reserveID) {
       ])
       .eq("id", reserveData.roomId)
       .eq("owner_id", userId)
-      .select();
+      .select(); */
 
-    if (error || roomErr) {
-      console.error("Supabase error:", error || roomErr);
-      return { error: error.message || roomErr.message };
+    if (error) {
+      console.error("Supabase error:", error);
+      return { error: error.message };
     }
 
     return { success: true, data };
@@ -113,7 +113,7 @@ export async function deleteReservation(reserveID, roomID) {
       .eq("id", reserveID)
       .select();
 
-    const { data: roomData, error: roomErr } = await supabase
+    /*     const { data: roomData, error: roomErr } = await supabase
       .from("rooms")
       .update([
         {
@@ -123,11 +123,11 @@ export async function deleteReservation(reserveID, roomID) {
       ])
       .eq("id", roomID)
       .eq("owner_id", userId)
-      .select();
+      .select(); */
 
-    if (error || roomErr) {
-      console.error("Supabase error:", error || roomErr);
-      return { error: error.message || roomErr.message };
+    if (error) {
+      console.error("Supabase error:", error);
+      return { error: error.message };
     }
 
     return { success: true, data };

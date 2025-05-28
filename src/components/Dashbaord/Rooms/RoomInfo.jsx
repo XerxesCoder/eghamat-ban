@@ -34,7 +34,7 @@ import { persianDate } from "@/lib/jalali";
 
 export default function RoomsPage({ rooms }) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+
   const [typeFilter, setTypeFilter] = useState("all");
   const [viewMode, setViewMode] = useState("grid");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -76,12 +76,6 @@ export default function RoomsPage({ rooms }) {
       );
     }
 
-    if (statusFilter !== "all") {
-      filtered = filtered.filter(
-        (room) => String(room.status).toLowerCase() === statusFilter
-      );
-    }
-
     if (typeFilter !== "all") {
       filtered = filtered.filter(
         (room) => String(room.type).toLowerCase() === typeFilter
@@ -89,7 +83,7 @@ export default function RoomsPage({ rooms }) {
     }
 
     return filtered;
-  }, [rooms, searchTerm, typeFilter, statusFilter]);
+  }, [rooms, searchTerm, typeFilter]);
 
   const resetForm = () => {
     setFormData({
@@ -194,20 +188,6 @@ export default function RoomsPage({ rooms }) {
         ? [...prev.amenities, amenity]
         : prev.amenities.filter((a) => a !== amenity),
     }));
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "AVAILABLE":
-        return "bg-green-100 text-green-800";
-      case "OCCUPIED":
-        return "bg-red-100 text-red-800";
-      case "EVACUATE":
-        return "bg-deep-ocean";
-
-      default:
-        return "bg-lime-zest text-deep-ocean";
-    }
   };
 
   return (
@@ -391,19 +371,7 @@ export default function RoomsPage({ rooms }) {
                 />
               </div>
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="وضعیت" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">همه </SelectItem>
-                {roomAvailability.map((status) => (
-                  <SelectItem key={status.value} value={status.value}>
-                    {status.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+
             <Select value={typeFilter} onValueChange={setTypeFilter}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="نوع" />
@@ -455,34 +423,21 @@ export default function RoomsPage({ rooms }) {
                   <CardTitle className="text-lg">
                     اتاق {room.room_number}
                   </CardTitle>
-                  <Badge className={getStatusColor(room.status)}>
-                    {roomAvailability.find(
-                      (status) =>
-                        status.value === String(room.status).toLowerCase()
-                    ).label || "نامعلوم"}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">نوع:</span>
-                  <span className="font-medium capitalize">
+                  <Badge className={`bg-deep-ocean text-white`}>
                     {
                       roomTypes.find(
                         (type) => room.type == String(type.value).toUpperCase()
                       ).label
                     }
-                  </span>
+                  </Badge>
                 </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600">نرخ:</span>
                   <span className="font-medium">
-                    {Number(
-                      room.price_tag == "night"
-                        ? room.price_per_night
-                        : room.price_per_person
-                    ).toLocaleString("fa-IR")}{" "}
-                    / {room.price_tag == "night" ? "شب" : "نفر"}
+                    {Number(room.price_per_night).toLocaleString("fa-IR")} /{" "}
+                    {room.price_tag == "night" ? "شب" : "نفر"}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
@@ -554,9 +509,6 @@ export default function RoomsPage({ rooms }) {
                     <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">
                       ظرفیت
                     </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">
-                      وضعیت
-                    </th>
 
                     <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[150px]">
                       عملیات
@@ -587,14 +539,6 @@ export default function RoomsPage({ rooms }) {
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-right">
                         {room.capacity} نفر
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap text-right">
-                        <Badge className={getStatusColor(room.status)}>
-                          {roomAvailability.find(
-                            (status) =>
-                              status.value === String(room.status).toLowerCase()
-                          ).label || "نامعلوم"}
-                        </Badge>
                       </td>
 
                       <td className="px-4 py-4 whitespace-nowrap text-right">
