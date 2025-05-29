@@ -8,7 +8,7 @@ export default async function Calendar() {
     await getUserReservations();
 
   return (
-    <div className="py-14 px-6 w-full min-h-screen">
+    <div className="py-20 sm:py-14 px-6 w-full min-h-screen  container mx-auto">
       <OccupancyPage reservations={reservations} rooms={data} />
     </div>
   );

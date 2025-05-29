@@ -357,7 +357,7 @@ export default function ReservationsPage({ rooms, reservations }) {
 
       {/* List View */}
       {viewMode === "list" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2  xl:grid-cols-3 gap-4">
           {filteredReservations.map((reservation) => {
             const room = rooms.find(
               (r) => String(r.id) === String(reservation.room_id)

@@ -17,6 +17,7 @@ export const persianClerk = {
   formButtonPrimary: "ادامه",
   formButtonPrimary__verify: "تایید",
   footerActionLink__useAnotherMethod: "با روش دیگری وارد شوید",
+
   unstable__errors: {
     form_code_incorrect: "کد وارد شده اشتباه است",
     form_password_length_too_short: "رمز عبور باید حداقل 8 کاراکتر باشد",
@@ -126,6 +127,40 @@ export const persianClerk = {
     action__signOut: "خروج از حساب",
   },
   userProfile: {
+    start: {
+      headerTitle__account: "اطلاعات حساب کاربری",
+      headerTitle__security: "امنیت حساب کاربری",
+      profileSection: {
+        title: "پروفایل",
+        primaryButton: "ویرایش پروفایل",
+      },
+      usernameSection: {
+        title: "نام کاربری",
+        primaryButton__updateUsername: "ویرایش نام کاربری",
+      },
+      emailAddressesSection: {
+        title: "ایمیل ها",
+        primaryButton: "اضافه کردن ایمیل جدید",
+        destructiveAction: "حذف ایمیل",
+      },
+      connectedAccountsSection: {
+        title: "حساب های متصل",
+        destructiveActionTitle: "حذف حساب",
+      },
+      passwordSection: {
+        title: "رمز عبور",
+        primaryButton__updatePassword: "تغییر رمز عبور",
+        primaryButton__setPassword: "تنظیم رمز عبور",
+      },
+      activeDevicesSection: {
+        title: "دستگاه های متصل",
+      },
+      dangerSection: {
+        title: "حذف حساب کاربری",
+        deleteAccountButton: "حذف حساب",
+      },
+    },
+
     profilePage: {
       fileDropAreaHint: "حجم تصویر باید کمتر از 10MB باشد.",
       imageFormDestructiveActionSubtitle: "حذف",
@@ -134,6 +169,34 @@ export const persianClerk = {
       readonly: "اطلاعات پروفایل",
       successMessage: "با موفقیت ذخیره شد.",
       title: "تنظیمات پروفایل",
+    },
+    usernamePage: {
+      title__set: "تنظیم نام کاربری",
+      title__update: "ویرایش نام کاربری",
+      successMessage: "با موفقیت ذخیره شد.",
+    },
+    emailAddressPage: {
+      title: "ایمیل جدید اضافه کنید",
+      formHint: "نیاز به تایید ایمیل بعد از اضافه کردن دارید",
+      removeResource: {
+        title: "حذف ایمیل",
+        messageLine1: "آیا از حذف این ایمیل اطمینان دارید؟",
+        messageLine2: "این عملیات قابل بازگشت نیست.",
+        successMessage: "ایمیل مورد نظر حذف شد.",
+      },
+    },
+    connectedAccountPage: {
+      removeResource: {
+        title: "حذف حساب",
+        messageLine1: "آیا از حذف این حساب اطمینان دارید؟",
+        messageLine2: "این عملیات قابل بازگشت نیست.",
+        successMessage: "حساب مورد نظر حذف شد.",
+      },
+    },
+    deletePage: {
+      title: "حذف حساب کاربری",
+      messageLine1: "آیا از حذف حساب کاربری خود اطمینان دارید؟",
+      messageLine2: "این عملیات قابل بازگشت نیست.",
     },
     mobileButton__menu: "Menu",
     navbar: {

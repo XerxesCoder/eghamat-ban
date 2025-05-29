@@ -142,7 +142,7 @@ export default function OccupancyPage({ rooms, reservations }) {
       (day) => day.jMonth() === selectedDate.jMonth()
     );
 
-    let csv = "Room Number,Room Type,";
+    let csv = "اتاق,نوع,";
     monthDays.forEach((day) => {
       csv += `${day.jDate()},`;
     });
@@ -175,7 +175,7 @@ export default function OccupancyPage({ rooms, reservations }) {
     URL.revokeObjectURL(url);
 
     toast.success("با موفقیت صادر شد.", {
-      description: "تقویم اشغال به صورت CSV دانلود شد.",
+      description: "تقویم  به صورت CSV دانلود شد.",
     });
   };
 
@@ -226,11 +226,10 @@ export default function OccupancyPage({ rooms, reservations }) {
         withButton={false}
       />
       <div className="space-y-4">
-        {/* Combined Header and Stats Card */}
         <Card>
           <div className="p-6 space-y-6">
             {/* Header */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
                   تقویم سکونت
@@ -287,8 +286,8 @@ export default function OccupancyPage({ rooms, reservations }) {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5">
-              <div className="col-span-2 lg:col-span-1">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+              <div className="col-span-2">
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex justify-between items-center gap-2">
                     <Button
@@ -309,9 +308,9 @@ export default function OccupancyPage({ rooms, reservations }) {
                     </Button>
                   </div>
 
-                  <div className="text-center font-medium">
+                  <h3 className="text-center font-bold text-deep-ocean">
                     {months[selectedDate.jMonth()]} {selectedDate.jYear()}
-                  </div>
+                  </h3>
                   <div className="flex justify-between items-center gap-2">
                     <Button
                       variant="outline"

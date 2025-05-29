@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-screenpy-14 px-6 space-y-6">
+    <div className="flex flex-col items-center justify-center w-full min-h-screen py-20 sm:py-14 px-6 space-y-6">
       <div className="relative">
         <div className="w-12 h-12 border-4 border-aqua-spark border-t-transparent rounded-full animate-spin" />
         <div className="absolute inset-0 flex items-center justify-center">

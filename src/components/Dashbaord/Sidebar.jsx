@@ -3,10 +3,11 @@
 import {
   HomeIcon,
   Hotel,
-  Calendar,
+  CalendarSearch,
   LayoutDashboard,
   CalendarDays,
   Clock,
+  ChevronsUpDown,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import {
@@ -34,10 +35,9 @@ import {
   persianTodayNumber,
   persianYear,
 } from "@/lib/jalali";
-import { SignedIn, UserButton } from "@clerk/nextjs";
+import { SignedIn, UserButton, useAuth, useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 
-// Menu items.
 const items = [
   {
     title: "نمای کلی",
@@ -58,7 +58,7 @@ const items = [
   {
     title: "تقویم سکونت",
     url: "/dashboard/calendar",
-    icon: Calendar,
+    icon: CalendarSearch,
   },
   {
     title: " اقامتگاه من",
@@ -68,6 +68,9 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const { user } = useUser();
+  const { signOut } = useAuth();
+
   const {
     state,
     open,
@@ -94,8 +97,8 @@ export function AppSidebar() {
   }, []);
 
   return (
-    <Sidebar side="right" collapsible="icon" variant="inset">
-      <SidebarHeader className="pb-2 ">
+    <Sidebar side="right" collapsible="icon">
+      <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem onClick={toggleSidebar} className={"cursor-pointer"}>
             <SidebarMenuButton size="lg" asChild>
@@ -151,16 +154,31 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarRail />
 
       <SidebarFooter>
-        <SidebarTrigger />
         {open && (
           <SignedIn>
-            <UserButton showName />
+            <SidebarMenuButton
+              size="md"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+            >
+              <UserButton
+                showName
+                appearance={{
+                  elements: {
+                    userButtonTrigger:
+                      "flex flex-row-reverse items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100",
+                    userButtonAvatarBox: "w-8 h-8",
+                    userButtonBox: "flex-row-reverse ",
+                    userButtonOuterIdentifier: "pl-0",
+                  },
+                }}
+              />
+            </SidebarMenuButton>
           </SignedIn>
         )}
       </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   );
 }

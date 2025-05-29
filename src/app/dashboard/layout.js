@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/Dashbaord/Sidebar";
+import { MobileHeader } from "@/components/Dashbaord/MobileHeader";
 
 import {
   SidebarInset,
@@ -7,15 +8,14 @@ import {
 } from "@/components/ui/sidebar";
 import { Toaster } from "sonner";
 
-export default function DashboardLayout({ children }) {
+export default async function DashboardLayout({ children }) {
   return (
     <SidebarProvider defaultOpen>
       <AppSidebar />
-      <SidebarInset>
-        <main className="min-h-screen bg-pearl-luster w-full flex flex-col justify-center items-center">
-          <Toaster richColors position="top-center" />
-          {children}
-        </main>
+      <MobileHeader />
+      <SidebarInset className=" bg-pearl-luster overflow-x-hidden">
+        <Toaster richColors position="top-center" />
+        {children}
       </SidebarInset>
     </SidebarProvider>
   );

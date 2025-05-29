@@ -7,7 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { Plus, Search, Edit, Trash2, Bed, Grid3X3, List } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Bed,
+  Grid3X3,
+  List,
+  HousePlus,
+} from "lucide-react";
 
 import {
   Dialog,
@@ -207,7 +216,7 @@ export default function RoomsPage({ rooms }) {
               }}
               className={"bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/70"}
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <HousePlus className="w-4 h-4 mr-2" />
               اضافه کردن اتاق جدید
             </Button>
           </DialogTrigger>

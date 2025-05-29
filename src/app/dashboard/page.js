@@ -13,7 +13,7 @@ export default async function Dashboard() {
 
 
   return (
-    <div className="py-14 px-6 w-full min-h-screen">
+    <div className="py-20 sm:py-14 px-6 w-full min-h-screen  container mx-auto">
       <Overview overviewData={detailedOverview} rooms={data} reservations={reservations} />
       <QuickActions />
       <RoomStats rooms={data} reservations={reservations} />

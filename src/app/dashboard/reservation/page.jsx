@@ -7,7 +7,7 @@ export default async function Reservation() {
   const { data: reservations, error: reservationError } =
     await getUserReservations();
   return (
-    <div className="py-14 px-6 w-full min-h-screen">
+    <div className="py-20 sm:py-14 px-6 w-full min-h-screen  container mx-auto">
       <ReservationsPage rooms={data} reservations={reservations} />
     </div>
   );

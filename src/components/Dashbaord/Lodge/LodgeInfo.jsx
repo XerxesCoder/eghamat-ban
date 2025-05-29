@@ -76,7 +76,7 @@ export default function LodgeInfo({ userLodgeInfo }) {
   };
 
   return (
-    <div className="py-14 px-6 w-full min-h-screen space-y-6">
+    <div className="py-20 sm:py-14 px-6 w-full min-h-screen space-y-6  container mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 sm:gap-0">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">اطلاعات اقامتگاه</h1>
