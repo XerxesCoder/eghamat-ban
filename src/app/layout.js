@@ -15,7 +15,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider localization={persianClerk}>
+    <ClerkProvider localization={persianClerk} afterSignOutUrl="/">
       <html lang="fa-IR" dir="rtl">
         <body className={`${Vazir.variable}`}>{children}</body>
       </html>
