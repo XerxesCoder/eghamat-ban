@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -14,12 +14,7 @@ import {
 import {
   ChevronLeft,
   ChevronRight,
-  Calendar,
   Download,
-  Printer,
-  ChevronLeftCircle,
-  ChevronRightIcon,
-  ChevronRightCircle,
   ChevronsLeft,
   ChevronsRight,
 } from "lucide-react";
@@ -28,7 +23,12 @@ import { toast } from "sonner";
 import moment from "moment-jalaali";
 import { roomTypes } from "@/lib/roomsData";
 import ReserveDialog from "../Reserve/ReserveDialog";
-
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 export default function OccupancyPage({ rooms, reservations }) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
@@ -431,69 +431,104 @@ export default function OccupancyPage({ rooms, reservations }) {
                             const dayStatus = getRoomStatusForDate(room, day);
 
                             return (
-                              <td
-                                key={dayIndex}
-                                className={cn(
-                                  "px-0.5 py-1 text-center border border-gray-100 relative",
-                                  dayStatus.isToday &&
-                                    "ring-1 ring-deep-ocean rounded-sm ring-inset"
-                                )}
-                              >
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className={cn(
-                                    "w-6 h-6  mx-auto p-0 rounded-full flex items-center justify-center text-xs",
-                                    dayStatus.isOccupied
-                                      ? "bg-red-100 text-red-800 hover:bg-red-200"
-                                      : "bg-green-100 text-green-800 hover:bg-green-200"
-                                  )}
-                                  disabled={
-                                    day.jMonth() === moment().jMonth() &&
-                                    day.jYear() === moment().jYear() &&
-                                    day.jDate() < moment().jDate()
-                                  }
-                                  onClick={() => {
-                                    toast.dismiss();
-
-                                    if (dayStatus.isOccupied) {
-                                      toast.warning(
-                                        `اتاق ${room.room_number} در این تاریخ رزرو شده است`,
-                                        {
-                                          description: `مهمان: ${
-                                            dayStatus.reservation?.guest_name ||
-                                            "نامشخص"
-                                          } - خروج: ${
-                                            dayStatus.reservation?.check_out
-                                          }`,
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <td
+                                      key={dayIndex}
+                                      className={cn(
+                                        "px-0.5 py-1 text-center border border-gray-100 relative",
+                                        dayStatus.isToday &&
+                                          "ring-1 ring-deep-ocean rounded-sm ring-inset"
+                                      )}
+                                    >
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className={cn(
+                                          "w-6 h-6  mx-auto p-0 rounded-full flex items-center justify-center text-xs",
+                                          dayStatus.isOccupied
+                                            ? "bg-red-100 text-red-800 hover:bg-red-200"
+                                            : "bg-green-100 text-green-800 hover:bg-green-200"
+                                        )}
+                                        disabled={
+                                          day.jMonth() === moment().jMonth() &&
+                                          day.jYear() === moment().jYear() &&
+                                          day.jDate() < moment().jDate()
                                         }
-                                      );
-                                    } else {
-                                      toast(
-                                        `اتاق ${room.room_number} در این تاریخ خالی است`,
-                                        {
-                                          action: {
-                                            label: "رزرو",
-                                            onClick: () => {
-                                              setFormData((prev) => ({
-                                                ...prev,
-                                                roomId: room.id,
-                                                checkIn: String(
-                                                  day.format("jYYYY-jMM-jDD")
-                                                ),
-                                              }));
+                                        onClick={() => {
+                                          toast.dismiss();
 
-                                              setIsAddDialogOpen(true);
-                                            },
-                                          },
-                                        }
-                                      );
-                                    }
-                                  }}
-                                >
-                                  {dayStatus.isOccupied ? "●" : "○"}
-                                </Button>
-                              </td>
+                                          if (dayStatus.isOccupied) {
+                                            toast.warning(
+                                              `اتاق ${room.room_number} در این تاریخ رزرو شده است`,
+                                              {
+                                                description: `مهمان: ${
+                                                  dayStatus.reservation
+                                                    ?.guest_name || "نامشخص"
+                                                } - خروج: ${
+                                                  dayStatus.reservation
+                                                    ?.check_out
+                                                }`,
+                                              }
+                                            );
+                                          } else {
+                                            toast(
+                                              `اتاق ${room.room_number} در این تاریخ خالی است`,
+                                              {
+                                                action: {
+                                                  label: "رزرو",
+                                                  onClick: () => {
+                                                    setFormData((prev) => ({
+                                                      ...prev,
+                                                      roomId: room.id,
+                                                      checkIn: String(
+                                                        day.format(
+                                                          "jYYYY-jMM-jDD"
+                                                        )
+                                                      ),
+                                                    }));
+
+                                                    setIsAddDialogOpen(true);
+                                                  },
+                                                },
+                                              }
+                                            );
+                                          }
+                                        }}
+                                      >
+                                        {dayStatus.isOccupied ? "●" : "○"}
+                                      </Button>
+                                    </td>
+                                  </TooltipTrigger>
+                                  <TooltipContent className={"bg-deep-ocean space-y-1"}>
+                                    {dayStatus.isOccupied ? (
+                                      <>
+                                        <p>
+                                          {dayStatus.isOccupied &&
+                                            ` اتاق ${room.room_number} در این تاریخ رزرو شده است`}
+                                        </p>
+                                        <p>
+                                          {dayStatus.isOccupied &&
+                                            `مهمان: ${
+                                              dayStatus.reservation
+                                                ?.guest_name || "نامشخص"
+                                            } - خروج: ${
+                                              dayStatus.reservation?.check_out
+                                            }`}
+                                        </p>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <p>
+                                          {`اتاق ${room.room_number} در این تاریخ خالی است.`}
+                                        </p>
+                                        <p>برای رزرو کلیک کنید</p>
+                                      </>
+                                    )}
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
                             );
                           })}
                         </tr>
