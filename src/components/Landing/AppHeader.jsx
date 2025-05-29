@@ -5,9 +5,11 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
 
 export default function AppHeader() {
   const [isOpen, setIsOpen] = useState(false);
+  const { isSignedIn } = useAuth();
 
   return (
     <motion.header
@@ -18,10 +20,9 @@ export default function AppHeader() {
     >
       <div className="container max-w-7xl mx-auto flex h-16 items-center justify-between p-4">
         <div className="flex items-center gap-2">
-          <span className="text-xl font-bold text-deep-ocean">اقامت‌بان</span>
+          <h3 className="text-xl font-bold text-deep-ocean">اقامت‌ بان</h3>
         </div>
 
-        {/* Mobile Menu Toggle Button */}
         <div className="md:hidden">
           <button
             className="text-deep-ocean hover:text-aqua-spark transition-colors"
@@ -31,7 +32,6 @@ export default function AppHeader() {
           </button>
         </div>
 
-        {/* Desktop Navigation */}
         <motion.nav
           className="hidden md:flex items-center gap-6"
           initial={{ opacity: 0, y: -10 }}
@@ -59,17 +59,27 @@ export default function AppHeader() {
           ))}
         </motion.nav>
 
-        {/* Desktop Buttons */}
         <div className="hidden md:flex items-center gap-4">
-          <Button variant="outline" asChild>
-            <Link href={"/sign-in"}>ورود</Link>
-          </Button>
-          <Button
-            className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
-            asChild
-          >
-            <Link href={"/sign-up"}>ثبت‌نام رایگان</Link>
-          </Button>
+          {isSignedIn ? (
+            <Button
+              className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
+              asChild
+            >
+              <Link href={"/dashboard"}>ورود به داشبورد</Link>
+            </Button>
+          ) : (
+            <>
+              <Button variant="outline" asChild>
+                <Link href={"/sign-in"}>ورود</Link>
+              </Button>
+              <Button
+                className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
+                asChild
+              >
+                <Link href={"/sign-up"}>ثبت‌ نام رایگان</Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -96,12 +106,26 @@ export default function AppHeader() {
             </Link>
           ))}
           <div className="flex justify-center items-center gap-5">
-            <Button variant="outline" onClick={() => setIsOpen(false)}>
-              ورود
-            </Button>
-            <Button className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90">
-              ثبت‌نام رایگان
-            </Button>
+            {isSignedIn ? (
+              <Button
+                className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
+                asChild
+              >
+                <Link href={"/dashboard"}>ورود به داشبورد</Link>
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" asChild>
+                  <Link href={"/sign-in"}>ورود</Link>
+                </Button>
+                <Button
+                  className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
+                  asChild
+                >
+                  <Link href={"/sign-up"}>ثبت‌ نام رایگان</Link>
+                </Button>
+              </>
+            )}
           </div>
         </motion.div>
       )}

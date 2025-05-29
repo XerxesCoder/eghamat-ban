@@ -28,7 +28,7 @@ export default function Hero() {
           با اقامت‌بان، همه چیز تحت کنترل است
         </motion.h4>
         <motion.p
-          className="max-w-[600px] text-deep-ocean/80 md:text-xl"
+          className="max-w-[600px] text-deep-ocean/80 md:text-xl text-center"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
