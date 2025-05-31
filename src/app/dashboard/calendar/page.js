@@ -1,15 +1,13 @@
-import { getUserReservations } from "@/app/actions/reserve";
-import { getUserRooms } from "@/app/actions/rooms";
 import OccupancyPage from "@/components/Dashbaord/Calendar/OccupancyCalendar";
 
-export default async function Calendar() {
-  const { data, error } = await getUserRooms();
-  const { data: reservations, error: reservationError } =
-    await getUserReservations();
-
+export const metadata = {
+  title: "اقامت بان | تقویم",
+  description: "مدریت ساده و سریع برای اقامتگاه‌ها",
+};
+export default function Calendar() {
   return (
     <div className="py-20 sm:py-14 px-6 w-full min-h-screen  container mx-auto">
-      <OccupancyPage reservations={reservations} rooms={data} />
+      <OccupancyPage />
     </div>
   );
 }

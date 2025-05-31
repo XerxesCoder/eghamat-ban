@@ -1,8 +1,9 @@
-import { getUserLodge } from "@/app/actions/lodge";
 import LodgeInfo from "@/components/Dashbaord/Lodge/LodgeInfo";
 
-export default async function Lodge() {
-  const { data, error } = await getUserLodge();
-
-  return <LodgeInfo userLodgeInfo={data[0]} />;
+export const metadata = {
+  title: "اقامت بان | اقامتگاه من",
+  description: "مدریت ساده و سریع برای اقامتگاه‌ها",
+};
+export default  function Lodge() {
+  return <LodgeInfo />;
 }

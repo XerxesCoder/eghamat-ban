@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-
+import { motion, AnimatePresence } from "framer-motion";
 import { Calendar } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
@@ -36,24 +36,21 @@ import {
 import { toast } from "sonner";
 
 import {
-  checkRoomAvailability,
   getJalaliDateDifference,
   persianDate,
-  updateEndedReservations,
   updateReservationStatuses,
-  validateReservationDates,
 } from "@/lib/jalali";
-import {
-  addNewReserve,
-  deleteReservation,
-  editReservation,
-} from "@/app/actions/reserve";
-import { useRouter } from "next/navigation";
+import { deleteReservation } from "@/app/actions/reserve";
+
 import { reserveStatus, roomTypes } from "@/lib/roomsData";
 import moment from "moment-jalaali";
 import ReserveDialog from "./ReserveDialog";
+import { useLodgeData } from "../DashbaordProvider";
+import { useSearchParams } from "next/navigation";
 
-export default function ReservationsPage({ rooms, reservations }) {
+export default function ReservationsPage() {
+  const { rooms, reservations, getLodgeData } = useLodgeData();
+  const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [roomFilter, setRoomFilter] = useState("all");
@@ -61,8 +58,7 @@ export default function ReservationsPage({ rooms, reservations }) {
   const [editingReservation, setEditingReservation] = useState(null);
   const [selectedDate, setSelectedDate] = useState(persianDate);
   const [viewMode, setViewMode] = useState("list");
-  const [isAddingOrEditing, setIsAddingOrEditing] = useState(false);
-  const router = useRouter();
+
   const [formData, setFormData] = useState({
     roomId: "",
     guestName: "",
@@ -151,7 +147,7 @@ export default function ReservationsPage({ rooms, reservations }) {
             {
               loading: `در حال حذف رزرواسیون ${reservation.guest_name}...`,
               success: () => {
-                router.refresh();
+                getLodgeData();
                 return `رزرواسیون ${reservation.guest_name} با موفقیت حذف شد`;
               },
               error: "خطا در حذف رزرواسیون",
@@ -192,13 +188,70 @@ export default function ReservationsPage({ rooms, reservations }) {
     });
   };
 
+  const container = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const item = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 10,
+      },
+    },
+  };
+
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.3 } },
+  };
+
+  useEffect(() => {
+    const searchParam = searchParams.get("reserve");
+    if (searchParam) {
+      setSearchTerm(searchParam);
+    }
+  }, []);
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <motion.div
+      className="space-y-6"
+      initial="hidden"
+      animate="visible"
+      variants={container}
+    >
+      <motion.div
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between"
+        variants={item}
+      >
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">سامانه رزرواسیون</h1>
-          <p className="text-gray-600 mt-1">مدیریت رزرواسیون اقامتکاه</p>
+          <motion.h1
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-3xl font-bold text-gray-900"
+          >
+            سامانه رزرواسیون
+          </motion.h1>
+          <motion.p
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="text-gray-600 mt-1"
+          >
+            مدیریت رزرواسیون اقامتکاه
+          </motion.p>
         </div>
         <div className="flex space-x-3 mt-4 sm:mt-0">
           <Button
@@ -223,284 +276,318 @@ export default function ReservationsPage({ rooms, reservations }) {
             withButton={true}
           />
         </div>
-      </div>
-
-      {/* Filters and Search */}
-      {viewMode === "list" && (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    placeholder="جستجو"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="وضعیت" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">همه</SelectItem>
-                  {reserveStatus.map((status) => (
-                    <SelectItem key={status.value} value={status.value}>
-                      {status.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={roomFilter} onValueChange={setRoomFilter}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="اتاق" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">همه اتاق ها</SelectItem>
-                  {rooms.map((room) => (
-                    <SelectItem key={room.id} value={room.id}>
-                      {room.room_number}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Calendar View */}
-      {viewMode === "calendar" && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className={"w-full md:max=w-md"}>
-            <CardHeader>
-              <CardTitle>تقویم</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Calendar
-                value={selectedDate}
-                onChange={handleCalendarDatePick}
-                calendar={persian}
-                locale={persian_fa}
-              />
-            </CardContent>
-          </Card>
-
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>رزروهای {String(selectedDate)}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {getReservationsForDate(selectedDate).map((reservation) => {
-                  const room = rooms.find(
-                    (r) => String(r.id) === String(reservation.room_id)
-                  );
-                  return (
-                    <div key={reservation.id} className="p-4 border rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium">
-                          {reservation.guest_name}
-                        </h4>
-                        <Badge
-                          className={getStatusColor(
-                            String(reservation.status).toLowerCase()
-                          )}
-                        >
-                          {
-                            reserveStatus.find(
-                              (res) =>
-                                res.value ===
-                                String(reservation.status).toLowerCase()
-                            )?.label
-                          }
-                        </Badge>
-                      </div>
-                      <div className="text-sm text-gray-600 space-y-1">
-                        <p className="font-bold text-deep-ocean text-sm">
-                          اتاق {room?.room_number} -{" "}
-                          {
-                            roomTypes.find(
-                              (type) =>
-                                room.type == String(type.value).toUpperCase()
-                            ).label
-                          }
-                        </p>
-                        <p>
-                          <span className="text-lime-600">
-                            {reservation.check_in}
-                          </span>{" "}
-                          -{" "}
-                          <span className="text-red-600">
-                            {reservation.check_out}
-                          </span>
-                        </p>
-                        <p>{reservation.adults} نفر</p>
-                      </div>
-                    </div>
-                  );
-                })}
-                {getReservationsForDate(selectedDate).length === 0 && (
-                  <p className="text-gray-500 text-center py-8">
-                    رزروی برای این تاریخ موجود نیست
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* List View */}
-      {viewMode === "list" && (
-        <div className="grid grid-cols-1 lg:grid-cols-2  xl:grid-cols-3 gap-4">
-          {filteredReservations.map((reservation) => {
-            const room = rooms.find(
-              (r) => String(r.id) === String(reservation.room_id)
-            );
-            return (
-              <Card className={"gap-0"} key={reservation.id}>
-                <CardContent className="p-6">
-                  <div className="flex flex-col md:flex-row gap-2 md:gap-0 md:items-center justify-between mb-4">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <User className="w-6 h-6 text-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg">
-                          {reservation.guest_name}
-                        </h3>
-                        <p className="text-gray-600">
-                          اتاق {room?.room_number} -{" "}
-                          {
-                            roomTypes.find(
-                              (type) =>
-                                room.type == String(type.value).toUpperCase()
-                            ).label
-                          }
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Badge
-                        className={getStatusColor(
-                          String(reservation.status).toLowerCase()
-                        )}
-                      >
-                        {
-                          reserveStatus.find(
-                            (res) =>
-                              res.value ===
-                              String(reservation.status).toLowerCase()
-                          )?.label
-                        }
-                      </Badge>
-                      <div className="flex space-x-1">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleEdit(reservation)}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDelete(reservation)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center  gap-4 text-sm">
-                    <div className="flex flex-col  items-start justify-center gap-4 enter text-sm w-full">
-                      <div className="flex items-center space-x-2">
-                        <Phone className="w-4 h-4 text-gray-400" />
-                        <span>{reservation.guest_phone}</span>
-                      </div>
-                      <div className="flex items-center space-x-2 w-full">
-                        <User className="w-4 h-4 text-gray-400" />
-                        <span>{reservation.adults} نفر</span>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col  items-end justify-center gap-4 enter text-sm w-full">
-                      <div>
-                        <span className="text-lime-600 ml-1">تاریخ ورود:</span>
-                        <span className="font-medium">
-                          {reservation.check_in}
-                        </span>
-                      </div>
-
-                      <div>
-                        <span className="text-red-600 ml-1">تاریخ خروج:</span>
-                        <span className="font-medium">
-                          {reservation.check_out}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <div className="mt-4 pt-4 border-t w-full border-gray-200">
-                    <div className="text-right">
-                      <span className="text-gray-600">هزینه اقامت: </span>
-                      <span className="font-semibold text-lg">
-                        {Number(reservation.total_price).toLocaleString(
-                          "fa-IR"
-                        )}{" "}
-                        تومان
-                      </span>
-                    </div>
-                    {reservation.special_requests !== "" && (
-                      <div className="mt-4">
-                        <span className="text-gray-600">یادداشت: </span>
-                        <span className="text-gray-800">
-                          {reservation.special_requests}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </CardFooter>
-              </Card>
-            );
-          })}
-
-          {filteredReservations.length === 0 && (
+      </motion.div>
+      <AnimatePresence mode="wait">
+        {viewMode === "list" && (
+          <motion.div variants={item}>
             <Card>
-              <CardContent className="text-center py-12">
-                <CalendarIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  رزروی پیدا نشد
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  {reservations.length === 0
-                    ? "اولین رزرو خود را ایجاد کنید"
-                    : "پارامترهای جستجوی خود را تغییر دهید"}
-                </p>
-                {reservations.length === 0 && (
-                  <Button
-                    onClick={() => setIsAddDialogOpen(true)}
-                    className={
-                      "bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/70"
-                    }
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    ایجاد رزرو
-                  </Button>
-                )}
+              <CardContent className="pt-6">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Input
+                        placeholder="جستجو"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="وضعیت" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">همه</SelectItem>
+                      {reserveStatus.map((status) => (
+                        <SelectItem key={status.value} value={status.value}>
+                          {status.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={roomFilter} onValueChange={setRoomFilter}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="اتاق" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">همه اتاق ها</SelectItem>
+                      {rooms.map((room) => (
+                        <SelectItem key={room.id} value={room.id}>
+                          {room.room_number}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardContent>
             </Card>
-          )}
-        </div>
-      )}
-    </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence mode="wait">
+        {viewMode === "calendar" && (
+          <motion.div
+            className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+            variants={item}
+          >
+            <Card className={"w-full md:max=w-md"}>
+              <CardHeader>
+                <CardTitle>تقویم</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Calendar
+                  value={selectedDate}
+                  onChange={handleCalendarDatePick}
+                  calendar={persian}
+                  locale={persian_fa}
+                />
+              </CardContent>
+            </Card>
+
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle>رزروهای {String(selectedDate)}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {getReservationsForDate(selectedDate).map((reservation) => {
+                    const room = rooms.find(
+                      (r) => String(r.id) === String(reservation.room_id)
+                    );
+                    return (
+                      <div
+                        key={reservation.id}
+                        className="p-4 border rounded-lg"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium">
+                            {reservation.guest_name}
+                          </h4>
+                          <Badge
+                            className={getStatusColor(
+                              String(reservation.status).toLowerCase()
+                            )}
+                          >
+                            {
+                              reserveStatus.find(
+                                (res) =>
+                                  res.value ===
+                                  String(reservation.status).toLowerCase()
+                              )?.label
+                            }
+                          </Badge>
+                        </div>
+                        <div className="text-sm text-gray-600 space-y-1">
+                          <p className="font-bold text-deep-ocean text-sm">
+                            اتاق {room?.room_number} -{" "}
+                            {
+                              roomTypes.find(
+                                (type) =>
+                                  room.type == String(type.value).toUpperCase()
+                              ).label
+                            }
+                          </p>
+                          <p>
+                            <span className="text-lime-600">
+                              {reservation.check_in}
+                            </span>{" "}
+                            -{" "}
+                            <span className="text-red-600">
+                              {reservation.check_out}
+                            </span>
+                          </p>
+                          <p>{reservation.adults} نفر</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {getReservationsForDate(selectedDate).length === 0 && (
+                    <p className="text-gray-500 text-center py-8">
+                      رزروی برای این تاریخ موجود نیست
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence mode="wait">
+        {viewMode === "list" && (
+          <motion.div
+            className="grid grid-cols-1 lg:grid-cols-2  xl:grid-cols-3 gap-4"
+            variants={container}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+          >
+            {filteredReservations.map((reservation, index) => {
+              const room = rooms.find(
+                (r) => String(r.id) === String(reservation.room_id)
+              );
+              return (
+                <motion.div
+                  key={reservation.id}
+                  variants={item}
+                  custom={index}
+                  whileHover={{ y: -5 }}
+                >
+                  <Card className={"gap-0"}>
+                    <CardContent className="p-6">
+                      <div className="flex flex-col md:flex-row gap-2 md:gap-0 md:items-center justify-between mb-4">
+                        <div className="flex items-center space-x-4">
+                          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <User className="w-6 h-6 text-blue-600" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-lg">
+                              {reservation.guest_name}
+                            </h3>
+                            <p className="text-gray-600">
+                              اتاق {room?.room_number} -{" "}
+                              {
+                                roomTypes.find(
+                                  (type) =>
+                                    room.type ==
+                                    String(type.value).toUpperCase()
+                                ).label
+                              }
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Badge
+                            className={getStatusColor(
+                              String(reservation.status).toLowerCase()
+                            )}
+                          >
+                            {
+                              reserveStatus.find(
+                                (res) =>
+                                  res.value ===
+                                  String(reservation.status).toLowerCase()
+                              )?.label
+                            }
+                          </Badge>
+                          <div className="flex space-x-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEdit(reservation)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDelete(reservation)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center  gap-4 text-sm">
+                        <div className="flex flex-col  items-start justify-center gap-4 enter text-sm w-full">
+                          <div className="flex items-center space-x-2">
+                            <Phone className="w-4 h-4 text-gray-400" />
+                            <span>{reservation.guest_phone}</span>
+                          </div>
+                          <div className="flex items-center space-x-2 w-full">
+                            <User className="w-4 h-4 text-gray-400" />
+                            <span>{reservation.adults} نفر</span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col  items-end justify-center gap-4 enter text-sm w-full">
+                          <div>
+                            <span className="text-lime-600 ml-1">
+                              تاریخ ورود:
+                            </span>
+                            <span className="font-medium">
+                              {reservation.check_in}
+                            </span>
+                          </div>
+
+                          <div>
+                            <span className="text-red-600 ml-1">
+                              تاریخ خروج:
+                            </span>
+                            <span className="font-medium">
+                              {reservation.check_out}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <div className="mt-4 pt-4 border-t w-full border-gray-200">
+                        <div className="text-right">
+                          <span className="text-gray-600">هزینه اقامت: </span>
+                          <span className="font-semibold text-lg">
+                            {Number(reservation.total_price).toLocaleString(
+                              "fa-IR"
+                            )}{" "}
+                            تومان
+                          </span>
+                        </div>
+                        {reservation.special_requests !== "" && (
+                          <div className="mt-4">
+                            <span className="text-gray-600">یادداشت: </span>
+                            <span className="text-gray-800">
+                              {reservation.special_requests}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </CardFooter>
+                  </Card>
+                </motion.div>
+              );
+            })}
+
+            {filteredReservations.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card>
+                  <CardContent className="text-center py-12">
+                    <CalendarIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      رزروی پیدا نشد
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      {reservations.length === 0
+                        ? "اولین رزرو خود را ایجاد کنید"
+                        : "پارامترهای جستجوی خود را تغییر دهید"}
+                    </p>
+                    {reservations.length === 0 && (
+                      <Button
+                        onClick={() => setIsAddDialogOpen(true)}
+                        className={
+                          "bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/70"
+                        }
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        ایجاد رزرو
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

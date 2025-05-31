@@ -1,11 +1,15 @@
-'use client'
+"use client";
+import Link from "next/link";
 import { Button } from "../ui/button";
 import { motion } from "framer-motion";
+import { useAuth } from "@clerk/nextjs";
+import Image from "next/image";
 
 export default function Hero() {
+  const { isSignedIn } = useAuth();
   return (
-    <section className="flex w-full overflow-hidden py-20 md:py-32 bg-pearl-luster ">
-      <motion.div 
+    <section className="flex w-full overflow-hidden py-20 md:py-32 bg-pearl-luster">
+      <motion.div
         className="flex flex-col justify-center items-center space-y-4 container max-w-7xl mx-auto w-full"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -35,22 +39,33 @@ export default function Hero() {
         >
           سیستم یکپارچه مدیریت اتاق‌ها، رزرواسیون و مالی اقامتگاه شما
         </motion.p>
-{/*         <motion.div 
+        <motion.div
           className="flex flex-col gap-2 sm:flex-row"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <Button className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90 hover:scale-105 transition-all shadow-lg hover:shadow-aqua-spark/20 h-12 px-8 ">
-            شروع دوره آزمایشی
-          </Button>
-          <Button
-            variant="outline"
-            className="border-deep-ocean text-deep-ocean hover:bg-sky-glint h-12 px-6"
-          >
-            مشاهده دمو
-          </Button>
-        </motion.div> */}
+          {isSignedIn ? (
+            <Button
+              className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
+              asChild
+            >
+              <Link href={"/dashboard"}>ورود به داشبورد</Link>
+            </Button>
+          ) : (
+            <>
+              <Button variant="outline" asChild>
+                <Link href={"/sign-in"}>ورود</Link>
+              </Button>
+              <Button
+                className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
+                asChild
+              >
+                <Link href={"/sign-up"}>ثبت‌ نام رایگان</Link>
+              </Button>
+            </>
+          )}
+        </motion.div>
       </motion.div>
     </section>
   );

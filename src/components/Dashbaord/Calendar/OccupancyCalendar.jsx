@@ -1,5 +1,5 @@
 "use client";
-
+import { motion } from "framer-motion";
 import { useMemo, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,9 @@ import {
   Download,
   ChevronsLeft,
   ChevronsRight,
+  CircleDot,
+  CircleDashed,
+  BanIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -29,7 +32,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-export default function OccupancyPage({ rooms, reservations }) {
+import { useLodgeData } from "../DashbaordProvider";
+export default function OccupancyPage() {
+  const { rooms, reservations } = useLodgeData();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const [selectedDate, setSelectedDate] = useState(moment());
@@ -136,7 +141,7 @@ export default function OccupancyPage({ rooms, reservations }) {
     setSelectedDate(newDate);
   };
 
-  const exportToCSV = () => {
+  /*   const exportToCSV = () => {
     const calendarDays = generateCalendarDays();
     const monthDays = calendarDays.filter(
       (day) => day.jMonth() === selectedDate.jMonth()
@@ -177,8 +182,55 @@ export default function OccupancyPage({ rooms, reservations }) {
     toast.success("با موفقیت صادر شد.", {
       description: "تقویم  به صورت CSV دانلود شد.",
     });
-  };
+  }; */
 
+  const exportToCSV = () => {
+    const calendarDays = generateCalendarDays();
+    const monthDays = calendarDays.filter(
+      (day) => day.jMonth() === selectedDate.jMonth()
+    );
+
+    let csv = "اتاق,نوع,تاریخ,";
+    monthDays.forEach((day) => {
+      csv += `${day.jDate()},`;
+    });
+    csv += "\n";
+
+    filteredRooms.forEach((room) => {
+      const jalaliMonthYear = `${
+        months[selectedDate.jMonth()]
+      } - ${selectedDate.jYear()}`;
+
+      csv += `${room.room_number},${
+        roomTypes.find((type) => type.value === String(room.type).toLowerCase())
+          ?.label
+      },${jalaliMonthYear},`;
+
+      monthDays.forEach((day) => {
+        const status = getRoomStatusForDate(room, day);
+        csv += `${status.isOccupied ? "پر" : "خالی"},`;
+      });
+      csv += "\n";
+    });
+
+    const blob = new Blob(["\uFEFF" + csv], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `occupancy-${selectedDate.jYear()}-${
+      selectedDate.jMonth() + 1
+    }.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast.success("با موفقیت صادر شد.", {
+      description: "تقویم به صورت CSV دانلود شد.",
+    });
+  };
   const calendarDays = generateCalendarDays();
   const monthDays = calendarDays.filter(
     (day) => day.jMonth() === selectedDate.jMonth()
@@ -197,7 +249,7 @@ export default function OccupancyPage({ rooms, reservations }) {
       ? Math.round((occupiedRoomDays / totalRoomDays) * 100)
       : 0;
 
-  const weekDays = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
+  const weekDays = ["ی", "د", "س", "چ", "پ", "ج", "ش"];
   const months = [
     "فروردین",
     "اردیبهشت",
@@ -213,8 +265,37 @@ export default function OccupancyPage({ rooms, reservations }) {
     "اسفند",
   ];
 
+  const container = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const item = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 10,
+      },
+    },
+  };
+
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.3 } },
+  };
+
   return (
-    <div>
+    <motion.div initial="hidden" animate="visible" variants={container}>
       <ReserveDialog
         rooms={rooms}
         reservations={reservations}
@@ -226,236 +307,325 @@ export default function OccupancyPage({ rooms, reservations }) {
         withButton={false}
       />
       <div className="space-y-4">
-        <Card>
-          <div className="p-6 space-y-6">
-            {/* Header */}
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
-                  تقویم سکونت
-                </h1>
-                <p className="text-sm text-gray-600 mt-1 md:text-base">
-                  جدول سکونت در تمام اتاق ها در یک نمای ماهانه
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-9"
-                  onClick={exportToCSV}
+        <motion.div variants={item}>
+          {" "}
+          <Card>
+            <div className="p-6 space-y-6">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <motion.h1
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-2xl font-bold text-gray-900 md:text-3xl"
+                  >
+                    تقویم سکونت
+                  </motion.h1>
+                  <motion.p
+                    initial={{ x: -20, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-sm text-gray-600 mt-1 md:text-base"
+                  >
+                    جدول سکونت در تمام اتاق ها در یک نمای ماهانه
+                  </motion.p>
+                </div>
+                <motion.div
+                  className="flex flex-wrap gap-2"
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.6 }}
                 >
-                  <Download className="w-4 h-4 ml-1" />
-                  <span className="hidden sm:inline">خروجی CSV</span>
-                </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9"
+                    onClick={exportToCSV}
+                  >
+                    <Download className="w-4 h-4 ml-1" />
+                    <span className="hidden sm:inline">خروجی CSV</span>
+                  </Button>
 
-                <Select
-                  value={selectedRoomType}
-                  onValueChange={setSelectedRoomType}
-                >
-                  <SelectTrigger className="w-[120px] h-9">
-                    <SelectValue placeholder="نوع اتاق" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">نوع اتاق</SelectItem>
-                    {roomTypes.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
-                <Select
-                  value={selectedRoomName}
-                  onValueChange={setSelectedRoomName}
-                >
-                  <SelectTrigger className="w-[120px] h-9">
-                    <SelectValue placeholder=" اتاق" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">همه اتاق ها</SelectItem>
-                    {rooms.map((room) => (
-                      <SelectItem key={room.id} value={room.room_number}>
-                        {room.room_number}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-              <div className="col-span-2">
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex justify-between items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => navigateYear("prev")}
-                    >
-                      <ChevronsRight className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => navigateMonth("prev")}
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
-                  </div>
-
-                  <h3 className="text-center font-bold text-deep-ocean">
-                    {months[selectedDate.jMonth()]} {selectedDate.jYear()}
-                  </h3>
-                  <div className="flex justify-between items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => navigateMonth("next")}
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-7 w-7"
-                      onClick={() => navigateYear("next")}
-                    >
-                      <ChevronsLeft className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">نرخ اشغال:</span>
-                    <span className="font-medium">{occupancyRate}%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">تعداد اتاق:</span>
-                    <span className="font-medium">{filteredRooms.length}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">روزهای ماه:</span>
-                    <span className="font-medium">{monthDays.length}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Stats Cards */}
-              <div className="bg-gray-50 rounded-lg p-4 flex flex-col items-center justify-center">
-                <div className="text-2xl font-bold text-green-600">
-                  {monthDays.length}
-                </div>
-                <div className="text-sm text-gray-600 text-center">
-                  روزهای ماه
-                </div>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-4 flex flex-col items-center justify-center">
-                <div className="text-2xl font-bold text-blue-600">
-                  {occupiedRoomDays}
-                </div>
-                <div className="text-sm text-gray-600 text-center">
-                  روز اشغال شده
-                </div>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-4 flex flex-col items-center justify-center">
-                <div className="text-2xl font-bold text-amber-600">
-                  {totalRoomDays - occupiedRoomDays}
-                </div>
-                <div className="text-sm text-gray-600 text-center">
-                  روز خالی
-                </div>
-              </div>
-            </div>
-          </div>
-        </Card>
-
-        {/* Calendar Table */}
-        <Card className="overflow-hidden">
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <h1 className="sticky right-5  w-fit text-center  text-lg sm:text-xl text-deep-ocean font-bold mb-2">
-                {months[selectedDate.jMonth()]} {selectedDate.jYear()}
-              </h1>
-              <div className="inline-block min-w-full align-middle">
-                <table className="min-w-full border-collapse" ref={tableRef}>
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="sticky right-0 z-10 bg-gray-50 px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider border-l border-gray-200 w-26">
-                        <span className="inline"> اتاق</span>
-                      </th>
-                      {monthDays.map((day, index) => (
-                        <th
-                          key={index}
-                          className="px-1 py-2 text-center text-xs font-medium text-gray-900 uppercase tracking-wider border-l border-gray-200 w-8 sm:w-10 bg-gray-50"
-                        >
-                          <div className="flex flex-col">
-                            <span className="text-[10px] text-gray-500">
-                              {weekDays[day.day()]}
-                            </span>
-                            <span className="text-xs sm:text-sm text-gray-900">
-                              {day.jDate()}
-                            </span>
-                          </div>
-                        </th>
+                  <Select
+                    value={selectedRoomType}
+                    onValueChange={setSelectedRoomType}
+                  >
+                    <SelectTrigger className="w-[120px] h-9">
+                      <SelectValue placeholder="نوع اتاق" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">نوع اتاق</SelectItem>
+                      {roomTypes.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
                       ))}
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredRooms.length > 0 ? (
-                      filteredRooms.map((room) => (
-                        <tr key={room.id} className="hover:bg-gray-50">
-                          <td className="sticky right-0 z-10 bg-white px-3 py-2 border-l border-gray-200">
-                            <div className="text-right">
-                              <div className="font-medium text-deep-ocean text-sm">
-                                {room.room_number}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {
-                                  roomTypes.find(
-                                    (type) =>
-                                      type.value ==
-                                      String(room.type).toLowerCase()
-                                  )?.label
-                                }
-                              </div>
-                            </div>
-                          </td>
-                          {monthDays.map((day, dayIndex) => {
-                            const dayStatus = getRoomStatusForDate(room, day);
+                    </SelectContent>
+                  </Select>
 
-                            return (
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <td
-                                      key={dayIndex}
-                                      className={cn(
-                                        "px-0.5 py-1 text-center border border-gray-100 relative",
-                                        dayStatus.isToday &&
-                                          "ring-1 ring-deep-ocean rounded-sm ring-inset"
-                                      )}
-                                    >
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
+                  <Select
+                    value={selectedRoomName}
+                    onValueChange={setSelectedRoomName}
+                  >
+                    <SelectTrigger className="w-[120px] h-9">
+                      <SelectValue placeholder=" اتاق" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">همه اتاق ها</SelectItem>
+                      {rooms.map((room) => (
+                        <SelectItem key={room.id} value={room.room_number}>
+                          {room.room_number}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </motion.div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+                <motion.div
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="col-span-2"
+                >
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex justify-between items-center gap-2">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => navigateYear("prev")}
+                          >
+                            <ChevronsRight className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>سال قبل</p>
+                        </TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => navigateMonth("prev")}
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>ماه قبل</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+
+                    <h3 className="text-center font-bold text-deep-ocean">
+                      {months[selectedDate.jMonth()]}{" "}
+                      {selectedDate
+                        .jYear()
+                        .toLocaleString("fa-IR", { useGrouping: false })}
+                    </h3>
+                    <div className="flex justify-between items-center gap-2">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => navigateMonth("next")}
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>ماه بعد</p>
+                        </TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() => navigateYear("next")}
+                          >
+                            <ChevronsLeft className="w-4 h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>سال بعد</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">نرخ اشغال:</span>
+                      <span className="font-medium">{occupancyRate}%</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">تعداد اتاق:</span>
+                      <span className="font-medium">
+                        {filteredRooms.length}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">روزهای ماه:</span>
+                      <span className="font-medium">{monthDays.length}</span>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="bg-gray-50 rounded-lg p-4 flex flex-col items-center justify-center"
+                >
+                  <motion.div
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="text-2xl font-bold text-green-600"
+                  >
+                    {monthDays.length}
+                  </motion.div>
+                  <motion.div
+                    initial={{ y: -20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.7 }}
+                    className="text-sm text-gray-600 text-center"
+                  >
+                    روزهای ماه
+                  </motion.div>
+                </motion.div>
+                <motion.div
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.8 }}
+                  className="bg-gray-50 rounded-lg p-4 flex flex-col items-center justify-center"
+                >
+                  <div className="text-2xl font-bold text-blue-600">
+                    {occupiedRoomDays}
+                  </div>
+                  <div className="text-sm text-gray-600 text-center">
+                    روز اشغال شده
+                  </div>
+                </motion.div>
+                <motion.div
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.9 }}
+                  className="bg-gray-50 rounded-lg p-4 flex flex-col items-center justify-center"
+                >
+                  <div className="text-2xl font-bold text-amber-600">
+                    {totalRoomDays - occupiedRoomDays}
+                  </div>
+                  <div className="text-sm text-gray-600 text-center">
+                    روز خالی
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </Card>
+        </motion.div>
+
+        <motion.div variants={item}>
+          <Card className="overflow-hidden">
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <h1 className="sticky right-5  w-fit text-center  text-lg sm:text-xl text-deep-ocean font-bold mb-2">
+                  {months[selectedDate.jMonth()]}{" "}
+                  {selectedDate
+                    .jYear()
+                    .toLocaleString("fa-IR", { useGrouping: false })}
+                </h1>
+                <div className="inline-block min-w-full align-middle px-4">
+                  <table className="min-w-full" ref={tableRef}>
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th className="sticky right-0 z-10 bg-gray-50 px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider border-l border-gray-200 w-26">
+                          <span className="inline"> اتاق</span>
+                        </th>
+                        {monthDays.map((day, index) => (
+                          <th
+                            key={index}
+                            className="px-1 py-2 text-center text-xs font-medium text-gray-900 uppercase tracking-wider border-l border-gray-200 w-8 sm:w-10 bg-gray-50"
+                          >
+                            <div className="flex flex-col">
+                              <span className="text-[10px] text-gray-500">
+                                {weekDays[day.day()]}
+                              </span>
+                              <span className="text-xs sm:text-sm text-gray-900">
+                                {day.jDate().toLocaleString("fa-IR", {
+                                  useGrouping: false,
+                                })}
+                              </span>
+                            </div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y  divide-sky-glint ">
+                      {filteredRooms.length > 0 ? (
+                        filteredRooms.map((room) => (
+                          <tr key={room.id}>
+                            <td className="sticky right-0 z-10 bg-white px-3 py-2 border-l border-gray-200">
+                              <div className="text-right">
+                                <div className="font-medium text-deep-ocean text-sm">
+                                  {room.room_number}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  {
+                                    roomTypes.find(
+                                      (type) =>
+                                        type.value ==
+                                        String(room.type).toLowerCase()
+                                    )?.label
+                                  }
+                                </div>
+                              </div>
+                            </td>
+                            {monthDays.map((day, dayIndex) => {
+                              const dayStatus = getRoomStatusForDate(room, day);
+
+                              const todayDate = moment();
+                              const isDisabled =
+                                day.jYear() < todayDate.jYear() ||
+                                (day.jYear() === todayDate.jYear() &&
+                                  (day.jMonth() < todayDate.jMonth() ||
+                                    (day.jMonth() === todayDate.jMonth() &&
+                                      day.jDate() < todayDate.jDate())));
+
+                              return isDisabled ? (
+                                <td
+                                  key={dayIndex}
+                                  className={cn(
+                                    "px-0.5 py-1 text-center opacity-50  border transition-colors ease-in-out rounded-sm border-gray-100 relative"
+                                  )}
+                                >
+                                  <BanIcon className="text-center w-4 h-4 mx-auto" />
+                                </td>
+                              ) : (
+                                <TooltipProvider key={dayIndex}>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <td
                                         className={cn(
-                                          "w-6 h-6  mx-auto p-0 rounded-full flex items-center justify-center text-xs",
+                                          "px-0.5 py-1 cursor-pointer text-center items-center hover:bg-pearl-luster rounded-xs  transition-colors ease-in-out border border-gray-100 relative",
+                                          dayStatus.isToday &&
+                                            "ring-1 ring-deep-ocean rounded-sm ring-inset",
                                           dayStatus.isOccupied
                                             ? "bg-red-100 text-red-800 hover:bg-red-200"
                                             : "bg-green-100 text-green-800 hover:bg-green-200"
                                         )}
-                                        disabled={
-                                          day.jMonth() === moment().jMonth() &&
-                                          day.jYear() === moment().jYear() &&
-                                          day.jDate() < moment().jDate()
-                                        }
                                         onClick={() => {
                                           toast.dismiss();
 
@@ -497,63 +667,66 @@ export default function OccupancyPage({ rooms, reservations }) {
                                           }
                                         }}
                                       >
-                                        {dayStatus.isOccupied ? "●" : "○"}
-                                      </Button>
-                                    </td>
-                                  </TooltipTrigger>
-                                  <TooltipContent className={"bg-deep-ocean space-y-1"}>
-                                    {dayStatus.isOccupied ? (
-                                      <>
-                                        <p>
-                                          {dayStatus.isOccupied &&
-                                            ` اتاق ${room.room_number} در این تاریخ رزرو شده است`}
-                                        </p>
-                                        <p>
-                                          {dayStatus.isOccupied &&
-                                            `مهمان: ${
-                                              dayStatus.reservation
-                                                ?.guest_name || "نامشخص"
-                                            } - خروج: ${
-                                              dayStatus.reservation?.check_out
-                                            }`}
-                                        </p>
-                                      </>
-                                    ) : (
-                                      <>
-                                        <p>
-                                          {`اتاق ${room.room_number} در این تاریخ خالی است.`}
-                                        </p>
-                                        <p>برای رزرو کلیک کنید</p>
-                                      </>
-                                    )}
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            );
-                          })}
+                                        {dayStatus.isOccupied ? (
+                                          <CircleDot className="text-center w-6 h-6 mx-auto" />
+                                        ) : (
+                                          <CircleDashed className="text-center w-6 h-6 mx-auto" />
+                                        )}
+                                      </td>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      {dayStatus.isOccupied ? (
+                                        <>
+                                          <p>
+                                            {dayStatus.isOccupied &&
+                                              ` اتاق ${room.room_number} در این تاریخ رزرو شده است`}
+                                          </p>
+                                          <p>
+                                            {dayStatus.isOccupied &&
+                                              `مهمان: ${
+                                                dayStatus.reservation
+                                                  ?.guest_name || "نامشخص"
+                                              } - خروج: ${
+                                                dayStatus.reservation?.check_out
+                                              }`}
+                                          </p>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <p>
+                                            {`اتاق ${room.room_number} در این تاریخ خالی است.`}
+                                          </p>
+                                          <p>برای رزرو کلیک کنید</p>
+                                        </>
+                                      )}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              );
+                            })}
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan={monthDays.length + 1}
+                            className="py-8 text-center text-gray-500 text-sm"
+                          >
+                            هیچ اتاقی با فیلترهای انتخاب شده یافت نشد
+                          </td>
                         </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td
-                          colSpan={monthDays.length + 1}
-                          className="py-8 text-center text-gray-500 text-sm"
-                        >
-                          هیچ اتاقی با فیلترهای انتخاب شده یافت نشد
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        {/* Room Summary - Grid View */}
         {filteredRooms.length > 0 && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filteredRooms.map((room) => {
+            {filteredRooms.map((room, index) => {
               const occupiedDays = monthDays.filter(
                 (day) => getRoomStatusForDate(room, day).isOccupied
               ).length;
@@ -563,64 +736,73 @@ export default function OccupancyPage({ rooms, reservations }) {
                   : 0;
 
               return (
-                <Card
+                <motion.div
                   key={room.id}
-                  className="hover:shadow-md transition-shadow"
+                  variants={item}
+                  custom={index}
+                  whileHover={{ y: -5 }}
                 >
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <h4 className="font-medium">اتاق {room.room_number}</h4>
-                        <p className="text-xs text-gray-500">
-                          {
-                            roomTypes.find(
-                              (type) =>
-                                type.value == String(room.type).toLowerCase()
-                            )?.label
+                  {" "}
+                  <Card className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <h4 className="font-medium">
+                            اتاق {room.room_number}
+                          </h4>
+                          <p className="text-xs text-gray-500">
+                            {
+                              roomTypes.find(
+                                (type) =>
+                                  type.value == String(room.type).toLowerCase()
+                              )?.label
+                            }
+                          </p>
+                        </div>
+                        <Badge
+                          variant={
+                            roomOccupancyRate > 70 ? "destructive" : "default"
                           }
-                        </p>
+                          className="text-xs"
+                        >
+                          {roomOccupancyRate}%
+                        </Badge>
                       </div>
-                      <Badge
-                        variant={
-                          roomOccupancyRate > 70 ? "destructive" : "default"
-                        }
-                        className="text-xs"
-                      >
-                        {roomOccupancyRate}%
-                      </Badge>
-                    </div>
-                    <div className="text-sm text-gray-600 space-y-1.5">
-                      <div className="flex justify-between text-xs">
-                        <span>اشغال شده:</span>
-                        <span className="font-medium">{occupiedDays} روز</span>
+                      <div className="text-sm text-gray-600 space-y-1.5">
+                        <div className="flex justify-between text-xs">
+                          <span>اشغال شده:</span>
+                          <span className="font-medium">
+                            {occupiedDays} روز
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-xs">
+                          <span>خالی:</span>
+                          <span className="font-medium">
+                            {monthDays.length - occupiedDays} روز
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                          <div
+                            className={cn(
+                              "h-2 rounded-full",
+                              roomOccupancyRate > 70
+                                ? "bg-red-500"
+                                : roomOccupancyRate > 30
+                                ? "bg-amber-500"
+                                : "bg-green-500"
+                            )}
+                            style={{ width: `${roomOccupancyRate}%` }}
+                          />
+                        </div>
                       </div>
-                      <div className="flex justify-between text-xs">
-                        <span>خالی:</span>
-                        <span className="font-medium">
-                          {monthDays.length - occupiedDays} روز
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                        <div
-                          className={cn(
-                            "h-2 rounded-full",
-                            roomOccupancyRate > 70
-                              ? "bg-red-500"
-                              : roomOccupancyRate > 30
-                              ? "bg-amber-500"
-                              : "bg-green-500"
-                          )}
-                          style={{ width: `${roomOccupancyRate}%` }}
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               );
             })}
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

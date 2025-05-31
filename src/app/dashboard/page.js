@@ -1,22 +1,18 @@
 import Overview from "@/components/Dashbaord/Overview/Overview";
 import QuickActions from "@/components/Dashbaord/Overview/QuickActions";
 import RoomStats from "@/components/Dashbaord/Overview/RoomStats";
-import { getUserRooms } from "../actions/rooms";
-import { getUserReservations } from "../actions/reserve";
-import { getDetailedTodayMovements } from "@/lib/jalali";
 
-export default async function Dashboard() {
-  const { data, error } = await getUserRooms();
-  const { data: reservations, error: reservationError } =
-    await getUserReservations();
-  const detailedOverview = getDetailedTodayMovements(reservations);
+export const metadata = {
+  title: "اقامت بان | نمای کلی",
+  description: "مدریت ساده و سریع برای اقامتگاه‌ها",
+};
 
-
+export default function Dashboard() {
   return (
     <div className="py-20 sm:py-14 px-6 w-full min-h-screen  container mx-auto">
-      <Overview overviewData={detailedOverview} rooms={data} reservations={reservations} />
+      <Overview />
       <QuickActions />
-      <RoomStats rooms={data} reservations={reservations} />
+      <RoomStats />
     </div>
   );
 }

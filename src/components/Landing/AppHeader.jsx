@@ -11,6 +11,11 @@ export default function AppHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const { isSignedIn } = useAuth();
 
+  const pagesLink = [
+    { href: "#features", label: "ویژگی‌ها" },
+    { href: "#testimonials", label: "نظرات کاربران" },
+    { href: "#demo", label: "راهنما" },
+  ];
   return (
     <motion.header
       className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
@@ -38,11 +43,7 @@ export default function AppHeader() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          {[
-            { href: "#features", label: "ویژگی‌ها" },
-            { href: "#testimonials", label: "نظرات کاربران" },
-            { href: "#pricing", label: "تعرفه‌ها" },
-          ].map((link, i) => (
+          {pagesLink.map((link, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: -10 }}
@@ -83,7 +84,6 @@ export default function AppHeader() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isOpen && (
         <motion.div
           className="absolute top-16 left-0 w-full bg-background shadow-md flex flex-col items-center py-4 gap-4 md:hidden"
@@ -91,11 +91,7 @@ export default function AppHeader() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {[
-            { href: "#features", label: "ویژگی‌ها" },
-            { href: "#testimonials", label: "نظرات کاربران" },
-            { href: "#pricing", label: "تعرفه‌ها" },
-          ].map((link, i) => (
+          {pagesLink.map((link, i) => (
             <Link
               key={i}
               href={link.href}

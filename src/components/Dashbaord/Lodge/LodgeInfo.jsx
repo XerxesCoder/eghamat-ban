@@ -1,5 +1,5 @@
 "use client";
-
+import { motion } from "framer-motion";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,8 +19,10 @@ import {
 } from "lucide-react";
 import { createOrUpdateMotel } from "@/app/actions/lodge";
 import { toast } from "sonner";
+import { useLodgeData } from "../DashbaordProvider";
 
-export default function LodgeInfo({ userLodgeInfo }) {
+export default function LodgeInfo() {
+  const { userLodgeInfo, getUserLodgeInformation } = useLodgeData();
   const [motelData, setMotelData] = useState({
     name: userLodgeInfo?.motel_name || "",
     address: userLodgeInfo?.motel_address || "",
@@ -65,6 +67,7 @@ export default function LodgeInfo({ userLodgeInfo }) {
       if (data.success) {
         toast.dismiss();
         toast.success("اطلاعات با موفقیت ذخیره شد");
+        getUserLodgeInformation();
       }
     } catch (error) {
       console.log(error);
@@ -75,15 +78,64 @@ export default function LodgeInfo({ userLodgeInfo }) {
     }
   };
 
+  const container = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
+
+  const item = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 10,
+      },
+    },
+  };
+
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.3 } },
+  };
+
   return (
-    <div className="py-20 sm:py-14 px-6 w-full min-h-screen space-y-6  container mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 sm:gap-0">
+    <motion.div
+      className="py-20 sm:py-14 px-6 w-full min-h-screen space-y-6  container mx-auto"
+      initial="hidden"
+      animate="visible"
+      variants={container}
+    >
+      <motion.div
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5 sm:gap-0"
+        variants={item}
+      >
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">اطلاعات اقامتگاه</h1>
-          <p className="text-gray-600 mt-1">
+          <motion.h1
+            className="text-3xl font-bold text-gray-900"
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            اطلاعات اقامتگاه
+          </motion.h1>
+          <motion.p
+            className="text-gray-600 mt-1"
+            initial={{ x: -20, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
             اطلاعات اقامتگاه خود را وارد کنید تا مشتریان بتوانند به راحتی با شما
             تماس بگیرند.
-          </p>
+          </motion.p>
         </div>
         <Button
           className={"bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/70"}
@@ -93,9 +145,12 @@ export default function LodgeInfo({ userLodgeInfo }) {
           <Save className="w-4 h-4 mr-2" />
           {saving ? "در حال ذخیره" : "ذخیره تغییرات"}
         </Button>
-      </div>
+      </motion.div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <motion.div
+        variants={item}
+        className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+      >
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -185,7 +240,6 @@ export default function LodgeInfo({ userLodgeInfo }) {
           </CardContent>
         </Card>
 
-        {/* Amenities */}
         <Card>
           <CardHeader>
             <CardTitle>امکانات</CardTitle>
@@ -234,67 +288,68 @@ export default function LodgeInfo({ userLodgeInfo }) {
             )}
           </CardContent>
         </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>پیش نمایش اقامتگاه</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <h2 className="text-2xl font-bold mb-2">
-            {motelData.name || "نام اقامتگاه"}
-          </h2>
-          <div className="space-y-2">
-            <div className="flex items-center">
-              <MapPinned className="w-4 h-4 ml-2" />
-              <span className="ml-1">{motelData.county || "استان"}</span>
-              <span>{motelData.city || "شهر"}</span>
-            </div>
-            <div className="flex items-center">
-              <MapPin className="w-4 h-4 ml-2" />
-              <span>{motelData.address || "آدرس"}</span>
-            </div>
-            <div className="flex items-center">
-              <Phone className="w-4 h-4 ml-2" />
-              <span>{motelData.phone || "تلفن تماس"}</span>
-            </div>
-          </div>
-
-          {motelData.description && (
-            <p className="mt-4 text-blue-50">{motelData.description}</p>
-          )}
-
-          {motelData.amenities.length > 0 && (
-            <div className="mt-4">
-              <h4 className="font-medium mb-2">امکانات:</h4>
-              <div className="flex flex-wrap gap-2">
-                {motelData.amenities.map((amenity) => (
-                  <Badge
-                    key={amenity}
-                    variant="secondary"
-                    className="bg-deep-ocean/80 text-white"
-                  >
-                    {amenity}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="mt-4 pt-4 border-t border-deep-ocean">
-            <div className="flex items-center space-x-6 text-sm">
+      </motion.div>
+      <motion.div variants={item}>
+        <Card>
+          <CardHeader>
+            <CardTitle>پیش نمایش اقامتگاه</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <h2 className="text-2xl font-bold mb-2">
+              {motelData.name || "نام اقامتگاه"}
+            </h2>
+            <div className="space-y-2">
               <div className="flex items-center">
-                <Clock className="w-4 h-4 ml-2" />
-                <span>زمان ورود: {motelData.checkInTime}</span>
+                <MapPinned className="w-4 h-4 ml-2" />
+                <span className="ml-1">{motelData.county || "استان"}</span>
+                <span>{motelData.city || "شهر"}</span>
               </div>
               <div className="flex items-center">
-                <Clock className="w-4 h-4 ml-2" />
-                <span>زمان خروج: {motelData.checkOutTime}</span>
+                <MapPin className="w-4 h-4 ml-2" />
+                <span>{motelData.address || "آدرس"}</span>
+              </div>
+              <div className="flex items-center">
+                <Phone className="w-4 h-4 ml-2" />
+                <span>{motelData.phone || "تلفن تماس"}</span>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+
+            {motelData.description && (
+              <p className="mt-4 text-blue-50">{motelData.description}</p>
+            )}
+
+            {motelData.amenities.length > 0 && (
+              <div className="mt-4">
+                <h4 className="font-medium mb-2">امکانات:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {motelData.amenities.map((amenity) => (
+                    <Badge
+                      key={amenity}
+                      variant="secondary"
+                      className="bg-deep-ocean/80 text-white"
+                    >
+                      {amenity}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-4 pt-4 border-t border-deep-ocean">
+              <div className="flex items-center space-x-6 text-sm">
+                <div className="flex items-center">
+                  <Clock className="w-4 h-4 ml-2" />
+                  <span>زمان ورود: {motelData.checkInTime}</span>
+                </div>
+                <div className="flex items-center">
+                  <Clock className="w-4 h-4 ml-2" />
+                  <span>زمان خروج: {motelData.checkOutTime}</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </motion.div>
   );
 }

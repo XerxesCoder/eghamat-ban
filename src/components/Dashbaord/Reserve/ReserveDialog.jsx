@@ -21,12 +21,10 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import DatePicker from "react-multi-date-picker";
-
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import transition from "react-element-popper/animations/transition";
 import InputIcon from "react-multi-date-picker/components/input_icon";
-import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
@@ -40,6 +38,7 @@ import {
   editReservation,
 } from "@/app/actions/reserve";
 import { toast } from "sonner";
+import { useLodgeData } from "../DashbaordProvider";
 
 export default function ReserveDialog({
   setEditingReservation,
@@ -53,8 +52,8 @@ export default function ReserveDialog({
   rooms,
   withButton,
 }) {
+  const { getLodgeData } = useLodgeData();
   const [isAddingOrEditing, setIsAddingOrEditing] = useState(false);
-  const router = useRouter();
 
   const dateDifference = useMemo(() => {
     if (formData.checkIn == formData.checkOut) return 1;
@@ -139,20 +138,20 @@ export default function ReserveDialog({
           editingReservation.id
         );
         if (editReserve.success) {
+          getLodgeData();
           toast.dismiss();
           toast.success("با موفقیت ویرایش شد");
           setEditingReservation(null);
           resetForm();
-          router.refresh();
         }
       } else {
         toast.loading("درحال افزودن اطلاعات");
         const addReserve = await addNewReserve(reservationData);
         if (addReserve.success) {
+          getLodgeData;
           toast.dismiss();
           toast.success("با موفقیت افزوده شد");
           resetForm();
-          router.refresh();
         }
       }
     } catch (error) {
@@ -175,7 +174,7 @@ export default function ReserveDialog({
             {
               loading: `در حال حذف رزرواسیون ${reservation.guest_name}...`,
               success: () => {
-                router.refresh();
+                getLodgeData();
                 return `رزرواسیون ${reservation.guest_name} با موفقیت حذف شد`;
               },
               error: "خطا در حذف رزرواسیون",

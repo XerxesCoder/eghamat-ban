@@ -1,3 +1,5 @@
+"use client";
+import { motion } from "framer-motion";
 import {
   CalendarCheck,
   Hotel,
@@ -7,56 +9,76 @@ import {
 } from "lucide-react";
 import StatCard from "./StatCard";
 import {
+  getDetailedTodayMovements,
   persianMonthName,
   persianTodayName,
   persianTodayNumber,
   persianYear,
 } from "@/lib/jalali";
+import { useLodgeData } from "../DashbaordProvider";
 
-export default function Overview({ overviewData, rooms, reservations }) {
+export default function Overview() {
+  const { rooms, reservations, isDataLoaded } = useLodgeData();
+  const overviewData = getDetailedTodayMovements(reservations);
+
   const OverviewData = [
     {
       title: "تعداد اتاق ها",
       icon: <Hotel className="h-6 w-6" />,
-      value: `${rooms.length}`,
+      value: `${rooms?.length}`,
       description: "تعداد کل اتاق ها",
     },
     {
       title: "تعداد رزروها",
       icon: <CalendarCheck className="h-6 w-6" />,
-      value: `${reservations.length}`,
+      value: `${reservations?.length}`,
       description: "رزرو تا به امروز",
     },
     {
       title: "ورودی امروز",
       icon: <UserPlus className="h-6 w-6" />,
-      value: `${overviewData.checkingIn.guests}`,
-      description: `مهمان ورودی امروز | (${overviewData.checkingIn.count} اتاق)`,
+      value: `${overviewData?.checkingIn?.guests}`,
+      description: `مهمان ورودی امروز | (${overviewData?.checkingIn?.count} اتاق)`,
     },
     {
       title: "خروجی امروز",
       icon: <UserMinus className="h-6 w-6" />,
-      value: `${overviewData.checkingOut.guests}`,
-      description: `مهمان خروجی امروز | (${overviewData.checkingOut.count} اتاق) `,
+      value: `${overviewData?.checkingOut?.guests}`,
+      description: `مهمان خروجی امروز | (${overviewData?.checkingOut?.count} اتاق) `,
     },
   ];
+
   return (
     <div className="flex-col space-y-4">
       <div className="flex flex-col items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">نمای کلی</h1>
-        <p className="text-lg text-deep-ocean pt-2">
+        <motion.h1
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="text-3xl font-bold tracking-tight"
+        >
+          نمای کلی
+        </motion.h1>
+        <motion.p
+          className="text-lg text-deep-ocean pt-2"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
           امروز {persianTodayName}, {persianTodayNumber} {persianMonthName}{" "}
           {persianYear}
-        </p>
+        </motion.p>
       </div>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {OverviewData.map((item, idx) => (
           <StatCard
             key={idx}
+            cardIndex={idx}
             title={item.title}
             icon={item.icon}
             value={item.value}
             description={item.description}
+            isDataLoaded={isDataLoaded}
           />
         ))}
       </div>

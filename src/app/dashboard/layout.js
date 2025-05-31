@@ -1,21 +1,17 @@
 import { AppSidebar } from "@/components/Dashbaord/Sidebar";
 import { MobileHeader } from "@/components/Dashbaord/MobileHeader";
-
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "sonner";
+import DashbaordProvider from "@/components/Dashbaord/DashbaordProvider";
 
-export default async function DashboardLayout({ children }) {
+export default function DashboardLayout({ children }) {
   return (
     <SidebarProvider defaultOpen>
       <AppSidebar />
       <MobileHeader />
       <SidebarInset className=" bg-pearl-luster overflow-x-hidden">
         <Toaster richColors position="top-center" />
-        {children}
+        <DashbaordProvider>{children}</DashbaordProvider>
       </SidebarInset>
     </SidebarProvider>
   );

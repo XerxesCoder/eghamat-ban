@@ -7,9 +7,10 @@ import {
   LayoutDashboard,
   CalendarDays,
   Clock,
-  ChevronsUpDown,
+  Banknote,
+  DoorClosed,
 } from "lucide-react";
-import { useTheme } from "next-themes";
+
 import {
   Sidebar,
   SidebarContent,
@@ -22,11 +23,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { Button } from "../ui/button";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -35,7 +35,7 @@ import {
   persianTodayNumber,
   persianYear,
 } from "@/lib/jalali";
-import { SignedIn, UserButton, useAuth, useUser } from "@clerk/nextjs";
+import { SignedIn, UserButton } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 
 const items = [
@@ -48,7 +48,7 @@ const items = [
   {
     title: "اتاق ها",
     url: "/dashboard/rooms",
-    icon: HomeIcon,
+    icon: DoorClosed,
   },
   {
     title: "رزرو",
@@ -61,6 +61,11 @@ const items = [
     icon: CalendarSearch,
   },
   {
+    title: "درآمد",
+    url: "/dashboard/finance",
+    icon: Banknote,
+  },
+  {
     title: " اقامتگاه من",
     url: "/dashboard/lodge",
     icon: Hotel,
@@ -68,22 +73,10 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const { user } = useUser();
-  const { signOut } = useAuth();
-
-  const {
-    state,
-    open,
-    setOpen,
-    openMobile,
-    setOpenMobile,
-    isMobile,
-    toggleSidebar,
-  } = useSidebar();
-
+  const { open, toggleSidebar } = useSidebar();
   const pathname = usePathname();
-
   const [currentTime, setCurrentTime] = useState("");
+  
   useEffect(() => {
     const updateTime = () => {
       const formatter = new Intl.DateTimeFormat("fa-IR", {
@@ -116,7 +109,7 @@ export function AppSidebar() {
         </SidebarMenu>
         {open && (
           <div className="flex  gap-5 justify-start items-center">
-            <Clock className="h-6 w-6" />
+            {/*     <Clock className="h-6 w-6" /> */}
             <div>
               <p>
                 {`${persianTodayName}, ${persianTodayNumber} ${persianMonthName} ${persianYear}`}

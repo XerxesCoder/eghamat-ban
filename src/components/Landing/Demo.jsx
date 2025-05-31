@@ -9,13 +9,15 @@ export default function Demo() {
       <motion.div
         className="container max-w-7xl mx-auto px-4 md:px-6"
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <motion.div
           className="flex flex-col items-center justify-center space-y-4 text-center"
           initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <div className="inline-block rounded-lg bg-sky-glint px-3 py-1 text-sm text-deep-ocean">
@@ -29,11 +31,11 @@ export default function Demo() {
           </p>
         </motion.div>
 
-        {/* Detailed Step-by-step Guide */}
         <motion.div
           className="mx-auto max-w-4xl grid gap-6 py-12 lg:grid-cols-2"
           initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
           {[
@@ -62,7 +64,8 @@ export default function Demo() {
               key={i}
               className="relative overflow-hidden rounded-lg border border-sky-glint bg-pearl-luster p-6 shadow-md transition-all hover:shadow-lg hover:shadow-aqua-spark/10 hover:-translate-y-1"
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.4 + i * 0.1 }}
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-aqua-spark text-deep-ocean mb-4">

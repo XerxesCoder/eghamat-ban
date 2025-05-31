@@ -9,19 +9,22 @@ export default function Features() {
       <motion.div
         className="container max-w-7xl mx-auto px-4 md:px-6"
         initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <motion.div
           className="flex flex-col items-center justify-center space-y-4 text-center"
           initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <motion.div
             className="space-y-2"
             initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             <div className="inline-block rounded-lg bg-sky-glint px-3 py-1 text-sm text-deep-ocean">
@@ -39,7 +42,8 @@ export default function Features() {
         <motion.div
           className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3"
           initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
           {[...Array(3)].map((_, i) => (
@@ -47,7 +51,8 @@ export default function Features() {
               key={i}
               className="group relative overflow-hidden rounded-lg border border-sky-glint bg-pearl-luster p-6 shadow-md transition-all hover:shadow-lg hover:shadow-aqua-spark/10 hover:-translate-y-1"
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.5 + i * 0.1 }}
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-aqua-spark text-deep-ocean mb-4">
