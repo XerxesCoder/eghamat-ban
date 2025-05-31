@@ -29,7 +29,9 @@ export default function LodgeInfo() {
     city: userLodgeInfo?.motel_city || "",
     county: userLodgeInfo?.motel_state || "",
     phone: userLodgeInfo?.motel_phone || "",
-    amenities: userLodgeInfo ? JSON.parse(userLodgeInfo?.motel_amenities) : [],
+    amenities: userLodgeInfo?.motel_amenities
+      ? JSON.parse(userLodgeInfo?.motel_amenities)
+      : [],
     checkInTime: userLodgeInfo?.motel_checkin || "14:00",
     checkOutTime: userLodgeInfo?.motel_checkout || "12:00",
   });
