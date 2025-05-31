@@ -1,6 +1,7 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { convertToPersianDigits } from "@/lib/jalali";
 import { motion } from "framer-motion";
 export default function StatCard({
   title,
@@ -8,9 +9,8 @@ export default function StatCard({
   value,
   description,
   cardIndex,
-  isDataLoaded
+  isDataLoaded,
 }) {
-  
   const cardVariants = {
     hidden: { opacity: 0, y: -20 },
     visible: (i) => ({
@@ -43,7 +43,11 @@ export default function StatCard({
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 + cardIndex * 0.1 }} // Extra delay for content
           >
-            {isDataLoaded ? value : <Skeleton className={'h-8 w-8'}/>}
+            {isDataLoaded ? (
+              convertToPersianDigits(value)
+            ) : (
+              <Skeleton className={"h-8 w-8"} />
+            )}
           </motion.h3>
           <motion.p
             className="text-xs text-muted-foreground mt-1"
@@ -51,7 +55,7 @@ export default function StatCard({
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 + cardIndex * 0.1 }}
           >
-            {description}
+            {convertToPersianDigits(description)}
           </motion.p>
         </CardContent>
       </Card>

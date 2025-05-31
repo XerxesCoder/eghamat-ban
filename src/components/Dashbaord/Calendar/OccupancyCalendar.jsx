@@ -33,6 +33,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useLodgeData } from "../DashbaordProvider";
+import { convertToPersianDigits } from "@/lib/jalali";
 export default function OccupancyPage() {
   const { rooms, reservations } = useLodgeData();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -468,17 +469,28 @@ export default function OccupancyPage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">نرخ اشغال:</span>
-                      <span className="font-medium">{occupancyRate}%</span>
+                      <span className="font-medium">
+                        {Number(occupancyRate).toLocaleString("fa-IR", {
+                          useGrouping: false,
+                        })}
+                        %
+                      </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">تعداد اتاق:</span>
                       <span className="font-medium">
-                        {filteredRooms.length}
+                        {Number(filteredRooms.length).toLocaleString("fa-IR", {
+                          useGrouping: false,
+                        })}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">روزهای ماه:</span>
-                      <span className="font-medium">{monthDays.length}</span>
+                      <span className="font-medium">
+                        {Number(monthDays.length).toLocaleString("fa-IR", {
+                          useGrouping: false,
+                        })}
+                      </span>
                     </div>
                   </div>
                 </motion.div>
@@ -489,22 +501,24 @@ export default function OccupancyPage() {
                   transition={{ delay: 0.5 }}
                   className="bg-gray-50 rounded-lg p-4 flex flex-col items-center justify-center"
                 >
-                  <motion.div
+                  <motion.h3
                     initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.6 }}
                     className="text-2xl font-bold text-green-600"
                   >
-                    {monthDays.length}
-                  </motion.div>
-                  <motion.div
+                    {Number(monthDays.length).toLocaleString("fa-IR", {
+                      useGrouping: false,
+                    })}
+                  </motion.h3>
+                  <motion.p
                     initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.7 }}
                     className="text-sm text-gray-600 text-center"
                   >
                     روزهای ماه
-                  </motion.div>
+                  </motion.p>
                 </motion.div>
                 <motion.div
                   initial={{ y: -20, opacity: 0 }}
@@ -512,12 +526,14 @@ export default function OccupancyPage() {
                   transition={{ delay: 0.8 }}
                   className="bg-gray-50 rounded-lg p-4 flex flex-col items-center justify-center"
                 >
-                  <div className="text-2xl font-bold text-blue-600">
-                    {occupiedRoomDays}
-                  </div>
-                  <div className="text-sm text-gray-600 text-center">
+                  <h3 className="text-2xl font-bold text-blue-600">
+                    {Number(occupiedRoomDays).toLocaleString("fa-IR", {
+                      useGrouping: false,
+                    })}
+                  </h3>
+                  <p className="text-sm text-gray-600 text-center">
                     روز اشغال شده
-                  </div>
+                  </p>
                 </motion.div>
                 <motion.div
                   initial={{ y: -20, opacity: 0 }}
@@ -525,12 +541,15 @@ export default function OccupancyPage() {
                   transition={{ delay: 0.9 }}
                   className="bg-gray-50 rounded-lg p-4 flex flex-col items-center justify-center"
                 >
-                  <div className="text-2xl font-bold text-amber-600">
-                    {totalRoomDays - occupiedRoomDays}
-                  </div>
-                  <div className="text-sm text-gray-600 text-center">
-                    روز خالی
-                  </div>
+                  <h3 className="text-2xl font-bold text-amber-600">
+                    {Number(totalRoomDays - occupiedRoomDays).toLocaleString(
+                      "fa-IR",
+                      {
+                        useGrouping: false,
+                      }
+                    )}
+                  </h3>
+                  <p className="text-sm text-gray-600 text-center">روز خالی</p>
                 </motion.div>
               </div>
             </div>
@@ -577,12 +596,18 @@ export default function OccupancyPage() {
                       {filteredRooms.length > 0 ? (
                         filteredRooms.map((room) => (
                           <tr key={room.id}>
-                            <td className="sticky right-0 z-10 bg-white px-3 py-2 border-l border-gray-200">
-                              <div className="text-right">
-                                <div className="font-medium text-deep-ocean text-sm">
-                                  {room.room_number}
-                                </div>
-                                <div className="text-xs text-gray-500">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <td className="sticky right-0 z-10 bg-white px-3 py-2 border-l border-gray-200 h-12">
+                                  <div className="text-right">
+                                    <h4 className="font-medium text-deep-ocean text-sm">
+                                      {room.room_number}{" "}
+                                    </h4>
+                                  </div>
+                                </td>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>
                                   {
                                     roomTypes.find(
                                       (type) =>
@@ -590,9 +615,10 @@ export default function OccupancyPage() {
                                         String(room.type).toLowerCase()
                                     )?.label
                                   }
-                                </div>
-                              </div>
-                            </td>
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+
                             {monthDays.map((day, dayIndex) => {
                               const dayStatus = getRoomStatusForDate(room, day);
 
@@ -608,7 +634,7 @@ export default function OccupancyPage() {
                                 <td
                                   key={dayIndex}
                                   className={cn(
-                                    "px-0.5 py-1 text-center opacity-50  border transition-colors ease-in-out rounded-sm border-gray-100 relative"
+                                    "p-1 text-center opacity-50  border transition-colors ease-in-out rounded-sm border-gray-100 relative"
                                   )}
                                 >
                                   <BanIcon className="text-center w-4 h-4 mx-auto" />
@@ -619,9 +645,9 @@ export default function OccupancyPage() {
                                     <TooltipTrigger asChild>
                                       <td
                                         className={cn(
-                                          "px-0.5 py-1 cursor-pointer text-center items-center hover:bg-pearl-luster rounded-xs  transition-colors ease-in-out border border-gray-100 relative",
+                                          "p-1 cursor-pointer text-center items-center hover:bg-pearl-luster rounded-xs  transition-colors ease-in-out border border-gray-100 relative",
                                           dayStatus.isToday &&
-                                            "ring-1 ring-deep-ocean rounded-sm ring-inset",
+                                            "ring-1 ring-deep-ocean  ring-inset",
                                           dayStatus.isOccupied
                                             ? "bg-red-100 text-red-800 hover:bg-red-200"
                                             : "bg-green-100 text-green-800 hover:bg-green-200"
@@ -636,10 +662,10 @@ export default function OccupancyPage() {
                                                 description: `مهمان: ${
                                                   dayStatus.reservation
                                                     ?.guest_name || "نامشخص"
-                                                } - خروج: ${
+                                                } - خروج: ${convertToPersianDigits(
                                                   dayStatus.reservation
                                                     ?.check_out
-                                                }`,
+                                                )}`,
                                               }
                                             );
                                           } else {
@@ -668,9 +694,9 @@ export default function OccupancyPage() {
                                         }}
                                       >
                                         {dayStatus.isOccupied ? (
-                                          <CircleDot className="text-center w-6 h-6 mx-auto" />
+                                          <CircleDot className="text-center sm:w-5 sm:h-5 w-4 h-4 mx-auto" />
                                         ) : (
-                                          <CircleDashed className="text-center w-6 h-6 mx-auto" />
+                                          <CircleDashed className="text-center sm:w-5 sm:h-5 w-4 h-4 mx-auto" />
                                         )}
                                       </td>
                                     </TooltipTrigger>
@@ -686,9 +712,9 @@ export default function OccupancyPage() {
                                               `مهمان: ${
                                                 dayStatus.reservation
                                                   ?.guest_name || "نامشخص"
-                                              } - خروج: ${
+                                              } - خروج: ${convertToPersianDigits(
                                                 dayStatus.reservation?.check_out
-                                              }`}
+                                              )}`}
                                           </p>
                                         </>
                                       ) : (
@@ -742,7 +768,6 @@ export default function OccupancyPage() {
                   custom={index}
                   whileHover={{ y: -5 }}
                 >
-                  {" "}
                   <Card className="hover:shadow-md transition-shadow">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-2">
@@ -765,20 +790,31 @@ export default function OccupancyPage() {
                           }
                           className="text-xs"
                         >
-                          {roomOccupancyRate}%
+                          {Number(roomOccupancyRate).toLocaleString("fa-IR", {
+                            useGrouping: false,
+                          })}
+                          %
                         </Badge>
                       </div>
                       <div className="text-sm text-gray-600 space-y-1.5">
                         <div className="flex justify-between text-xs">
                           <span>اشغال شده:</span>
                           <span className="font-medium">
-                            {occupiedDays} روز
+                            {Number(occupiedDays).toLocaleString("fa-IR", {
+                              useGrouping: false,
+                            })}{" "}
+                            روز
                           </span>
                         </div>
                         <div className="flex justify-between text-xs">
                           <span>خالی:</span>
                           <span className="font-medium">
-                            {monthDays.length - occupiedDays} روز
+                            {Number(
+                              monthDays.length - occupiedDays
+                            ).toLocaleString("fa-IR", {
+                              useGrouping: false,
+                            })}{" "}
+                            روز
                           </span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2 mt-2">

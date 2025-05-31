@@ -43,6 +43,11 @@ export const persianTime = new Intl.DateTimeFormat("fa-IR-u-nu-latn", {
   timeStyle: "full",
 }).format();
 
+export function convertToPersianDigits(input) {
+  const persianDigits = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+  return input.replace(/\d/g, (d) => persianDigits[d]);
+}
+
 export const checkRoomAvailability = (newReservation, existingReservations) => {
   const newCheckIn = moment(newReservation.checkIn, "jYYYY-jMM-jDD");
   const newCheckOut = moment(newReservation.checkOut, "jYYYY-jMM-jDD");

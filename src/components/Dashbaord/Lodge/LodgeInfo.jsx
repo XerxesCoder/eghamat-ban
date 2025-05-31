@@ -20,6 +20,7 @@ import {
 import { createOrUpdateMotel } from "@/app/actions/lodge";
 import { toast } from "sonner";
 import { useLodgeData } from "../DashbaordProvider";
+import { convertToPersianDigits } from "@/lib/jalali";
 
 export default function LodgeInfo() {
   const { userLodgeInfo, getUserLodgeInformation } = useLodgeData();
@@ -312,7 +313,7 @@ export default function LodgeInfo() {
               </div>
               <div className="flex items-center">
                 <Phone className="w-4 h-4 ml-2" />
-                <span>{motelData.phone || "تلفن تماس"}</span>
+                <span>{convertToPersianDigits(motelData.phone) || "تلفن تماس"}</span>
               </div>
             </div>
 
@@ -341,11 +342,11 @@ export default function LodgeInfo() {
               <div className="flex items-center space-x-6 text-sm">
                 <div className="flex items-center">
                   <Clock className="w-4 h-4 ml-2" />
-                  <span>زمان ورود: {motelData.checkInTime}</span>
+                  <span>زمان ورود: {convertToPersianDigits(motelData.checkInTime)}</span>
                 </div>
                 <div className="flex items-center">
                   <Clock className="w-4 h-4 ml-2" />
-                  <span>زمان خروج: {motelData.checkOutTime}</span>
+                  <span>زمان خروج: {convertToPersianDigits(motelData.checkOutTime) }</span>
                 </div>
               </div>
             </div>

@@ -148,7 +148,7 @@ export default function ReserveDialog({
         toast.loading("درحال افزودن اطلاعات");
         const addReserve = await addNewReserve(reservationData);
         if (addReserve.success) {
-          getLodgeData;
+          getLodgeData();
           toast.dismiss();
           toast.success("با موفقیت افزوده شد");
           resetForm();

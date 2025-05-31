@@ -15,7 +15,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Calendar } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
-
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Plus,
   Search,
@@ -24,6 +29,7 @@ import {
   Phone,
   Edit,
   Trash2,
+  X,
 } from "lucide-react";
 
 import {
@@ -36,6 +42,7 @@ import {
 import { toast } from "sonner";
 
 import {
+  convertToPersianDigits,
   getJalaliDateDifference,
   persianDate,
   updateReservationStatuses,
@@ -100,7 +107,7 @@ export default function ReservationsPage() {
     }
 
     return filtered;
-  }, [rooms, searchTerm, statusFilter, roomFilter]);
+  }, [rooms, searchTerm, statusFilter, roomFilter, reservations]);
 
   const resetForm = () => {
     setFormData({
@@ -290,8 +297,16 @@ export default function ReservationsPage() {
                         placeholder="جستجو"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10"
+                        className="pl-10 pr-8"
                       />
+                      {searchTerm && (
+                        <button
+                          onClick={() => setSearchTerm("")}
+                          className="absolute cursor-pointer right-3  top-1/2 transform -translate-y-1/2 text-deep-ocean hover:text-deep-ocean/80 focus:outline-none"
+                        >
+                          <X className="w-4 h-4" />{" "}
+                        </button>
+                      )}
                     </div>
                   </div>
                   <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -507,23 +522,27 @@ export default function ReservationsPage() {
                         </div>
 
                         <div className="flex flex-col  items-end justify-center gap-4 enter text-sm w-full">
-                          <div>
-                            <span className="text-lime-600 ml-1">
-                              تاریخ ورود:
-                            </span>
-                            <span className="font-medium">
-                              {reservation.check_in}
-                            </span>
-                          </div>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <p className="text-lime-600 font-bold cursor-pointer">
+                                {convertToPersianDigits(reservation.check_in)}
+                              </p>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>تاریخ ورود</p>
+                            </TooltipContent>
+                          </Tooltip>
 
-                          <div>
-                            <span className="text-red-600 ml-1">
-                              تاریخ خروج:
-                            </span>
-                            <span className="font-medium">
-                              {reservation.check_out}
-                            </span>
-                          </div>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <p className="text-red-600 font-bold cursor-pointer">
+                                {convertToPersianDigits(reservation.check_out)}
+                              </p>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>تاریخ خروج</p>
+                            </TooltipContent>
+                          </Tooltip>
                         </div>
                       </div>
                     </CardContent>

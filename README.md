@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# سیستم مدیریت اقامت گاه (اقامت بان)
 
-## Getting Started
+**نرم‌افزار مدیریت اقامتگاه**  
 
-First, run the development server:
+## 📌 قابلیت‌های اصلی  
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### ۱. مدیریت اتاق‌ها  
+- ثبت مشخصات اتاق‌ها (شماره، نوع، ظرفیت، امکانات)  
+- تعیین نرخ اقامت (شبانه یا نفرمحور)  
+- مشاهده وضعیت لحظه‌ای اتاق‌ها (خالی، رزرو شده، در حال اقامت)  
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### ۲. مدیریت رزرواسیون  
+- ثبت رزرو جدید با مشخصات کامل مهمان  
+- نمایش تقویم اقامت به صورت بصری  
+- تغییر وضعیت رزرو (تأیید شده، لغو شده، در حال اقامت، خاتمه یافته)  
+- ثبت خودکار وضعیت "اقامت شروع شد" و "اقامت پایان یافت"  
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### ۳. گزارش‌دهی و آمار  
+- گزارش روزانه ورود/خروج مهمانان  
+- آمار اشغال اتاق‌ها به صورت درصدی  
+- گزارش مالی دوره‌ای  
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠 فناوری‌های استفاده شده  
+- **Frontend:** React.js + TypeScript + TailwindCSS  
+- **Backend:** Supabase (PostgreSQL)  
+- **تاریخ شمسی:** کتابخانه moment-jalaali  
+- **UI Components:** ShadCN/ui  
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## 🤝 مشارکت در توسعه  
+پروژه متن‌باز است و مشارکت شما باعث بهبود سیستم می‌شود.  
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📜 مجوز  
+این پروژه تحت مجوز MIT منتشر شده است.  
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📞 تماس با توسعه‌دهنده  
+- **Telegram**: [@xerxescoder](https://t.me/xerxescoder)
+- **Telegram Channel**: [@xerxescodes](https://t.me/xerxescodes)
+- **Email**: [xerxescode@gmail.com](mailto:xerxescode@gmail.com)
+
+---
+**نسخه ۱.۰.۰ - خرداد 1404**

@@ -25,6 +25,7 @@ export default function DashbaordProvider({ children }) {
       const reservations = await getUserReservations();
       setReservations(reservations?.data);
       setIsDataLoaded(true);
+      console.log("Room and Reservation data loaded");
     } catch (e) {
       console.log(e);
     }
@@ -33,8 +34,8 @@ export default function DashbaordProvider({ children }) {
   const getUserLodgeInformation = async () => {
     try {
       const userInfo = await getUserLodge();
-      console.log(userInfo.data[0]);
       setuserLodgeInfo(userInfo.data[0]);
+      console.log("user data loaded");
     } catch (e) {
       console.log(e);
     }

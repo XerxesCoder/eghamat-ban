@@ -7,7 +7,10 @@ import Link from "next/link";
 import { reserveStatus, roomTypes } from "@/lib/roomsData";
 import { DoorOpen, HomeIcon } from "lucide-react";
 import { useMemo } from "react";
-import { updateReservationStatuses } from "@/lib/jalali";
+import {
+  convertToPersianDigits,
+  updateReservationStatuses,
+} from "@/lib/jalali";
 import { useLodgeData } from "../DashbaordProvider";
 import { RoomsCardSkeleton } from "./RoomsSkeleton";
 import { ReservationsCardSkeleton } from "./ReservationSkeletonCard";
@@ -96,7 +99,7 @@ export default function RoomStats() {
                         <p className="font-medium">اتاق {room.room_number}</p>
                       </div>
                     </div>
-                    <Badge className="bg-deep-ocean">
+                    <Badge className="text-deep-ocean bg-lime-zest">
                       {
                         roomTypes.find(
                           (type) =>
@@ -163,11 +166,11 @@ export default function RoomStats() {
                           </p>
                           <p className="text-sm">
                             <span className="text-lime-600">
-                              {reservation.check_in}
+                              {convertToPersianDigits(reservation.check_in)}
                             </span>{" "}
                             -
                             <span className="text-red-600">
-                              {reservation.check_out}
+                              {convertToPersianDigits(reservation.check_out)}
                             </span>
                           </p>
                         </div>

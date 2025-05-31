@@ -16,6 +16,7 @@ import {
   Grid3X3,
   List,
   HousePlus,
+  X,
 } from "lucide-react";
 
 import {
@@ -419,8 +420,16 @@ export default function RoomsPage() {
                     placeholder="جستجو..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 pr-8"
                   />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm("")}
+                      className="absolute cursor-pointer right-3  top-1/2 transform -translate-y-1/2 text-deep-ocean hover:text-deep-ocean/80 focus:outline-none"
+                    >
+                      <X className="w-4 h-4" />{" "}
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -489,7 +498,7 @@ export default function RoomsPage() {
                       <CardTitle className="text-lg">
                         اتاق {room.room_number}
                       </CardTitle>
-                      <Badge className={`bg-deep-ocean text-white`}>
+                      <Badge className={`text-deep-ocean bg-lime-zest`}>
                         {
                           roomTypes.find(
                             (type) =>
