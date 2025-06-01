@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { roomTypes } from "@/lib/roomsData";
-import { Plus } from "lucide-react";
+import { Calendar, CalendarDays, Plus } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -20,15 +20,16 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import DatePicker from "react-multi-date-picker";
+import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import transition from "react-element-popper/animations/transition";
-import InputIcon from "react-multi-date-picker/components/input_icon";
-import { useMemo, useState } from "react";
+
+import { useCallback, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   checkRoomAvailability,
+  convertToEnglishDigits,
   getJalaliDateDifference,
   validateReservationDates,
 } from "@/lib/jalali";
@@ -55,6 +56,11 @@ export default function ReserveDialog({
   const { getLodgeData } = useLodgeData();
   const [isAddingOrEditing, setIsAddingOrEditing] = useState(false);
 
+  const handleInputChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }, []);
+
   const dateDifference = useMemo(() => {
     if (formData.checkIn == formData.checkOut) return 1;
     return getJalaliDateDifference(formData.checkIn, formData.checkOut);
@@ -72,12 +78,25 @@ export default function ReserveDialog({
     return nights * roomPrice;
   };
 
+  const totalAmount = useMemo(() => {
+    return calculateTotalAmount(
+      formData.roomId,
+      formData.checkIn,
+      formData.checkOut,
+      formData.adults
+    );
+  }, [formData.roomId, formData.checkIn, formData.checkOut, formData.adults]);
+  console.log(totalAmount);
+  const todayDate = new DateObject({ calendar: persian, locale: persian_fa });
+
   const handleDatePick = (state, value) => {
-    const choosenDate = `${value?.year}/${value?.month.number}/${value?.day}`;
+    const choosenDate = value.format();
+
     if (state == "in") {
       setFormData((prev) => ({
         ...prev,
         checkIn: String(choosenDate),
+        checkOut: "",
       }));
     } else {
       setFormData((prev) => ({
@@ -89,7 +108,6 @@ export default function ReserveDialog({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (formData.roomId === "") {
       toast.error("لطفا یک اتاق انتخاب کنید");
       return;
@@ -102,6 +120,21 @@ export default function ReserveDialog({
       toast.error("لطفا تاریخ خروج را انتخاب کنید");
       return;
     }
+    if (formData.guestName === "") {
+      toast.error("لطفا نام مهمان را وارد کنید");
+      return;
+    }
+    if (formData.guestPhone === "") {
+      toast.error("لطفا شماره تلفن را وارد کنید");
+      return;
+    }
+
+    // Persian phone number validation (Iranian format)
+    const phoneRegex = /^(0|\+98|0098)9[0-9]{9}$/;
+    if (!phoneRegex.test(formData.guestPhone)) {
+      toast.error("لطفا شماره تلفن معتبر وارد کنید (مثال: 09123456789)");
+      return;
+    }
     if (!editingReservation) {
       if (!checkRoomAvailability(formData, reservations)) {
         return;
@@ -112,23 +145,16 @@ export default function ReserveDialog({
     }
     setIsAddingOrEditing(true);
     try {
-      const totalAmount = calculateTotalAmount(
-        formData.roomId,
-        formData.checkIn,
-        formData.checkOut,
-        formData.adults
-      );
-
       const reservationData = {
         roomId: formData.roomId,
         guestName: formData.guestName,
         guestPhone: formData.guestPhone,
-        checkIn: formData.checkIn,
-        checkOut: formData.checkOut,
+        checkIn: convertToEnglishDigits(formData.checkIn),
+        checkOut: convertToEnglishDigits(formData.checkOut),
         adults: Number(formData.adults),
         notes: formData.notes,
         status: formData.status,
-        totalAmount,
+        totalAmount: totalAmount,
       };
 
       if (editingReservation) {
@@ -190,6 +216,26 @@ export default function ReserveDialog({
     });
   };
 
+  const CustomDateInput = ({ openCalendar, value, disabled }) => {
+    return (
+      <div
+        onClick={(e) => {
+          if (disabled) return;
+          e.stopPropagation();
+          openCalendar();
+        }}
+        className={`flex items-center gap-2 border w-40 rounded-sm bg-transparent px-3 py-1 
+        ${disabled ? "opacity-50 pointer-events-none" : "cursor-pointer"}
+        border-deep-ocean focus-visible:border-deep-ocean/50 focus-visible:ring-aqua-spark/50 focus-visible:ring-[1px]`}
+      >
+        <span className="flex-1 text-sm truncate">
+          {value || "انتخاب تاریخ"}
+        </span>
+        <CalendarDays className="w-4 h-4 " />
+      </div>
+    );
+  };
+
   return (
     <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
       {withButton && (
@@ -221,13 +267,9 @@ export default function ReserveDialog({
               <Label htmlFor="guestName">نام مسافر</Label>
               <Input
                 id="guestName"
+                name="guestName"
                 value={formData.guestName}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    guestName: e.target.value,
-                  }))
-                }
+                onChange={handleInputChange}
                 required
               />
             </div>
@@ -235,18 +277,14 @@ export default function ReserveDialog({
               <Label htmlFor="guestPhone">تلفن تماس</Label>
               <Input
                 id="guestPhone"
+                name="guestPhone"
                 value={formData.guestPhone}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    guestPhone: e.target.value,
-                  }))
-                }
+                onChange={handleInputChange}
                 required
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex justify-start items-center gap-8">
             <div className="space-y-2">
               <Label htmlFor="roomId">اتاق</Label>
               <Select
@@ -273,44 +311,42 @@ export default function ReserveDialog({
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="adults">نفرات</Label>
-                <Select
-                  value={formData.adults}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, adults: value }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Array.from(
-                      {
-                        length: formData.roomId
-                          ? rooms.find(
-                              (room) =>
-                                String(room.id) == String(formData.roomId)
-                            ).capacity
-                          : 6,
-                      },
-                      (_, i) => i + 1
-                    ).map((num) => (
-                      <SelectItem key={num} value={num.toString()}>
-                        {num}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-2">
+              <Label htmlFor="adults">نفرات</Label>
+              <Select
+                value={formData.adults}
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, adults: value }))
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from(
+                    {
+                      length: formData.roomId
+                        ? rooms.find(
+                            (room) => String(room.id) == String(formData.roomId)
+                          ).capacity
+                        : 6,
+                    },
+                    (_, i) => i + 1
+                  ).map((num) => (
+                    <SelectItem key={num} value={num.toString()}>
+                      {num}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="flex justify-start gap-8 items-center ">
             <div className="space-y-2">
               <Label htmlFor="checkIn">تاریخ ورود</Label>
               <DatePicker
+                minDate={todayDate}
                 animations={[transition()]}
                 monthYearSeparator="|"
                 calendar={persian}
@@ -318,10 +354,7 @@ export default function ReserveDialog({
                 calendarPosition="bottom-right"
                 value={formData.checkIn}
                 onChange={(e) => handleDatePick("in", e)}
-                render={<InputIcon />}
-                inputClass={
-                  "border-deep-ocean border w-32 rounded-sm bg-transparent px-3 py-1  focus-visible:border-deep-ocean/50 focus-visible:ring-aqua-spark/50 focus-visible:ring-[1px]"
-                }
+                render={<CustomDateInput />}
               />
             </div>
             <div className="space-y-2">
@@ -330,15 +363,22 @@ export default function ReserveDialog({
               <DatePicker
                 animations={[transition()]}
                 monthYearSeparator="|"
+                minDate={
+                  formData.checkIn
+                    ? new DateObject({
+                        date: formData.checkIn,
+                        calendar: persian,
+                        locale: persian_fa,
+                      }).add(1, "day")
+                    : undefined
+                }
                 calendar={persian}
                 locale={persian_fa}
                 calendarPosition="bottom-right"
                 value={formData.checkOut}
                 onChange={(e) => handleDatePick("out", e)}
-                render={<InputIcon />}
-                inputClass={
-                  "border-deep-ocean border w-32 rounded-sm bg-transparent px-3 py-1  focus-visible:border-deep-ocean/50 focus-visible:ring-aqua-spark/50 focus-visible:ring-[1px]"
-                }
+                render={<CustomDateInput />}
+                disabled={!formData.checkIn}
               />
             </div>
           </div>
@@ -376,7 +416,7 @@ export default function ReserveDialog({
                     {Number(
                       rooms.find((r) => String(r.id) === formData.roomId)
                         ?.price_per_night
-                    ).toLocaleString("fa-IR")}
+                    ).toLocaleString("fa-IR")}{" "}
                     تومان
                   </strong>
                 </p>
@@ -389,15 +429,7 @@ export default function ReserveDialog({
                 <p className="text-base text-deep-ocean font-bold">
                   <strong>
                     مبلغ کل:
-                    {Number(
-                      calculateTotalAmount(
-                        formData.roomId,
-                        formData.checkIn,
-                        formData.checkOut,
-                        formData.adults
-                      )
-                    ).toLocaleString("fa-IR")}{" "}
-                    تومان
+                    {Number(totalAmount).toLocaleString("fa-IR")} تومان
                   </strong>
                 </p>
               </div>

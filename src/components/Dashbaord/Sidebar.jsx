@@ -9,6 +9,8 @@ import {
   Clock,
   Banknote,
   DoorClosed,
+  Users,
+  DollarSign,
 } from "lucide-react";
 
 import {
@@ -61,9 +63,14 @@ const items = [
     icon: CalendarSearch,
   },
   {
-    title: "درآمد",
+    title: "مالی",
     url: "/dashboard/finance",
-    icon: Banknote,
+    icon: DollarSign,
+  },
+  {
+    title: "مشتریان",
+    url: "/dashboard/customers",
+    icon: Users,
   },
   {
     title: " اقامتگاه من",
@@ -76,7 +83,7 @@ export function AppSidebar() {
   const { open, toggleSidebar } = useSidebar();
   const pathname = usePathname();
   const [currentTime, setCurrentTime] = useState("");
-  
+
   useEffect(() => {
     const updateTime = () => {
       const formatter = new Intl.DateTimeFormat("fa-IR", {

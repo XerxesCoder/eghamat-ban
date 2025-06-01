@@ -43,7 +43,6 @@ import { toast } from "sonner";
 
 import {
   convertToPersianDigits,
-  getJalaliDateDifference,
   persianDate,
   updateReservationStatuses,
 } from "@/lib/jalali";
@@ -54,6 +53,7 @@ import moment from "moment-jalaali";
 import ReserveDialog from "./ReserveDialog";
 import { useLodgeData } from "../DashbaordProvider";
 import { useSearchParams } from "next/navigation";
+import { getStatusColor } from "@/lib/badgeColors";
 
 export default function ReservationsPage() {
   const { rooms, reservations, getLodgeData } = useLodgeData();
@@ -77,11 +77,6 @@ export default function ReservationsPage() {
     status: "pending",
   });
 
-  const dateDifference = useMemo(() => {
-    if (formData.checkIn == formData.checkOut) return 1;
-    return getJalaliDateDifference(formData.checkIn, formData.checkOut);
-  }, [formData.checkIn, formData.checkOut]);
-
   const filteredReservations = useMemo(() => {
     const rawData = updateReservationStatuses(reservations);
     let filtered = rawData;
@@ -90,7 +85,8 @@ export default function ReservationsPage() {
       filtered = filtered.filter(
         (res) =>
           res.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          res.guest_phone.includes(searchTerm)
+          res.guest_phone.includes(searchTerm) ||
+          res.id.includes(searchTerm)
       );
     }
 
@@ -170,20 +166,6 @@ export default function ReservationsPage() {
     });
   };
 
-  const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-      case "confirmed":
-        return "bg-emerald-100 text-emerald-800";
-      case "outdated":
-        return "bg-red-100 text-red-800";
-      case "ended":
-        return "bg-orange-100 text-orange-800 animate-pulse";
-      case "checked_in":
-        return "bg-cyan-100 text-cyan-800 animate-pulse";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
   const getReservationsForDate = (jalaliDate) => {
     const targetDate = moment(jalaliDate, "jYYYY/jM/jD");
 
@@ -490,13 +472,16 @@ export default function ReservationsPage() {
                             }
                           </Badge>
                           <div className="flex space-x-1">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleEdit(reservation)}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
+                            {String(reservation.status) !== "OUTDATED" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleEdit(reservation)}
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                            )}
+
                             <Button
                               size="sm"
                               variant="outline"

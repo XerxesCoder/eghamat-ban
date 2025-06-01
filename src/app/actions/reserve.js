@@ -8,6 +8,7 @@ export async function addNewReserve(reserveData) {
   if (!userId) return { error: "User ID is required" };
 
   try {
+
     const { data, error } = await supabase
       .from("reservations")
       .insert([
@@ -25,18 +26,6 @@ export async function addNewReserve(reserveData) {
         },
       ])
       .select();
-
-    /*     const { data: roomData, error: roomErr } = await supabase
-      .from("rooms")
-      .update([
-        {
-          enter_date: reserveData.checkIn,
-          exit_date: reserveData.checkOut,
-        },
-      ])
-      .eq("id", reserveData.roomId)
-      .eq("owner_id", userId)
-      .select(); */
 
     if (error) {
       console.error("Supabase error:", error);
@@ -56,6 +45,7 @@ export async function editReservation(reserveData, reserveID) {
   if (!userId) return { error: "User ID is required" };
 
   try {
+        console.log(reserveData.checkIn, reserveData.checkOut);
     const { data, error } = await supabase
       .from("reservations")
       .update([

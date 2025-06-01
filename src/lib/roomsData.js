@@ -35,5 +35,6 @@ export const reserveStatus = [
   { value: "outdated", label: "منقضی شده" },
   { value: "ended", label: "تخلیه امروز" },
   { value: "checked_in", label: "ورود امروز" },
+  { value: "stay", label: "در حال اقامت" },
   ,
 ];

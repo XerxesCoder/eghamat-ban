@@ -675,12 +675,17 @@ export default function OccupancyPage() {
                                                 action: {
                                                   label: "رزرو",
                                                   onClick: () => {
+                                                    console.log(
+                                                      day.format(
+                                                        "jYYYY/jMM/jDD"
+                                                      )
+                                                    );
                                                     setFormData((prev) => ({
                                                       ...prev,
                                                       roomId: room.id,
                                                       checkIn: String(
                                                         day.format(
-                                                          "jYYYY-jMM-jDD"
+                                                          "jYYYY/jMM/jDD"
                                                         )
                                                       ),
                                                     }));

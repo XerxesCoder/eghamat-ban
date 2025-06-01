@@ -4,13 +4,6 @@ import { toast } from "sonner";
 export const persianDate = moment().format("jYYYY/jM/jD");
 export const persianDateWithTime = moment().format("jYYYY/jM/jD HH:mm:ss");
 
-export function getJalaliDateDifference(startDate, endDate) {
-  const mStart = moment(startDate, "jYYYY/jMM/jDD");
-  const mEnd = moment(endDate, "jYYYY/jMM/jDD");
-
-  return mEnd.diff(mStart, "days");
-}
-
 /*
   ??? Date Formats
 */
@@ -48,9 +41,20 @@ export function convertToPersianDigits(input) {
   return input.replace(/\d/g, (d) => persianDigits[d]);
 }
 
+export const convertToEnglishDigits = (str) => {
+  return str.replace(/[۰-۹]/g, (d) => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
+};
+
 export const checkRoomAvailability = (newReservation, existingReservations) => {
-  const newCheckIn = moment(newReservation.checkIn, "jYYYY-jMM-jDD");
-  const newCheckOut = moment(newReservation.checkOut, "jYYYY-jMM-jDD");
+  const newCheckIn = moment(
+    convertToEnglishDigits(newReservation.checkIn),
+    "jYYYY/jMM/jDD"
+  );
+
+  const newCheckOut = moment(
+    convertToEnglishDigits(newReservation.checkOut),
+    "jYYYY/jMM/jDD"
+  );
 
   if (!newCheckIn.isValid() || !newCheckOut.isValid()) {
     toast.warning("فرمت تاریخ وارد شده نامعتبر است");
@@ -87,9 +91,12 @@ export const checkRoomAvailability = (newReservation, existingReservations) => {
 };
 
 export const validateReservationDates = (checkIn, checkOut) => {
-  const currentDate = moment(persianDate, "jYYYY-jMM-jDD");
-  const checkInDate = moment(checkIn, "jYYYY-jMM-jDD");
-  const checkOutDate = moment(checkOut, "jYYYY-jMM-jDD");
+  const currentDate = moment(persianDate, "jYYYY/jMM/jDD");
+  const checkInDate = moment(convertToEnglishDigits(checkIn), "jYYYY/jMM/jDD");
+  const checkOutDate = moment(
+    convertToEnglishDigits(checkOut),
+    "jYYYY/jMM/jDD"
+  );
 
   if (!checkInDate.isValid() || !checkOutDate.isValid()) {
     toast.warning("فرمت تاریخ وارد شده نامعتبر است");
@@ -113,6 +120,13 @@ export const validateReservationDates = (checkIn, checkOut) => {
 
   return true;
 };
+
+export function getJalaliDateDifference(startDate, endDate) {
+  const mStart = moment(convertToEnglishDigits(startDate), "jYYYY/jMM/jDD");
+  const mEnd = moment(convertToEnglishDigits(endDate), "jYYYY/jMM/jDD");
+
+  return mEnd.diff(mStart, "days");
+}
 
 export const generateMonthlyAvailability = (
   jYearMonth,
@@ -196,7 +210,9 @@ export const updateReservationStatuses = (reservations) => {
   const todayMoment = moment(today, "jYYYY/jM/jD");
 
   return reservations.map((reservation) => {
-    if (["ENDED", "OUTDATED", "CHECKED_IN"].includes(reservation.status)) {
+    if (
+      ["ENDED", "OUTDATED", "CHECKED_IN", "STAY"].includes(reservation.status)
+    ) {
       return reservation;
     }
 
@@ -226,6 +242,15 @@ export const updateReservationStatuses = (reservations) => {
       return {
         ...reservation,
         status: "OUTDATED",
+        updated_at: new Date().toISOString(),
+      };
+    } else if (
+      todayMoment.isAfter(checkInMoment, "day") &&
+      todayMoment.isBefore(checkOutMoment, "day")
+    ) {
+      return {
+        ...reservation,
+        status: "STAY",
         updated_at: new Date().toISOString(),
       };
     }

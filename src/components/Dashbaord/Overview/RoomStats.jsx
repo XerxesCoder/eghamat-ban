@@ -15,6 +15,7 @@ import { useLodgeData } from "../DashbaordProvider";
 import { RoomsCardSkeleton } from "./RoomsSkeleton";
 import { ReservationsCardSkeleton } from "./ReservationSkeletonCard";
 import { useRouter } from "next/navigation";
+import { getStatusColor } from "@/lib/badgeColors";
 
 export default function RoomStats() {
   const { rooms, reservations, isDataLoaded } = useLodgeData();
@@ -26,20 +27,7 @@ export default function RoomStats() {
 
   const router = useRouter();
 
-  const getStatusColor = (status) => {
-    switch (status.toLowerCase()) {
-      case "confirmed":
-        return "bg-emerald-100 text-emerald-800";
-      case "outdated":
-        return "bg-red-100 text-red-800";
-      case "ended":
-        return "bg-orange-100 text-orange-800 animate-pulse";
-      case "checked_in":
-        return "bg-cyan-100 text-cyan-800 animate-pulse";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
+
 
   const container = {
     hidden: { opacity: 0 },
