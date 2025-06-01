@@ -32,7 +32,7 @@ export default function CTA() {
               className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
               asChild
             >
-              <Link href={"/dashboard"}>ورود به داشبورد</Link>
+              <Link href={"/dashboard"}>داشبورد</Link>
             </Button>
             <Button variant="outline" asChild>
               <Link href={"/sign-up"}>ثبت‌ نام </Link>

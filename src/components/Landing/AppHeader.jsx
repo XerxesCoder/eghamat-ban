@@ -13,8 +13,8 @@ export default function AppHeader() {
 
   const pagesLink = [
     { href: "#features", label: "ویژگی‌ها" },
-    { href: "#testimonials", label: "نظرات کاربران" },
     { href: "#demo", label: "راهنما" },
+    { href: "#testimonials", label: "نظرات کاربران" },
   ];
   return (
     <motion.header
@@ -74,7 +74,7 @@ export default function AppHeader() {
                 <Link href={"/sign-in"}>ورود</Link>
               </Button>
               <Button
-                className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
+                className="bg-lime-zest text-deep-ocean hover:bg-lime-zest/80"
                 asChild
               >
                 <Link href={"/sign-up"}>ثبت‌ نام رایگان</Link>
@@ -102,26 +102,22 @@ export default function AppHeader() {
             </Link>
           ))}
           <div className="flex justify-center items-center gap-5">
-            {isSignedIn ? (
-              <Button
-                className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
-                asChild
-              >
-                <Link href={"/dashboard"}>ورود به داشبورد</Link>
-              </Button>
-            ) : (
-              <>
-                <Button variant="outline" asChild>
-                  <Link href={"/sign-in"}>ورود</Link>
-                </Button>
-                <Button
-                  className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
-                  asChild
-                >
-                  <Link href={"/sign-up"}>ثبت‌ نام رایگان</Link>
-                </Button>
-              </>
-            )}
+            <Button variant="outline" asChild>
+              <Link href={"/sign-in"}>ورود</Link>
+            </Button>
+
+            <Button
+              className="bg-lime-zest text-deep-ocean hover:bg-lime-zest/80"
+              asChild
+            >
+              <Link href={"/sign-up"}>ثبت‌ نام رایگان</Link>
+            </Button>
+            <Button
+              className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
+              asChild
+            >
+              <Link href={"/dashboard"}> داشبورد</Link>
+            </Button>
           </div>
         </motion.div>
       )}

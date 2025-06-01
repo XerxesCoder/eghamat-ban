@@ -43,10 +43,11 @@ export default function Hero() {
           transition={{ duration: 0.5, delay: 0.5 }}
         >
           <Button
-            className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
+            className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/80 text-lg"
             asChild
+            size={"lg"}
           >
-            <Link href={"/dashboard"}>ورود به داشبورد</Link>
+            <Link href={"/dashboard"}>داشبورد</Link>
           </Button>
         </motion.div>
       </motion.div>
