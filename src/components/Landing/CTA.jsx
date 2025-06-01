@@ -25,26 +25,18 @@ export default function CTA() {
             </p>
           </div>
           <div className="flex flex-col gap-2 min-[400px]:flex-row">
-            {isSignedIn ? (
-              <Button
-                className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
-                asChild
-              >
-                <Link href={"/dashboard"}>ورود به داشبورد</Link>
-              </Button>
-            ) : (
-              <>
-                <Button variant="outline" asChild>
-                  <Link href={"/sign-in"}>ورود</Link>
-                </Button>
-                <Button
-                  className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
-                  asChild
-                >
-                  <Link href={"/sign-up"}>ثبت‌ نام رایگان</Link>
-                </Button>
-              </>
-            )}
+            <Button variant="outline" asChild>
+              <Link href={"/sign-in"}>ورود</Link>
+            </Button>
+            <Button
+              className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
+              asChild
+            >
+              <Link href={"/dashboard"}>ورود به داشبورد</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href={"/sign-up"}>ثبت‌ نام </Link>
+            </Button>
           </div>
         </div>
       </motion.div>

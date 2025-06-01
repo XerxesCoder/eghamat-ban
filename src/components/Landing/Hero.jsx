@@ -2,11 +2,8 @@
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { motion } from "framer-motion";
-import { useAuth } from "@clerk/nextjs";
-import Image from "next/image";
 
 export default function Hero() {
-  const { isSignedIn } = useAuth();
   return (
     <section className="flex w-full overflow-hidden py-20 md:py-32 bg-pearl-luster">
       <motion.div
@@ -45,26 +42,12 @@ export default function Hero() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          {isSignedIn ? (
-            <Button
-              className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
-              asChild
-            >
-              <Link href={"/dashboard"}>ورود به داشبورد</Link>
-            </Button>
-          ) : (
-            <>
-              <Button variant="outline" asChild>
-                <Link href={"/sign-in"}>ورود</Link>
-              </Button>
-              <Button
-                className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
-                asChild
-              >
-                <Link href={"/sign-up"}>ثبت‌ نام رایگان</Link>
-              </Button>
-            </>
-          )}
+          <Button
+            className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90"
+            asChild
+          >
+            <Link href={"/dashboard"}>ورود به داشبورد</Link>
+          </Button>
         </motion.div>
       </motion.div>
     </section>

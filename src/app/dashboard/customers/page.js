@@ -1,4 +1,4 @@
-import CustomersPage from "@/components/Customers/CustomersInfo";
+import CustomersPage from "@/components/Dashbaord/Customers/CustomersInfo";
 
 export const metadata = {
   title: "اقامت بان | مشتریان ",

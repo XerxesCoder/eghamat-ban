@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { useLodgeData } from "../Dashbaord/DashbaordProvider";
+import { useLodgeData } from "../DashbaordProvider";
 import {
   Select,
   SelectContent,
