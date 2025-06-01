@@ -4,7 +4,7 @@ export const roomTypes = [
   { value: "triple", label: "سه خواب" },
   { value: "nobed", label: "کف خواب" },
   { value: "double", label: "دبل" },
-  { value: "suite", label: "سوییت" },
+  { value: "suite", label: "سوئیت" },
   { value: "vip", label: "VIP" },
 ];
 

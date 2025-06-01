@@ -168,11 +168,10 @@ export default function ReservationsPage() {
 
   const getReservationsForDate = (jalaliDate) => {
     const targetDate = moment(jalaliDate, "jYYYY/jM/jD");
-
-    return reservations.filter((res) => {
+    const updatedReservations = updateReservationStatuses(reservations);
+    return updatedReservations.filter((res) => {
       const checkIn = moment(res.check_in, "jYYYY/jM/jD");
       const checkOut = moment(res.check_out, "jYYYY/jM/jD");
-
       return targetDate.isSameOrAfter(checkIn) && targetDate.isBefore(checkOut);
     });
   };
@@ -355,6 +354,7 @@ export default function ReservationsPage() {
                     const room = rooms.find(
                       (r) => String(r.id) === String(reservation.room_id)
                     );
+
                     return (
                       <div
                         key={reservation.id}

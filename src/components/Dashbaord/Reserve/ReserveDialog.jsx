@@ -57,8 +57,13 @@ export default function ReserveDialog({
   const [isAddingOrEditing, setIsAddingOrEditing] = useState(false);
 
   const handleInputChange = useCallback((e) => {
+    const onlyNumbers = e.target.value.replace(/\D/g, "");
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name == "guestPhone") {
+      setFormData((prev) => ({ ...prev, [name]: onlyNumbers }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   }, []);
 
   const dateDifference = useMemo(() => {
@@ -86,7 +91,6 @@ export default function ReserveDialog({
       formData.adults
     );
   }, [formData.roomId, formData.checkIn, formData.checkOut, formData.adults]);
-  console.log(totalAmount);
   const todayDate = new DateObject({ calendar: persian, locale: persian_fa });
 
   const handleDatePick = (state, value) => {
@@ -334,7 +338,7 @@ export default function ReserveDialog({
                     (_, i) => i + 1
                   ).map((num) => (
                     <SelectItem key={num} value={num.toString()}>
-                      {num}
+                      {num.toLocaleString("fa-IR")}
                     </SelectItem>
                   ))}
                 </SelectContent>
