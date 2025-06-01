@@ -1,7 +1,7 @@
 import FinanceInfo from "@/components/Dashbaord/Finance/FinanceInfo";
 
 export const metadata = {
-  title: "اقامت بان | درآمد ",
+  title: "اقامت بان | مالی ",
   description: "مدریت ساده و سریع برای اقامتگاه‌ها",
 };
 export default function Finance() {

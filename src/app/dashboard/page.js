@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function Dashboard() {
   return (
-    <div className="py-20 sm:py-14 px-6 w-full min-h-screen  container mx-auto">
+    <div className="py-20 sm:py-14 px-6 w-full min-h-screen  container mx-auto" >
       <Overview />
       <QuickActions />
       <RoomStats />

@@ -284,6 +284,13 @@ const CustomersPage = () => {
       {/* Filters and Search */}
       <motion.div variants={item}>
         <Card>
+          <CardHeader>
+            <p>این صفحه لیست منحصر به فرد مشتریان را نمایش می‌دهد. </p>
+            <p>
+              در این گزارش، تمامی وضعیت‌های رزرو به همراه محاسبات دقیق درآمدهای
+              مربوطه در نظر گرفته شده‌اند.
+            </p>
+          </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
