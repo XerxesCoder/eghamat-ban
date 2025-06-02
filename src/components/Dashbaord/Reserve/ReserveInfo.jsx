@@ -18,7 +18,6 @@ import persian_fa from "react-date-object/locales/persian_fa";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
@@ -86,7 +85,7 @@ export default function ReservationsPage() {
         (res) =>
           res.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           res.guest_phone.includes(searchTerm) ||
-          res.id.includes(searchTerm)
+          res.id == searchTerm
       );
     }
 
@@ -242,15 +241,6 @@ export default function ReservationsPage() {
           </motion.p>
         </div>
         <div className="flex space-x-3 mt-4 sm:mt-0">
-          <Button
-            variant="outline"
-            onClick={() =>
-              setViewMode(viewMode === "list" ? "calendar" : "list")
-            }
-          >
-            <CalendarIcon className="w-4 h-4 mr-2" />
-            {viewMode === "list" ? "نمای تقویم" : "نمای لیست"}
-          </Button>
           <ReserveDialog
             rooms={rooms}
             reservations={reservations}
@@ -263,17 +253,26 @@ export default function ReservationsPage() {
             resetForm={resetForm}
             withButton={true}
           />
+          <Button
+            variant="outline"
+            onClick={() =>
+              setViewMode(viewMode === "list" ? "calendar" : "list")
+            }
+          >
+            <CalendarIcon className="w-4 h-4 mr-2" />
+            {viewMode === "list" ? "نمای تقویم" : "نمای لیست"}
+          </Button>
         </div>
       </motion.div>
       <AnimatePresence mode="wait">
         {viewMode === "list" && (
           <motion.div variants={item}>
             <Card>
-              <CardContent className="pt-6">
-                <div className="flex flex-col sm:flex-row gap-4">
+              <CardContent>
+                <div className="flex flex-col sm:flex-row gap-2">
                   <div className="flex-1">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                      <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
                         placeholder="جستجو"
                         value={searchTerm}
@@ -283,40 +282,44 @@ export default function ReservationsPage() {
                       {searchTerm && (
                         <button
                           onClick={() => setSearchTerm("")}
-                          className="absolute cursor-pointer right-3  top-1/2 transform -translate-y-1/2 text-deep-ocean hover:text-deep-ocean/80 focus:outline-none"
+                          className="absolute cursor-pointer left-3  top-1/2 transform -translate-y-1/2 text-deep-ocean hover:text-deep-ocean/80 focus:outline-none"
                         >
                           <X className="w-4 h-4" />{" "}
                         </button>
                       )}
                     </div>
                   </div>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="وضعیت" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">همه</SelectItem>
-                      {reserveStatus.map((status) => (
-                        <SelectItem key={status.value} value={status.value}>
-                          {status.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  <Select value={roomFilter} onValueChange={setRoomFilter}>
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="اتاق" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">همه اتاق ها</SelectItem>
-                      {rooms.map((room) => (
-                        <SelectItem key={room.id} value={room.id}>
-                          {room.room_number}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex justify-center items-center gap-3">
+                    <Select
+                      value={statusFilter}
+                      onValueChange={setStatusFilter}
+                    >
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="وضعیت" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">همه وضعیت ها</SelectItem>
+                        {reserveStatus.map((status) => (
+                          <SelectItem key={status.value} value={status.value}>
+                            {status.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={roomFilter} onValueChange={setRoomFilter}>
+                      <SelectTrigger className="w-40">
+                        <SelectValue placeholder="اتاق" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">همه اتاق ها</SelectItem>
+                        {rooms.map((room) => (
+                          <SelectItem key={room.id} value={room.id}>
+                            {room.room_number}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -330,11 +333,11 @@ export default function ReservationsPage() {
             className="grid grid-cols-1 lg:grid-cols-3 gap-6"
             variants={item}
           >
-            <Card className={"w-full md:max=w-md"}>
+            <Card className={"w-full  flex justify-center items-center"}>
               <CardHeader>
                 <CardTitle>تقویم</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className={"p-0"}>
                 <Calendar
                   value={selectedDate}
                   onChange={handleCalendarDatePick}
@@ -346,7 +349,9 @@ export default function ReservationsPage() {
 
             <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle>رزروهای {String(selectedDate)}</CardTitle>
+                <CardTitle>
+                  رزروهای {convertToPersianDigits(String(selectedDate))}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -390,14 +395,20 @@ export default function ReservationsPage() {
                           </p>
                           <p>
                             <span className="text-lime-600">
-                              {reservation.check_in}
+                              {convertToPersianDigits(reservation.check_in)}
                             </span>{" "}
                             -{" "}
                             <span className="text-red-600">
-                              {reservation.check_out}
+                              {convertToPersianDigits(reservation.check_out)}
                             </span>
                           </p>
-                          <p>{reservation.adults} نفر</p>
+                          <p className="font-bold">
+                            {Number(reservation.adults).toLocaleString(
+                              "fa-IR",
+                              { useGrouping: false }
+                            )}{" "}
+                            نفر
+                          </p>
                         </div>
                       </div>
                     );
@@ -498,11 +509,19 @@ export default function ReservationsPage() {
                         <div className="flex flex-col  items-start justify-center gap-4 enter text-sm w-full">
                           <div className="flex items-center space-x-2">
                             <Phone className="w-4 h-4 text-gray-400" />
-                            <span>{reservation.guest_phone}</span>
+                            <span>
+                              {convertToPersianDigits(reservation.guest_phone)}
+                            </span>
                           </div>
                           <div className="flex items-center space-x-2 w-full">
                             <User className="w-4 h-4 text-gray-400" />
-                            <span>{reservation.adults} نفر</span>
+                            <span>
+                              {Number(reservation.adults).toLocaleString(
+                                "fa-IR",
+                                { useGrouping: false }
+                              )}{" "}
+                              نفر
+                            </span>
                           </div>
                         </div>
 
@@ -562,17 +581,17 @@ export default function ReservationsPage() {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
+                className="lg:col-span-2  xl:col-span-3"
               >
                 <Card>
-                  <CardContent className="text-center py-12">
+                  <CardContent className="text-center">
                     <CalendarIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
                       رزروی پیدا نشد
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      {reservations.length === 0
-                        ? "اولین رزرو خود را ایجاد کنید"
-                        : "پارامترهای جستجوی خود را تغییر دهید"}
+                      {reservations.length === 0 &&
+                        "اولین رزرو خود را ایجاد کنید"}
                     </p>
                     {reservations.length === 0 && (
                       <Button

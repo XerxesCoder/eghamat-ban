@@ -259,7 +259,7 @@ export default function LodgeInfo() {
                 onClick={addAmenity}
                 size="sm"
                 className={
-                  "bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/70"
+                  "bg-lime-zest text-deep-ocean hover:bg-lime-zest/70"
                 }
               >
                 <Plus className="w-4 h-4" />
@@ -294,9 +294,9 @@ export default function LodgeInfo() {
       </motion.div>
       <motion.div variants={item}>
         <Card>
-          <CardHeader>
+{/*           <CardHeader>
             <CardTitle>پیش نمایش اقامتگاه</CardTitle>
-          </CardHeader>
+          </CardHeader> */}
           <CardContent>
             <h2 className="text-2xl font-bold mb-2">
               {motelData.name || "نام اقامتگاه"}

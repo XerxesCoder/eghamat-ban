@@ -305,7 +305,7 @@ const CustomersPage = () => {
                   {searchTerm && (
                     <button
                       onClick={() => setSearchTerm("")}
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                      className="absolute cursor-pointer left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -424,11 +424,10 @@ const CustomersPage = () => {
             <motion.div key={customer.phone} variants={item}>
               <Card
                 className={`py-0 ${
-                  expandedCardId === customer.id ? "" : "h-[400px]"
+                  expandedCardId === customer.id ? "" : "h-[410px] sm:h-[400px]"
                 } overflow-hidden transition-all duration-300`}
               >
                 <CardContent className="p-6 space-y-4">
-                  {/* Header */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
@@ -438,8 +437,8 @@ const CustomersPage = () => {
                         <h3 className="font-semibold text-lg">
                           {customer.name}
                         </h3>
-                        <p className="text-gray-500 text-sm">
-                          {customer.phone}
+                        <p className="text-deep-ocean text-sm">
+                          {convertToPersianDigits(customer.phone)}
                         </p>
                       </div>
                     </div>
@@ -460,10 +459,10 @@ const CustomersPage = () => {
 
                   {/* Info Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-right">
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-600">آخرین بازدید: </span>
                       <span>
-                        آخرین بازدید:{" "}
                         {convertToPersianDigits(
                           moment(customer.lastVisit, "jYYYY/jM/jD").format(
                             "jYYYY/jMM/jDD"
@@ -471,42 +470,44 @@ const CustomersPage = () => {
                         )}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2">
                       <TrendingUp className="w-4 h-4 text-gray-400" />
                       <span>
                         {customer.totalBookings.toLocaleString("fa-IR")} رزرو
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2">
                       <DollarSign className="w-4 h-4 text-gray-400" />
-                      <span>
-                        مجموع: {customer.totalSpent.toLocaleString("fa-IR")}{" "}
-                        تومان
+                      <span className="text-gray-600">
+                        مجموع:{" "}
+                        <span className="text-black">
+                          {customer.totalSpent.toLocaleString("fa-IR")} تومان
+                        </span>
                       </span>
                     </div>
                   </div>
 
                   {/* Footer Info */}
                   <div className="pt-4 border-t border-gray-200 text-sm text-right space-y-1">
-                    <div>
+                    <p>
                       <span className="text-gray-600">مشتری از: </span>
-                      <span className="font-medium">
+                      <span>
                         {convertToPersianDigits(
                           moment(customer.firstVisit, "jYYYY/jM/jD").format(
                             "jYYYY/jMM/jDD"
                           )
                         )}
                       </span>
-                    </div>
-                    <div>
+                    </p>
+                    <p>
                       <span className="text-gray-600">
                         میانگین ارزش رزروها:{" "}
                       </span>
-                      <span className="font-semibold">
+                      <span>
                         {customer.averageBookingValue.toLocaleString("fa-IR")}{" "}
                         تومان
                       </span>
-                    </div>
+                    </p>
                   </div>
 
                   {/* Recent Reservations */}
@@ -523,7 +524,7 @@ const CustomersPage = () => {
                               moment(b.check_in, "jYYYY/jM/jD").valueOf()
                           )
                           .map((reservation, index) => (
-                            <div
+                            <p
                               key={index}
                               className="flex justify-between text-xs text-gray-600"
                             >
@@ -555,7 +556,7 @@ const CustomersPage = () => {
                                 )}{" "}
                                 تومان
                               </span>
-                            </div>
+                            </p>
                           ))}
 
                         {customer.reservations.length > 3 && (

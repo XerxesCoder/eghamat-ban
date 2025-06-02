@@ -1,13 +1,10 @@
 "use client";
 
 import {
-  HomeIcon,
   Hotel,
   CalendarSearch,
   LayoutDashboard,
   CalendarDays,
-  Clock,
-  Banknote,
   DoorClosed,
   Users,
   DollarSign,
@@ -28,17 +25,11 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  persianMonthName,
-  persianTodayName,
-  persianTodayNumber,
-  persianYear,
-} from "@/lib/jalali";
-import { SignedIn, UserButton } from "@clerk/nextjs";
-import { useEffect, useState } from "react";
+import { UserProfile } from "./UserButtonProfile";
+import { AnimatedClock } from "./AnimatedClock";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const items = [
   {
@@ -80,28 +71,21 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const { open, toggleSidebar } = useSidebar();
-  const pathname = usePathname();
-  const [currentTime, setCurrentTime] = useState("");
+  const { open, toggleSidebar, isMobile } = useSidebar();
 
-  useEffect(() => {
-    const updateTime = () => {
-      const formatter = new Intl.DateTimeFormat("fa-IR", {
-        timeStyle: "full",
-      });
-      setCurrentTime(formatter.format(new Date()).split(" ")[0]);
-    };
-    updateTime();
-    const intervalId = setInterval(updateTime, 1000);
-    return () => clearInterval(intervalId);
-  }, []);
+  const pathname = usePathname();
 
   return (
     <Sidebar side="right" collapsible="icon">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem onClick={toggleSidebar} className={"cursor-pointer"}>
-            <SidebarMenuButton size="lg" asChild>
+            <SidebarMenuButton
+              size="lg"
+              asChild
+              tooltip={"باز / بسته"}
+              className={"hover:bg-aqua-spark/20"}
+            >
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src="/assets/logo.png" alt="EghamatBan" />
@@ -114,17 +98,7 @@ export function AppSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-        {open && (
-          <div className="flex  gap-5 justify-start items-center">
-            {/*     <Clock className="h-6 w-6" /> */}
-            <div>
-              <p>
-                {`${persianTodayName}, ${persianTodayNumber} ${persianMonthName} ${persianYear}`}
-              </p>
-              <p>{currentTime}</p>
-            </div>
-          </div>
-        )}
+        {open && <AnimatedClock />}
       </SidebarHeader>
 
       <SidebarContent>
@@ -137,6 +111,11 @@ export function AppSidebar() {
                   <SidebarMenuButton
                     asChild
                     tooltip={item.title}
+                    onClick={() => {
+                      if (isMobile && open) {
+                        toggleSidebar();
+                      }
+                    }}
                     className={` hover:bg-aqua-spark/20 ${
                       pathname === item.url &&
                       "bg-aqua-spark border-l-2 border-deep-ocean pointer-events-none"
@@ -156,27 +135,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
-        {open && (
-          <SignedIn>
-            <SidebarMenuButton
-              size="md"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <UserButton
-                showName
-                appearance={{
-                  elements: {
-                    userButtonTrigger:
-                      "flex flex-row-reverse items-center gap-2 px-3 py-2 rounded-md hover:bg-gray-100",
-                    userButtonAvatarBox: "w-8 h-8",
-                    userButtonBox: "flex-row-reverse ",
-                    userButtonOuterIdentifier: "pl-0",
-                  },
-                }}
-              />
-            </SidebarMenuButton>
-          </SignedIn>
-        )}
+        <UserProfile />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

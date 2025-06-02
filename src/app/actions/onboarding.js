@@ -33,6 +33,8 @@ export const completeOnboarding = async (formData) => {
       .select();
 
     const res = await client.users.updateUser(userId, {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
       publicMetadata: {
         onboardingComplete: true,
       },

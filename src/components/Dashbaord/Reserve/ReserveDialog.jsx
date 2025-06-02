@@ -112,31 +112,30 @@ export default function ReserveDialog({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.roomId === "") {
-      toast.error("لطفا یک اتاق انتخاب کنید");
-      return;
-    }
-    if (formData.checkIn === "") {
-      toast.error("لطفا تاریخ ورود را انتخاب کنید");
-      return;
-    }
-    if (formData.checkOut === "") {
-      toast.error("لطفا تاریخ خروج را انتخاب کنید");
-      return;
-    }
     if (formData.guestName === "") {
-      toast.error("لطفا نام مهمان را وارد کنید");
+      toast.warning("لطفا نام مهمان را وارد کنید");
       return;
     }
     if (formData.guestPhone === "") {
-      toast.error("لطفا شماره تلفن را وارد کنید");
+      toast.warning("لطفا شماره تلفن را وارد کنید");
+      return;
+    }
+    if (formData.roomId === "") {
+      toast.warning("لطفا یک اتاق انتخاب کنید");
+      return;
+    }
+    if (formData.checkIn === "") {
+      toast.warning("لطفا تاریخ ورود را انتخاب کنید");
+      return;
+    }
+    if (formData.checkOut === "") {
+      toast.warning("لطفا تاریخ خروج را انتخاب کنید");
       return;
     }
 
-    // Persian phone number validation (Iranian format)
     const phoneRegex = /^(0|\+98|0098)9[0-9]{9}$/;
     if (!phoneRegex.test(formData.guestPhone)) {
-      toast.error("لطفا شماره تلفن معتبر وارد کنید (مثال: 09123456789)");
+      toast.warning("لطفا شماره تلفن معتبر وارد کنید (مثال: 09123456789)");
       return;
     }
     if (!editingReservation) {
@@ -220,22 +219,36 @@ export default function ReserveDialog({
     });
   };
 
-  const CustomDateInput = ({ openCalendar, value, disabled }) => {
+  const CustomDateInputEnter = ({ openCalendar, value }) => {
     return (
       <div
         onClick={(e) => {
-          if (disabled) return;
           e.stopPropagation();
           openCalendar();
         }}
-        className={`flex items-center gap-2 border w-40 rounded-sm bg-transparent px-3 py-1 
-        ${disabled ? "opacity-50 pointer-events-none" : "cursor-pointer"}
+        className={`flex justify-between items-center gap-5 border w-40 rounded-sm bg-transparent px-3 py-1 cursor-pointer
         border-deep-ocean focus-visible:border-deep-ocean/50 focus-visible:ring-aqua-spark/50 focus-visible:ring-[1px]`}
       >
-        <span className="flex-1 text-sm truncate">
-          {value || "انتخاب تاریخ"}
-        </span>
         <CalendarDays className="w-4 h-4 " />
+        <span className=" text-sm truncate">{value || "انتخاب تاریخ"}</span>
+      </div>
+    );
+  };
+
+  const CustomDateInputExit = ({ openCalendar, value }) => {
+    return (
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+          openCalendar();
+        }}
+        className={`flex justify-between items-center gap-5 border w-40 rounded-sm bg-transparent px-3 py-1 cursor-pointer
+       ${
+         !formData.checkIn && "opacity-50 pointer-events-none"
+       } border-deep-ocean focus-visible:border-deep-ocean/50 focus-visible:ring-aqua-spark/50 focus-visible:ring-[1px]`}
+      >
+        <CalendarDays className="w-4 h-4 " />
+        <span className=" text-sm truncate">{value || "انتخاب تاریخ"}</span>
       </div>
     );
   };
@@ -257,13 +270,17 @@ export default function ReserveDialog({
         </DialogTrigger>
       )}
       <DialogContent className="max-w-2xl">
-        <DialogHeader>
+        <DialogHeader
+          className={
+            "border-b border-deep-ocean/30 pb-3 justify-center items-center"
+          }
+        >
           <DialogTitle>
             {editingReservation ? "ویرایش رزرو" : "رزرو جدید"}
           </DialogTitle>
-          <DialogDescription>
+          {/*           <DialogDescription>
             {editingReservation ? "ویرایش اطلاعات رزرو" : "ایجاد رزرو جدید"}
-          </DialogDescription>
+          </DialogDescription> */}
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -274,7 +291,7 @@ export default function ReserveDialog({
                 name="guestName"
                 value={formData.guestName}
                 onChange={handleInputChange}
-                required
+                //required
               />
             </div>
             <div className="space-y-2">
@@ -284,7 +301,7 @@ export default function ReserveDialog({
                 name="guestPhone"
                 value={formData.guestPhone}
                 onChange={handleInputChange}
-                required
+                //required
               />
             </div>
           </div>
@@ -301,17 +318,28 @@ export default function ReserveDialog({
                   <SelectValue placeholder="انتخاب اتاق" />
                 </SelectTrigger>
                 <SelectContent>
-                  {rooms.map((room) => (
-                    <SelectItem key={room.id} value={room.id}>
-                      اتاق {room.room_number} -{" "}
-                      {
-                        roomTypes.find(
-                          (type) =>
-                            room.type == String(type.value).toUpperCase()
-                        ).label
-                      }
-                    </SelectItem>
-                  ))}
+                  {rooms.map((room) => {
+                    const isMaintenance = room.status === "MAINTENANCE";
+                    const roomType = roomTypes.find(
+                      (type) => room.type === String(type.value).toUpperCase()
+                    );
+
+                    return (
+                      <SelectItem
+                        key={room.id}
+                        value={room.id}
+                        disabled={isMaintenance}
+                        className={
+                          isMaintenance
+                            ? "opacity-50 pointer-events-none text-red-800"
+                            : "cursor-pointer"
+                        }
+                      >
+                        {room.room_number} -{" "}
+                        {!isMaintenance ? roomType?.label : "تعمیرات"}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -358,7 +386,7 @@ export default function ReserveDialog({
                 calendarPosition="bottom-right"
                 value={formData.checkIn}
                 onChange={(e) => handleDatePick("in", e)}
-                render={<CustomDateInput />}
+                render={<CustomDateInputEnter />}
               />
             </div>
             <div className="space-y-2">
@@ -381,7 +409,7 @@ export default function ReserveDialog({
                 calendarPosition="bottom-right"
                 value={formData.checkOut}
                 onChange={(e) => handleDatePick("out", e)}
-                render={<CustomDateInput />}
+                render={<CustomDateInputExit />}
                 disabled={!formData.checkIn}
               />
             </div>
@@ -407,7 +435,7 @@ export default function ReserveDialog({
             formData.checkIn &&
             formData.checkOut &&
             formData.adults && (
-              <div className="p-4 bg-blue-100 rounded-lg space-y-1">
+              <div className="p-4 border border-deep-ocean/20 bg-pearl-luster rounded-lg space-y-1">
                 <p className="text-sm text-deep-ocean">
                   <strong>
                     {" "}
@@ -432,8 +460,7 @@ export default function ReserveDialog({
                 </p>
                 <p className="text-base text-deep-ocean font-bold">
                   <strong>
-                    مبلغ کل:
-                    {Number(totalAmount).toLocaleString("fa-IR")} تومان
+                    مبلغ کل: {Number(totalAmount).toLocaleString("fa-IR")} تومان
                   </strong>
                 </p>
               </div>
@@ -451,20 +478,22 @@ export default function ReserveDialog({
               کنسلی
             </Button>
           )}
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={() => setIsAddDialogOpen(false)}
-            >
-              لغو
-            </Button>
+          <DialogFooter
+            className={"border-t border-deep-ocean/30 pt-3 flex-col"}
+          >
             <Button
               type="submit"
               disabled={isAddingOrEditing}
               className={"disabled:opacity-50 disabled:pointer-events-none"}
             >
               {editingReservation ? "ویرایش" : "ایجاد"}
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={() => setIsAddDialogOpen(false)}
+            >
+              لغو
             </Button>
           </DialogFooter>
         </form>

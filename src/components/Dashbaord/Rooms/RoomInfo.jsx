@@ -17,12 +17,13 @@ import {
   List,
   HousePlus,
   X,
+  BadgeCheck,
+  Construction,
 } from "lucide-react";
 
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -37,9 +38,9 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { roomAmenities, roomTypes } from "@/lib/roomsData";
+import { roomAmenities, roomStatusTypes, roomTypes } from "@/lib/roomsData";
 import { addNewRoom, deleteRoom, editRoom } from "@/app/actions/rooms";
-import { persianDate } from "@/lib/jalali";
+
 import { useLodgeData } from "../DashbaordProvider";
 import { useSearchParams } from "next/navigation";
 
@@ -48,6 +49,7 @@ export default function RoomsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const searchParams = useSearchParams();
   const [typeFilter, setTypeFilter] = useState("all");
+  const [statusFilter, setstatusFilter] = useState("all");
   const [viewMode, setViewMode] = useState("grid");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
@@ -60,6 +62,7 @@ export default function RoomsPage() {
     maxOccupancy: "",
     amenities: [],
     priceTag: "night",
+    status: "AVAILABLE",
   });
 
   const filteredRooms = useMemo(() => {
@@ -79,8 +82,12 @@ export default function RoomsPage() {
       );
     }
 
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((room) => room.status === statusFilter);
+    }
+
     return filtered;
-  }, [rooms, searchTerm, typeFilter]);
+  }, [rooms, searchTerm, typeFilter, statusFilter]);
 
   const resetForm = () => {
     setFormData({
@@ -90,6 +97,7 @@ export default function RoomsPage() {
       maxOccupancy: "",
       amenities: [],
       priceTag: "night",
+      status: "AVAILABLE",
     });
   };
 
@@ -105,6 +113,7 @@ export default function RoomsPage() {
         price: Number(formData.price),
         amenities: formData.amenities,
         priceTag: formData.priceTag,
+        status: formData.status,
       };
 
       if (editingRoom) {
@@ -151,6 +160,7 @@ export default function RoomsPage() {
       maxOccupancy: room.capacity.toString(),
       amenities: room.amenities,
       priceTag: room.price_tag,
+      status: room.status,
     });
     setIsAddDialogOpen(true);
   };
@@ -265,15 +275,19 @@ export default function RoomsPage() {
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
-            <DialogHeader>
+            <DialogHeader
+              className={
+                "justify-center items-center pb-3 border-b border-deep-ocean/30"
+              }
+            >
               <DialogTitle>
                 {editingRoom ? "ویرایش اتاق" : "اضافه کردن اتاق جدید"}
               </DialogTitle>
-              <DialogDescription>
+              {/*               <DialogDescription>
                 {editingRoom
                   ? "بروز کردن اطلاعات اتاق"
                   : "اضافه کردن اطلاعات اتاق جدید"}
-              </DialogDescription>
+              </DialogDescription> */}
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -364,6 +378,29 @@ export default function RoomsPage() {
                     required
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="status"> وضعیت</Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, status: value }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {roomStatusTypes.map((status, id) => {
+                        return (
+                          <SelectItem key={id} value={status.value}>
+                            {status.label}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -386,14 +423,9 @@ export default function RoomsPage() {
                 </div>
               </div>
 
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => setIsAddDialogOpen(false)}
-                >
-                  لغو
-                </Button>
+              <DialogFooter
+                className={"flex-col border-t border-deep-ocean/30 pt-3"}
+              >
                 <Button
                   disabled={isAddingRoom}
                   className={
@@ -403,6 +435,13 @@ export default function RoomsPage() {
                 >
                   {editingRoom ? "ویرایش" : "اضافه کردن"}
                 </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => setIsAddDialogOpen(false)}
+                >
+                  لغو
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>
@@ -411,11 +450,11 @@ export default function RoomsPage() {
 
       <motion.div variants={item}>
         <Card>
-          <CardContent className="pt-6">
-            <div className="flex flex-col sm:flex-row gap-4">
+          <CardContent>
+            <div className="flex flex-col sm:flex-row gap-2">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
                     placeholder="جستجو..."
                     value={searchTerm}
@@ -425,50 +464,64 @@ export default function RoomsPage() {
                   {searchTerm && (
                     <button
                       onClick={() => setSearchTerm("")}
-                      className="absolute cursor-pointer right-3  top-1/2 transform -translate-y-1/2 text-deep-ocean hover:text-deep-ocean/80 focus:outline-none"
+                      className="absolute cursor-pointer left-3  top-1/2 transform -translate-y-1/2 text-deep-ocean hover:text-deep-ocean/80 focus:outline-none"
                     >
                       <X className="w-4 h-4" />{" "}
                     </button>
                   )}
                 </div>
               </div>
-
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="نوع" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">همه</SelectItem>
-                  {roomTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="flex rounded-lg">
-                <Button
-                  variant={viewMode === "grid" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                  className={`${
-                    viewMode == "grid" &&
-                    "bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/70 rounded-l-none"
-                  } `}
-                >
-                  <Grid3X3 className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "list" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                  className={`${
-                    viewMode === "list" &&
-                    "bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/70"
-                  } rounded-r-none`}
-                >
-                  <List className="w-4 h-4" />
-                </Button>
+              <div className="flex justify-center items-center gap-2">
+                <Select value={typeFilter} onValueChange={setTypeFilter}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="نوع" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">نوع اتاق </SelectItem>
+                    {roomTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={statusFilter} onValueChange={setstatusFilter}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="وضعیت" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">همه وضعیت ها</SelectItem>
+                    {roomStatusTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="flex">
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                    className={`${
+                      viewMode == "grid" &&
+                      "bg-deep-ocean text-white hover:bg-deep-ocean/70 "
+                    } rounded-l-none hover:bg-deep-ocean/20`}
+                  >
+                    <Grid3X3 className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setViewMode("list")}
+                    className={`${
+                      viewMode === "list" &&
+                      "bg-deep-ocean text-white hover:bg-deep-ocean/70"
+                    } rounded-r-none hover:bg-deep-ocean/20`}
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -498,17 +551,38 @@ export default function RoomsPage() {
                       <CardTitle className="text-lg">
                         اتاق {room.room_number}
                       </CardTitle>
-                      <Badge className={`text-deep-ocean bg-lime-zest`}>
+                      <Badge
+                        className={`${
+                          room.status == "AVAILABLE"
+                            ? "text-deep-ocean bg-lime-zest"
+                            : "text-pearl-luster bg-red-500"
+                        }`}
+                      >
+                        {room.status == "AVAILABLE" ? (
+                          <BadgeCheck />
+                        ) : (
+                          <Construction />
+                        )}
                         {
-                          roomTypes.find(
-                            (type) =>
-                              room.type == String(type.value).toUpperCase()
+                          roomStatusTypes.find(
+                            (status) => room.status == status.value
                           ).label
                         }
                       </Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">نوع:</span>
+                      <span className="font-medium">
+                        {
+                          roomTypes.find(
+                            (type) =>
+                              room.type == String(type.value).toUpperCase()
+                          ).label
+                        }
+                      </span>
+                    </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">نرخ:</span>
                       <span className="font-medium">
@@ -518,7 +592,12 @@ export default function RoomsPage() {
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-gray-600">ظرفیت:</span>
-                      <span className="font-medium">{room.capacity} مهمان</span>
+                      <span className="font-medium">
+                        {Number(room.capacity).toLocaleString("fa-IR", {
+                          useGrouping: false,
+                        })}{" "}
+                        مهمان
+                      </span>
                     </div>
 
                     {room.amenities.length > 0 && (
@@ -593,7 +672,9 @@ export default function RoomsPage() {
                         <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">
                           ظرفیت
                         </th>
-
+                        <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">
+                          وضعیت
+                        </th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[150px]">
                           عملیات
                         </th>
@@ -631,7 +712,31 @@ export default function RoomsPage() {
                             تومان / {room.price_tag == "night" ? "شب" : "نفر"}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-right">
-                            {room.capacity} نفر
+                            {Number(room.capacity).toLocaleString("fa-IR", {
+                              useGrouping: false,
+                            })}{" "}
+                            نفر
+                          </td>
+
+                          <td>
+                            <Badge
+                              className={`${
+                                room.status == "AVAILABLE"
+                                  ? "text-deep-ocean bg-lime-zest"
+                                  : "text-pearl-luster bg-red-500"
+                              }`}
+                            >
+                              {room.status == "AVAILABLE" ? (
+                                <BadgeCheck />
+                              ) : (
+                                <Construction />
+                              )}
+                              {
+                                roomStatusTypes.find(
+                                  (status) => room.status == status.value
+                                ).label
+                              }
+                            </Badge>
                           </td>
 
                           <td className="px-4 py-4 whitespace-nowrap text-right">
@@ -672,15 +777,13 @@ export default function RoomsPage() {
           transition={{ duration: 0.3 }}
         >
           <Card>
-            <CardContent className="text-center py-12">
+            <CardContent className="text-center">
               <Bed className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
                 اتاقی پیدا نشد
               </h3>
               <p className="text-gray-600 mb-4">
-                {rooms.length === 0
-                  ? "اولیت اتاق اقامتگاهت رو اضافه کن"
-                  : "پارامترهای جستجوی خود را تغییر بده"}
+                {rooms.length === 0 && "اولیت اتاق اقامتگاهت رو اضافه کن"}
               </p>
               {rooms.length === 0 && (
                 <Button

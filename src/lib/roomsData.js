@@ -8,12 +8,9 @@ export const roomTypes = [
   { value: "vip", label: "VIP" },
 ];
 
-export const roomAvailability = [
-  { value: "available", label: "موجود" },
-  { value: "occupied", label: "مشغول" },
-  /*   { value: "maintenance", label: "تعمیرات" },
-  { value: "cleaning", label: "نظافت" }, */
-  { value: "evacuate", label: "تخلیه امروز" },
+export const roomStatusTypes = [
+  { value: "AVAILABLE", label: "فعال" },
+  { value: "MAINTENANCE", label: "تعمیرات" },
 ];
 
 export const roomAmenities = [

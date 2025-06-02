@@ -310,7 +310,7 @@ export default function OccupancyPage() {
       <div className="space-y-4">
         <motion.div variants={item}>
           {" "}
-          <Card>
+          <Card className={'p-0'}>
             <div className="p-6 space-y-6">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>

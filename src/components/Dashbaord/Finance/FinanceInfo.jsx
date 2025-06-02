@@ -29,6 +29,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useLodgeData } from "../DashbaordProvider";
 import { updateReservationStatuses } from "@/lib/jalali";
+import { Input } from "@/components/ui/input";
 
 moment.loadPersian({ dialect: "persian-modern" });
 
@@ -300,30 +301,34 @@ const FinancePage = () => {
               محاسبات بر اساس رزروهای منقضی شده یا در حال اقامت انجام می‌شود.
             </p>
             <p>
-              لطفاً توجه داشته باشید که رزروهای با وضعیت "تایید شده" در این
-              محاسبات لحاظ نشده‌اند.
+              لطفاً توجه داشته باشید که رزروهای با وضعیت
+              <span className="font-bold text-deep-ocean animate-pulse">
+                {" "}
+                "تایید شده"
+              </span>{" "}
+              در این محاسبات لحاظ نشده‌اند.
             </p>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-              <div className="relative w-full sm:w-64">
+              <div className="relative w-full">
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
+                <Input
                   placeholder="جستجوی اتاق..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pr-10 pl-8 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  className="pr-10 pl-8 "
                 />
                 {searchTerm && (
                   <button
                     onClick={() => setSearchTerm("")}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
-              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <div className="flex flex-row gap-4 w-full sm:w-auto">
                 <div className="flex items-center space-x-2">
                   <label className="text-sm font-medium text-gray-700">
                     سال:
@@ -474,60 +479,6 @@ const FinancePage = () => {
         ))}
       </motion.div>
 
-      {/*       <motion.div variants={item}>
-        <Card>
-          <CardHeader>
-            <CardTitle>روند درآمد ماهانه</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <motion.div variants={container} className="space-y-4">
-              {currentYearData.map((data, index) => {
-                const maxRevenue = Math.max(
-                  ...currentYearData.map((d) => d.totalRevenue)
-                );
-                const percentage =
-                  maxRevenue > 0 ? (data.totalRevenue / maxRevenue) * 100 : 0;
-
-                return (
-                  <motion.div key={index} variants={item} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">
-                        {data.monthName}
-                      </span>
-                      <div className="text-left">
-                        <span className="text-sm font-bold">
-                          {data.totalRevenue.toLocaleString("fa-IR")} تومان
-                        </span>
-                        <span className="text-xs text-gray-500 mr-2">
-                          ({data.totalReservations.toLocaleString("fa-IR")}{" "}
-                          رزرو)
-                        </span>
-                      </div>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${percentage}%` }}
-                        className="bg-blue-600 h-3 rounded-full"
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                      />
-                    </div>
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>میزان اشغال: {data.occupancyRate.toFixed(1)}%</span>
-                      <span>
-                        میانگین:{" "}
-                        {data.averageBookingValue.toLocaleString("fa-IR")}
-                        تومان
-                      </span>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-          </CardContent>
-        </Card>
-      </motion.div> */}
-
       <motion.div variants={item}>
         <Card>
           <CardHeader>
@@ -542,51 +493,64 @@ const FinancePage = () => {
                 : selectedYear.toLocaleString("fa-IR", { useGrouping: false })}
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <motion.div variants={fadeIn} className="overflow-x-auto">
-              <table className="min-w-full ">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-right py-2">اتاق</th>
+          <CardContent className="p-6">
+            <div className="relative overflow-x-auto pb-2">
+              <motion.div
+                variants={fadeIn}
+                className="inline-block min-w-full align-middle"
+              >
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="px-3 py-2 text-right text-xs sm:text-sm whitespace-nowrap">
+                        اتاق
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs sm:text-sm whitespace-nowrap">
+                        تعداد رزرو
+                      </th>
+                      <th className="px-3 py-2 text-left text-xs sm:text-sm whitespace-nowrap">
+                        درآمد
+                      </th>
 
-                    <th className="text-left py-2">درآمد</th>
-                    <th className="text-left py-2">تعداد رزرو</th>
-                    <th className="text-left py-2">میانگین هر رزرو</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {roomRevenueData.map((room, index) => (
-                    <motion.tr
-                      key={room.roomId}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="border-b hover:bg-gray-50"
-                    >
-                      <td className="py-3 font-medium text-right">
-                        {room.roomNumber}
-                      </td>
+                      <th className="px-3 py-2 text-left text-xs sm:text-sm whitespace-nowrap">
+                        میانگین هر رزرو
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {roomRevenueData.map((room, index) => (
+                      <motion.tr
+                        key={room.roomId}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="hover:bg-gray-50"
+                      >
+                        <td className="px-3 py-3 font-medium text-right text-sm sm:text-base whitespace-nowrap">
+                          {room.roomNumber}
+                        </td>
 
-                      <td className="py-3 text-left font-semibold">
-                        {room.revenue.toLocaleString("fa-IR")}{" "}
-                        <span className="text-[10px]">تومان</span>
-                      </td>
-                      <td className="py-3 text-left">
-                        {room.bookings.toLocaleString("fa-IR")}
-                      </td>
-                      <td className="py-3 text-left">
-                        {room.bookings > 0
-                          ? (room.revenue / room.bookings).toLocaleString(
-                              "fa-IR"
-                            )
-                          : "۰"}{" "}
-                        <span className="text-[10px]">تومان</span>
-                      </td>
-                    </motion.tr>
-                  ))}
-                </tbody>
-              </table>
-            </motion.div>
+                        <td className="px-3 py-3 text-left text-sm sm:text-base whitespace-nowrap">
+                          {room.bookings.toLocaleString("fa-IR")}
+                        </td>
+                        <td className="px-3 py-3 text-left font-semibold text-sm sm:text-base whitespace-nowrap">
+                          {room.revenue.toLocaleString("fa-IR")}{" "}
+                          <span className="text-xs font-normal">تومان</span>
+                        </td>
+                        <td className="px-3 py-3 text-left text-sm sm:text-base whitespace-nowrap font-semibold">
+                          {room.bookings > 0
+                            ? (room.revenue / room.bookings).toLocaleString(
+                                "fa-IR"
+                              )
+                            : "۰"}{" "}
+                          <span className="text-xs font-normal">تومان</span>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </motion.div>
+            </div>
           </CardContent>
         </Card>
       </motion.div>

@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { reserveStatus, roomTypes } from "@/lib/roomsData";
-import { DoorOpen, HomeIcon } from "lucide-react";
+import { reserveStatus, roomStatusTypes, roomTypes } from "@/lib/roomsData";
+import { BadgeCheck, Construction, DoorOpen, HomeIcon } from "lucide-react";
 import { useMemo } from "react";
 import {
   convertToPersianDigits,
@@ -26,8 +26,6 @@ export default function RoomStats() {
   }, [reservations]);
 
   const router = useRouter();
-
-
 
   const container = {
     hidden: { opacity: 0 },
@@ -87,12 +85,22 @@ export default function RoomStats() {
                         <p className="font-medium">اتاق {room.room_number}</p>
                       </div>
                     </div>
-                    <Badge className="text-deep-ocean bg-lime-zest">
+                    <Badge
+                      className={`${
+                        room.status == "AVAILABLE"
+                          ? "text-deep-ocean bg-lime-zest"
+                          : "text-pearl-luster bg-red-500"
+                      }`}
+                    >
+                      {room.status == "AVAILABLE" ? (
+                        <BadgeCheck />
+                      ) : (
+                        <Construction />
+                      )}
                       {
-                        roomTypes.find(
-                          (type) =>
-                            type.value === String(room.type).toLowerCase()
-                        )?.label
+                        roomStatusTypes.find(
+                          (status) => room.status == status.value
+                        ).label
                       }
                     </Badge>
                   </motion.div>
