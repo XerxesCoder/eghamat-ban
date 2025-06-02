@@ -19,7 +19,7 @@ export async function addNewRoom(roomData) {
           amenities: roomData.amenities,
           owner_id: userId,
           price_tag: roomData.priceTag,
-          status: "AVAILABLE",
+          status: roomData.status,
         },
       ])
       .select();
@@ -52,7 +52,7 @@ export async function editRoom(roomData, roomID) {
           price_per_night: roomData.price,
           amenities: roomData.amenities,
           price_tag: roomData.pricaTag,
-          status: roomData.status
+          status: roomData.status,
         },
       ])
       .eq("owner_id", userId)

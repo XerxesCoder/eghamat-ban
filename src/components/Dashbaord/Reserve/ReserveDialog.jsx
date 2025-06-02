@@ -269,7 +269,10 @@ export default function ReserveDialog({
           </Button>
         </DialogTrigger>
       )}
-      <DialogContent className="max-w-2xl">
+      <DialogContent
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        className={"max-w-md"}
+      >
         <DialogHeader
           className={
             "border-b border-deep-ocean/30 pb-3 justify-center items-center"
@@ -278,9 +281,6 @@ export default function ReserveDialog({
           <DialogTitle>
             {editingReservation ? "ویرایش رزرو" : "رزرو جدید"}
           </DialogTitle>
-          {/*           <DialogDescription>
-            {editingReservation ? "ویرایش اطلاعات رزرو" : "ایجاد رزرو جدید"}
-          </DialogDescription> */}
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -289,6 +289,7 @@ export default function ReserveDialog({
               <Input
                 id="guestName"
                 name="guestName"
+                placeholder="نام مسافر"
                 value={formData.guestName}
                 onChange={handleInputChange}
                 //required
@@ -299,14 +300,15 @@ export default function ReserveDialog({
               <Input
                 id="guestPhone"
                 name="guestPhone"
+                placeholder="09123456789"
                 value={formData.guestPhone}
                 onChange={handleInputChange}
                 //required
               />
             </div>
           </div>
-          <div className="flex justify-start items-center gap-8">
-            <div className="space-y-2">
+          <div className="flex justify-start items-center gap-8 w-full">
+            <div className="space-y-2 w-full">
               <Label htmlFor="roomId">اتاق</Label>
               <Select
                 value={formData.roomId}
@@ -314,7 +316,7 @@ export default function ReserveDialog({
                   setFormData((prev) => ({ ...prev, roomId: value }))
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className={"w-full"}>
                   <SelectValue placeholder="انتخاب اتاق" />
                 </SelectTrigger>
                 <SelectContent>
@@ -343,7 +345,7 @@ export default function ReserveDialog({
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 w-full">
               <Label htmlFor="adults">نفرات</Label>
               <Select
                 value={formData.adults}
@@ -351,7 +353,7 @@ export default function ReserveDialog({
                   setFormData((prev) => ({ ...prev, adults: value }))
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className={"w-full"}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -374,7 +376,7 @@ export default function ReserveDialog({
             </div>
           </div>
 
-          <div className="flex justify-start gap-8 items-center ">
+          <div className="flex justify-around gap-8 items-center w-full">
             <div className="space-y-2">
               <Label htmlFor="checkIn">تاریخ ورود</Label>
               <DatePicker
@@ -479,7 +481,9 @@ export default function ReserveDialog({
             </Button>
           )}
           <DialogFooter
-            className={"border-t border-deep-ocean/30 pt-3 flex-col"}
+            className={
+              "border-t sm:justify-start  border-deep-ocean/30 pt-3 flex-col"
+            }
           >
             <Button
               type="submit"

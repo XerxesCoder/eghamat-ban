@@ -120,12 +120,13 @@ export default function RoomsPage() {
         toast.loading(`در حال بروزرسانی اتاق ${editingRoom.room_number}...`);
         const editRes = await editRoom(roomData, editingRoom.id);
         if (editRes.success) {
+          getLodgeData();
           toast.dismiss();
           toast.success("اتاق ویرایش شد", {
             description: `اتاق ${formData.number} با موفقیت ویرایش شد`,
           });
         }
-        getLodgeData();
+
         setIsAddDialogOpen(false);
         setEditingRoom(null);
         resetForm();
@@ -133,6 +134,7 @@ export default function RoomsPage() {
         toast.loading("در حال اضافه کردن اتاق جدید...");
         const response = await addNewRoom(roomData);
         if (response.success) {
+          getLodgeData();
           toast.dismiss();
           toast.success("اتاق اضافه شد", {
             description: `اتاق ${formData.number} با موفقیت اضافه شد`,
@@ -274,7 +276,10 @@ export default function RoomsPage() {
               اضافه کردن اتاق جدید
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent
+            className="max-w-md"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+          >
             <DialogHeader
               className={
                 "justify-center items-center pb-3 border-b border-deep-ocean/30"
@@ -283,11 +288,6 @@ export default function RoomsPage() {
               <DialogTitle>
                 {editingRoom ? "ویرایش اتاق" : "اضافه کردن اتاق جدید"}
               </DialogTitle>
-              {/*               <DialogDescription>
-                {editingRoom
-                  ? "بروز کردن اطلاعات اتاق"
-                  : "اضافه کردن اطلاعات اتاق جدید"}
-              </DialogDescription> */}
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -296,6 +296,7 @@ export default function RoomsPage() {
                   <Input
                     id="number"
                     value={formData.number}
+                    placeholder={"بستل"}
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,
@@ -313,7 +314,7 @@ export default function RoomsPage() {
                       setFormData((prev) => ({ ...prev, priceTag: value }))
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className={"w-full"}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -330,6 +331,7 @@ export default function RoomsPage() {
                   <Input
                     id="price"
                     type="number"
+                    placeholder={Number(1000000).toLocaleString("fa-IR")}
                     value={formData.price}
                     onChange={(e) =>
                       setFormData((prev) => ({
@@ -348,7 +350,7 @@ export default function RoomsPage() {
                       setFormData((prev) => ({ ...prev, type: value }))
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className={"w-full"}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -368,6 +370,7 @@ export default function RoomsPage() {
                   <Input
                     id="maxOccupancy"
                     type="number"
+                    placeholder={5}
                     value={formData.maxOccupancy}
                     onChange={(e) =>
                       setFormData((prev) => ({
@@ -387,7 +390,7 @@ export default function RoomsPage() {
                       setFormData((prev) => ({ ...prev, status: value }))
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className={"w-full"}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -424,7 +427,9 @@ export default function RoomsPage() {
               </div>
 
               <DialogFooter
-                className={"flex-col border-t border-deep-ocean/30 pt-3"}
+                className={
+                  "flex-col sm:justify-start border-t border-deep-ocean/30 pt-3"
+                }
               >
                 <Button
                   disabled={isAddingRoom}
@@ -532,7 +537,7 @@ export default function RoomsPage() {
         {viewMode === "grid" ? (
           <motion.div
             key="grid-view"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
             variants={container}
             initial="hidden"
             animate="visible"
