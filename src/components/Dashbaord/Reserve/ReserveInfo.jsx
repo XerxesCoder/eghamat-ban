@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -29,6 +29,9 @@ import {
   Edit,
   Trash2,
   X,
+  Printer,
+  FileText,
+  Download,
 } from "lucide-react";
 
 import {
@@ -42,20 +45,30 @@ import { toast } from "sonner";
 
 import {
   convertToPersianDigits,
+  getJalaliDateDifference,
   persianDate,
   updateReservationStatuses,
 } from "@/lib/jalali";
 import { deleteReservation } from "@/app/actions/reserve";
-
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { reserveStatus, roomTypes } from "@/lib/roomsData";
 import moment from "moment-jalaali";
 import ReserveDialog from "./ReserveDialog";
 import { useLodgeData } from "../DashbaordProvider";
 import { useSearchParams } from "next/navigation";
 import { getStatusColor } from "@/lib/badgeColors";
+import html2canvas from "html2canvas-pro";
 
 export default function ReservationsPage() {
-  const { rooms, reservations, getLodgeData } = useLodgeData();
+  const { rooms, reservations, userLodgeInfo, getLodgeData } = useLodgeData();
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -64,6 +77,10 @@ export default function ReservationsPage() {
   const [editingReservation, setEditingReservation] = useState(null);
   const [selectedDate, setSelectedDate] = useState(persianDate);
   const [viewMode, setViewMode] = useState("list");
+  const [selectedReservation, setSelectedReservation] = useState(null);
+  const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
+
+  const invoiceRef = useRef(null);
 
   const [formData, setFormData] = useState({
     roomId: "",
@@ -199,9 +216,126 @@ export default function ReservationsPage() {
     },
   };
 
-  const fadeIn = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.3 } },
+  const handlePrintInvoice = (reservation) => {
+    setSelectedReservation(reservation);
+    setIsInvoiceDialogOpen(true);
+  };
+
+  const exportInvoice = async () => {
+    if (!invoiceRef.current) return;
+
+    try {
+      const canvas = await html2canvas(invoiceRef.current, {
+        //scale: 1,
+        backgroundColor: "#ffffff",
+        logging: true,
+      });
+      const url = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `invoice-${selectedReservation?.id || "reservation"}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      toast.success("Invoice exported", {
+        description: `Invoice has been exported as png.`,
+      });
+      setIsInvoiceDialogOpen(false);
+    } catch (error) {
+      console.error("Export error:", error);
+    }
+  };
+
+  const InvoiceDialog = () => {
+    const motelData = userLodgeInfo;
+    const room = rooms.find(
+      (r) => String(r.id) === selectedReservation.room_id
+    );
+    const checkInDate = selectedReservation.check_in;
+    const checkOutDate = selectedReservation.check_out;
+    const nights = getJalaliDateDifference(checkInDate, checkOutDate);
+    const roomType = room?.price_tag === "night" ? "شب" : "نفر";
+
+    return (
+      <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
+        <DialogContent className="min-w-[720px] max-w-[840px] max-h-[90vh] overflow-y-auto font-sans">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <FileText className="w-5 h-5 ml-2" />
+              فاکتور رزرو هتل
+            </DialogTitle>
+          </DialogHeader>
+
+          <div
+            ref={invoiceRef}
+            className="p-4 mx-auto border rounded bg-white text-black"
+            style={{
+              width: "140mm",
+              maxHeight: "210mm",
+              direction: "rtl",
+            }}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <div className="text-right">
+                <h1 className="text-xl font-bold">{motelData.motel_name}</h1>
+                <p className="text-sm">نرم افزار حسابداری مهمانسرا</p>
+              </div>
+              <div className="text-left text-sm">
+                <p>شماره فاکتور: #{selectedReservation.id.slice(-6)}</p>
+                <p>تاریخ: {persianDate}</p>
+              </div>
+            </div>
+
+            <table className="w-full text-sm border border-black">
+              <thead className="bg-gray-100">
+                <tr className="border-b border-black text-center">
+                  <th className="border-l border-black p-1">تاریخ ورود</th>
+                  <th className="border-l border-black p-1">تاریخ خروج</th>
+                  <th className="border-l border-black p-1">اتاق</th>
+                  <th className="border-l border-black p-1">مدت اقامت</th>
+                  <th className="border-l border-black p-1">قیمت واحد</th>
+                  <th className="p-1">قیمت کل</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="text-center">
+                  <td className="border-t border-black p-1">{checkInDate}</td>
+                  <td className="border-t border-black p-1">{checkOutDate}</td>
+                  <td className="border-t border-black p-1">
+                    {room?.room_number}
+                  </td>
+                  <td className="border-t border-black p-1">{nights}</td>
+                  <td className="border-t border-black p-1">
+                    {room?.price_per_night.toLocaleString("fa-IR")}
+                  </td>
+                  <td className="border-t border-black p-1 font-bold">
+                    {(room?.price_per_night * nights).toLocaleString("fa-IR")}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div className="text-sm mt-4">
+              <p className="font-bold mt-2">
+                مبلغ قابل پرداخت:{" "}
+                {selectedReservation.total_price.toLocaleString("fa-IR")} تومان
+              </p>
+            </div>
+
+            <div className="text-center text-xs text-gray-700 mt-6 border-t pt-4 leading-5">
+              <p>از انتخاب شما متشکریم</p>
+            </div>
+          </div>
+
+          <div className="flex justify-end mt-4">
+            <Button onClick={exportInvoice}>
+              <Download className="w-4 h-4 mr-2" />
+              ذخیره فاکتور
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
   };
 
   useEffect(() => {
@@ -253,7 +387,7 @@ export default function ReservationsPage() {
             resetForm={resetForm}
             withButton={true}
           />
-          <Button
+          {/*           <Button
             variant="outline"
             onClick={() =>
               setViewMode(viewMode === "list" ? "calendar" : "list")
@@ -261,7 +395,7 @@ export default function ReservationsPage() {
           >
             <CalendarIcon className="w-4 h-4 mr-2" />
             {viewMode === "list" ? "نمای تقویم" : "نمای لیست"}
-          </Button>
+          </Button> */}
         </div>
       </motion.div>
       <AnimatePresence mode="wait">
@@ -443,7 +577,7 @@ export default function ReservationsPage() {
                   key={reservation.id}
                   variants={item}
                   custom={index}
-                  whileHover={{ y: -5 }}
+                  //whileHover={{ y: -5 }}
                 >
                   <Card className={"gap-0"}>
                     <CardContent className="p-6">
@@ -528,9 +662,9 @@ export default function ReservationsPage() {
                         <div className="flex flex-col  items-end justify-center gap-4 enter text-sm w-full">
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <p className="text-lime-600 font-bold cursor-pointer">
+                              <Badge className={"bg-lime-200 text-lime-900"}>
                                 {convertToPersianDigits(reservation.check_in)}
-                              </p>
+                              </Badge>
                             </TooltipTrigger>
                             <TooltipContent>
                               <p>تاریخ ورود</p>
@@ -539,9 +673,9 @@ export default function ReservationsPage() {
 
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <p className="text-red-600 font-bold cursor-pointer">
+                              <Badge className={"bg-red-200 text-red-900"}>
                                 {convertToPersianDigits(reservation.check_out)}
-                              </p>
+                              </Badge>
                             </TooltipTrigger>
                             <TooltipContent>
                               <p>تاریخ خروج</p>
@@ -552,18 +686,44 @@ export default function ReservationsPage() {
                     </CardContent>
                     <CardFooter>
                       <div className="mt-4 pt-4 border-t w-full border-gray-200">
-                        <div className="text-right">
-                          <span className="text-gray-600">هزینه اقامت: </span>
-                          <span className="font-semibold text-lg">
-                            {Number(reservation.total_price).toLocaleString(
-                              "fa-IR"
-                            )}{" "}
-                            تومان
-                          </span>
+                        <div className="flex justify-between items-center">
+                          <div className="text-right">
+                            <span className="text-gray-600 sm:text-sm text-xs">
+                              هزینه اقامت:{" "}
+                            </span>
+                            <span className="font-semibold text-lg">
+                              {Number(reservation.total_price).toLocaleString(
+                                "fa-IR"
+                              )}{" "}
+                              تومان
+                            </span>
+                          </div>
+                          <div>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant={"icon"}
+                                  onClick={() =>
+                                    handlePrintInvoice(reservation)
+                                  }
+                                  className={
+                                    " border hover:scale-90 transition-all ease-in-out"
+                                  }
+                                >
+                                  <Printer />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p> دریافت فاکتور</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
                         </div>
                         {reservation.special_requests !== "" && (
                           <div className="mt-4">
-                            <span className="text-gray-600">یادداشت: </span>
+                            <span className="text-gray-600 sm:text-sm text-xs">
+                              یادداشت:{" "}
+                            </span>
                             <span className="text-gray-800">
                               {reservation.special_requests}
                             </span>
@@ -575,7 +735,7 @@ export default function ReservationsPage() {
                 </motion.div>
               );
             })}
-
+            <InvoiceDialog />
             {filteredReservations.length === 0 && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}

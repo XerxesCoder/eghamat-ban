@@ -3,25 +3,95 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { persianYear } from "@/lib/jalali";
+import { Home, Phone, Mail, Github } from "lucide-react";
 
 export default function Footer() {
+  const footerLinks = [
+    {
+      title: "دسترسی سریع",
+      links: [
+        { name: "ویژگی‌ها", href: "#features" },
+        { name: "راهنما  ", href: "#demo" },
+        { name: "نظرات", href: "#testimonials" },
+      ],
+    },
+    {
+      title: "پشتیبانی",
+      links: [
+        {
+          name: "تلفن: ۰۲۱-۱۲۳۴۵۶۷",
+          href: "tel:+98211234567",
+          icon: <Phone className="h-4 w-4" />,
+        },
+        {
+          name: "ایمیل: info@eghamatban.ir",
+          href: "mailto:info@eghamatban.ir",
+          icon: <Mail className="h-4 w-4" />,
+        },
+        {
+          name: "گیت‌هاب",
+          href: "https://github.com/eghamatban",
+          icon: <Github className="h-4 w-4" />,
+        },
+      ],
+    },
+  ];
+
   return (
-    <footer className="border-t bg-pearl-luster py-6 w-full ">
+    <footer className="border-t bg-pearl-luster w-full">
       <motion.div
-        className="container max-w-7xl mx-auto"
+        className="container max-w-7xl mx-auto px-4 py-8 md:py-12"
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold text-deep-ocean">اقامت‌ بان</h3>
+            <p className="text-deep-ocean/80 text-justify">
+              سیستم یکپارچه مدیریت مهمانپذیرها و اقامتگاه‌ها با قابلیت‌های کامل
+              برای مدیریت هوشمند کسب‌ و کار شما
+            </p>
+          </div>
+
+          {footerLinks.map((section, i) => (
+            <div key={i} className="space-y-4">
+              <h4 className="text-lg font-bold text-deep-ocean">
+                {section.title}
+              </h4>
+              <ul className="space-y-3">
+                {section.links.map((link, j) => (
+                  <li key={j}>
+                    <a
+                      href={link.href}
+                      className="flex items-center gap-2 text-deep-ocean/80 hover:text-deep-ocean transition-colors"
+                      target={
+                        link.href.startsWith("http") ? "_blank" : undefined
+                      }
+                    >
+                      {link.icon && link.icon}
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
         <motion.div
-          className="pt-2 mt-2  text-center text-deep-ocean/70  border-t border-deep-ocean/10"
+          className="pt-6  text-center text-deep-ocean/70 border-t border-deep-ocean/10"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.7 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <p>© {persianYear} اقامت‌ بان، تمامی حقوق محفوظ است.</p>
+          <p>
+            © {persianYear} اقامت‌ بان - تمامی حقوق برای تیم اقامت‌ بان محفوظ
+            است
+          </p>
+          <p className="text-sm mt-2">نسخه ۱.۰.۰</p>
         </motion.div>
       </motion.div>
     </footer>

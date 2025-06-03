@@ -143,9 +143,9 @@ export default function ReserveDialog({
         return;
       }
     }
-    if (!validateReservationDates(formData.checkIn, formData.checkOut)) {
+    /*     if (!validateReservationDates(formData.checkIn, formData.checkOut)) {
       return;
-    }
+    } */
     setIsAddingOrEditing(true);
     try {
       const reservationData = {
@@ -437,7 +437,7 @@ export default function ReserveDialog({
             formData.checkIn &&
             formData.checkOut &&
             formData.adults && (
-              <div className="p-4 border border-deep-ocean/20 bg-pearl-luster rounded-lg space-y-1">
+              <div className="p-4 border border-deep-ocean/20 bg-pearl-luster/50 rounded-lg space-y-1">
                 <p className="text-sm text-deep-ocean">
                   <strong>
                     {" "}
@@ -473,7 +473,6 @@ export default function ReserveDialog({
               variant="destructive"
               onClick={() => {
                 setIsAddDialogOpen(false);
-
                 handleDelete(editingReservation);
               }}
             >

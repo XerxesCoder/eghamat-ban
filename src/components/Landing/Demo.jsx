@@ -1,33 +1,64 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CheckCircle } from "lucide-react";
+import { Home, Bed, Calendar, ClipboardCheck } from "lucide-react";
 
 export default function Demo() {
+  const steps = [
+    {
+      icon: <Home className="h-6 w-6" />,
+      title: "۱. ثبت اقامتگاه",
+      description:
+        "پروفایل اقامتگاه خود را در کمتر از ۵ دقیقه ایجاد کنید. نام، آدرس، امکانات و تصاویر را اضافه نمایید.",
+      tip: "می‌توانید بعداً اطلاعات را تکمیل کنید",
+    },
+    {
+      icon: <Bed className="h-6 w-6" />,
+      title: "۲. تنظیم اتاق‌ها",
+      description:
+        "اتاق‌های خود را با جزئیات کامل (ظرفیت، قیمت، امکانات) اضافه کنید و وضعیت آن‌ها را مدیریت نمایید.",
+      tip: "از عکس‌های باکیفیت استفاده کنید",
+    },
+    {
+      icon: <Calendar className="h-6 w-6" />,
+      title: "۳. مدیریت رزروها",
+      description:
+        "رزروهای جدید را ثبت کنید، مهمانان را به اتاق‌ها اختصاص دهید و تقویم اشغال را به صورت لحظه‌ای مشاهده نمایید.",
+      tip: "هشدارهای رزرو خودکار دریافت کنید",
+    },
+    {
+      icon: <ClipboardCheck className="h-6 w-6" />,
+      title: "۴. نظارت و گزارشات",
+      description:
+        "وضعیت مالی، نرخ اشغال و رضایت مشتریان را از طریق داشبورد هوشمند پیگیری کنید.",
+      tip: "گزارشات را به صورت ماهانه دریافت نمایید",
+    },
+  ];
+
   return (
     <section id="demo" className="py-20 bg-pearl-luster w-full">
       <motion.div
-        className="container max-w-7xl mx-auto px-4 md:px-6"
+        className="container max-w-7xl mx-auto px-4 sm:px-6"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <motion.div
-          className="flex flex-col items-center justify-center space-y-4 text-center"
+          className="flex flex-col items-center justify-center space-y-4 text-center mb-12"
           initial={{ opacity: 0, y: -10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <div className="inline-block rounded-lg bg-sky-glint px-3 py-1 text-sm text-deep-ocean">
-            راهنمای مدیریت اقامتگاه
-          </div>
+          <h4 className="inline-block rounded-lg bg-lime-zest px-3 py-1 text-sm text-deep-ocean">
+            راهنمای شروع
+          </h4>
           <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-deep-ocean">
-            مدیریت آسان مهمانسرا با اقامت‌بان
+            تنها در ۴ مرحله ساده مدیریت را شروع کنید
           </h2>
-          <p className="max-w-[900px] text-deep-ocean/80 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-            از ثبت اقامتگاه تا مدیریت رزروها و بررسی وضعیت اتاق‌ها
+          <p className="max-w-[900px] text-deep-ocean/80 md:text-xl/relaxed">
+            ثبت نام تا مدیریت حرفه‌ای اقامتگاه
           </p>
         </motion.div>
 
@@ -38,43 +69,27 @@ export default function Demo() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          {[
-            {
-              title: "۱. ثبت اقامتگاه",
-              description:
-                "مدیران مهمانسرا می‌توانند اطلاعات اقامتگاه خود را ثبت کنند، شامل نام، موقعیت مکانی و امکانات.",
-            },
-            {
-              title: "۲. افزودن اتاق‌ها",
-              description:
-                "تعریف اتاق‌های مختلف با ظرفیت، قیمت‌گذاری، عکس‌ها و توضیحات برای هر واحد.",
-            },
-            {
-              title: "۳. مدیریت رزروها",
-              description:
-                "رزروهای جدید را بررسی کنید، اتاق‌ها را اختصاص دهید و تغییرات را به‌صورت زنده مشاهده کنید.",
-            },
-            {
-              title: "۴. بررسی وضعیت اتاق‌ها",
-              description:
-                "اطلاعات اتاق‌های اشغال شده و در دسترس را مشاهده کنید، تنظیمات مربوط به پذیرش را مدیریت کنید.",
-            },
-          ].map((step, i) => (
+          {steps.map((step, i) => (
             <motion.div
               key={i}
-              className="relative overflow-hidden rounded-lg border border-sky-glint bg-pearl-luster p-6 shadow-md transition-all hover:shadow-lg hover:shadow-aqua-spark/10 hover:-translate-y-1"
+              className="relative overflow-hidden rounded-xl border border-sky-glint/50 bg-white p-6 shadow-sm transition-all hover:shadow-lg hover:-translate-y-1 hover:border-aqua-spark group"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: 0.4 + i * 0.1 }}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-aqua-spark text-deep-ocean mb-4">
-                <CheckCircle className="h-6 w-6" />
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-aqua-spark/20 text-deep-ocean flex-shrink-0">
+                  {step.icon}
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-deep-ocean mb-2">
+                    {step.title}
+                  </h3>
+                  <p className="text-deep-ocean/80 mb-3">{step.description}</p>
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-deep-ocean mb-2">
-                {step.title}
-              </h3>
-              <p className="text-deep-ocean/80">{step.description}</p>
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-aqua-spark to-lime-zest opacity-0 group-hover:opacity-100 transition-opacity" />
             </motion.div>
           ))}
         </motion.div>

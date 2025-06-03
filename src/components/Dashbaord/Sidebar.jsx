@@ -49,7 +49,7 @@ const items = [
     icon: CalendarDays,
   },
   {
-    title: "تقویم سکونت",
+    title: "تقویم رزرو",
     url: "/dashboard/calendar",
     icon: CalendarSearch,
   },
