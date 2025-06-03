@@ -247,6 +247,7 @@ export default function ReservationsPage() {
   };
 
   const InvoiceDialog = () => {
+    if (!selectedReservation) return null;
     const motelData = userLodgeInfo;
     const room = rooms.find(
       (r) => String(r.id) === selectedReservation.room_id
@@ -258,31 +259,34 @@ export default function ReservationsPage() {
 
     return (
       <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
-        <DialogContent className="min-w-[720px] max-w-[840px] max-h-[90vh] overflow-y-auto font-sans">
+        <DialogContent className="min-w-[620px] max-h-[90vh] overflow-y-auto p-3">
           <DialogHeader>
             <DialogTitle className="flex items-center">
               <FileText className="w-5 h-5 ml-2" />
-              فاکتور رزرو هتل
+              فاکتور رزرو
             </DialogTitle>
           </DialogHeader>
 
           <div
             ref={invoiceRef}
-            className="p-4 mx-auto border rounded bg-white text-black"
+            className="p-4 mx-auto border rounded-md bg-white text-black"
             style={{
               width: "140mm",
-              maxHeight: "210mm",
+              //minHeight: "200mm",
+              maxHeight: "205mm",
               direction: "rtl",
             }}
           >
             <div className="flex justify-between items-start mb-4">
               <div className="text-right">
-                <h1 className="text-xl font-bold">{motelData.motel_name}</h1>
-                <p className="text-sm">نرم افزار حسابداری مهمانسرا</p>
+                <h1 className="text-xl font-bold">
+                  اقامتگاه {motelData.motel_name}
+                </h1>
+                <p className="text-sm">وب اپلیکشن اقامت بان</p>
               </div>
               <div className="text-left text-sm">
                 <p>شماره فاکتور: #{selectedReservation.id.slice(-6)}</p>
-                <p>تاریخ: {persianDate}</p>
+                <p>تاریخ: {convertToPersianDigits(persianDate)}</p>
               </div>
             </div>
 
@@ -293,46 +297,71 @@ export default function ReservationsPage() {
                   <th className="border-l border-black p-1">تاریخ خروج</th>
                   <th className="border-l border-black p-1">اتاق</th>
                   <th className="border-l border-black p-1">مدت اقامت</th>
+                  <th className="border-l border-black p-1">نفرات</th>
                   <th className="border-l border-black p-1">قیمت واحد</th>
-                  <th className="p-1">قیمت کل</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="text-center">
-                  <td className="border-t border-black p-1">{checkInDate}</td>
-                  <td className="border-t border-black p-1">{checkOutDate}</td>
+                  <td className="border-t border-black p-1">
+                    {convertToPersianDigits(checkInDate)}
+                  </td>
+                  <td className="border-t border-black p-1">
+                    {convertToPersianDigits(checkOutDate)}
+                  </td>
                   <td className="border-t border-black p-1">
                     {room?.room_number}
                   </td>
-                  <td className="border-t border-black p-1">{nights}</td>
+                  <td className="border-t border-black p-1">
+                    {nights.toLocaleString("fa-IR")}
+                  </td>
+                  <td className="border-t border-black p-1">
+                    {(selectedReservation?.adults).toLocaleString("fa-IR")}
+                  </td>
                   <td className="border-t border-black p-1">
                     {room?.price_per_night.toLocaleString("fa-IR")}
-                  </td>
-                  <td className="border-t border-black p-1 font-bold">
-                    {(room?.price_per_night * nights).toLocaleString("fa-IR")}
                   </td>
                 </tr>
               </tbody>
             </table>
 
-            <div className="text-sm mt-4">
-              <p className="font-bold mt-2">
-                مبلغ قابل پرداخت:{" "}
-                {selectedReservation.total_price.toLocaleString("fa-IR")} تومان
+            <div className="text-sm mt-4 space-y-2">
+              <p>
+                قیمت کل:{" "}
+                <span className="font-bold ">
+                  {" "}
+                  {selectedReservation.total_price.toLocaleString("fa-IR")}{" "}
+                  تومان
+                </span>
+              </p>
+              <p>ساعت تحویل اتاق: 14:00</p>
+
+              <p>ساعت تخلیه اتاق: 12:00</p>
+              <p>
+                شماره کارت :{" "}
+                <span className="font-bold ">
+                  {convertToPersianDigits("6063360223658520")}
+                </span>
+              </p>
+              <p>
+                شماره شبا :{" "}
+                <span className="font-bold ">
+                  {convertToPersianDigits("6063360223658520")}
+                </span>
               </p>
             </div>
 
-            <div className="text-center text-xs text-gray-700 mt-6 border-t pt-4 leading-5">
+            <div className="text-center text-xs text-gray-700 mt-3 border-t pt-2 ">
               <p>از انتخاب شما متشکریم</p>
             </div>
           </div>
 
-          <div className="flex justify-end mt-4">
+          <DialogFooter>
             <Button onClick={exportInvoice}>
-              <Download className="w-4 h-4 mr-2" />
+              <Download className="w-4 h-4" />
               ذخیره فاکتور
             </Button>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     );
@@ -735,7 +764,8 @@ export default function ReservationsPage() {
                 </motion.div>
               );
             })}
-            <InvoiceDialog />
+
+            {filteredReservations.length > 0 && <InvoiceDialog />}
             {filteredReservations.length === 0 && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}

@@ -38,14 +38,14 @@ export default function Hero() {
         >
           از مدیریت اتاق‌ها تا پیگیری مالی‌ - همه در یک سیستم ساده و کاربردی
         </motion.p>
-        <motion.p
+{/*         <motion.p
           className="text-sm text-deep-ocean/60 mt-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.7 }}
         >
           بدون نیاز به اشتراک - همیشه رایگان
-        </motion.p>
+        </motion.p> */}
         <motion.div
           className="flex flex-col gap-2 sm:flex-row mt-6"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -53,7 +53,7 @@ export default function Hero() {
           transition={{ duration: 0.5, delay: 0.5 }}
         >
           <Button
-            className="bg-lime-zest text-deep-ocean hover:bg-lime-zest/70 text-deep-ocean  text-lg font-bold "
+            className="bg-lime-zest text-deep-ocean hover:bg-lime-zest/70  text-lg font-bold "
             asChild
             size={"lg"}
           >

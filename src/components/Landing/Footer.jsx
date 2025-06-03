@@ -19,18 +19,18 @@ export default function Footer() {
       title: "پشتیبانی",
       links: [
         {
-          name: "تلفن: ۰۲۱-۱۲۳۴۵۶۷",
+          name: "۰۲۱-۱۲۳۴۵۶۷",
           href: "tel:+98211234567",
           icon: <Phone className="h-4 w-4" />,
         },
         {
-          name: "ایمیل: info@eghamatban.ir",
-          href: "mailto:info@eghamatban.ir",
+          name: "xerxescode@gmail.com",
+          href: "mailto:xerxescode@gmail.com",
           icon: <Mail className="h-4 w-4" />,
         },
         {
-          name: "گیت‌هاب",
-          href: "https://github.com/eghamatban",
+          name: "توسعه‌دهنده",
+          href: "https://github.com/XerxesCoder",
           icon: <Github className="h-4 w-4" />,
         },
       ],
@@ -50,8 +50,7 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="text-lg font-bold text-deep-ocean">اقامت‌ بان</h3>
             <p className="text-deep-ocean/80 text-justify">
-              سیستم یکپارچه مدیریت مهمانپذیرها و اقامتگاه‌ها با قابلیت‌های کامل
-              برای مدیریت هوشمند کسب‌ و کار شما
+              مدیریت هوشمند مهمانپذیرها و اقامتگاه‌ها
             </p>
           </div>
 
