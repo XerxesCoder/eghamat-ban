@@ -10,7 +10,7 @@ const Vazir = Vazirmatn({
 
 export const metadata = {
   title: "اقامت بان",
-  description: "مدریت ساده و سریع برای اقامتگاه‌ها",
+  description: "مدیریت ساده و سریع برای اقامتگاه‌ها",
 };
 
 export default function RootLayout({ children }) {

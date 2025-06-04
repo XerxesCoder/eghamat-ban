@@ -66,46 +66,55 @@ export default function RoomStats() {
             </CardHeader>
             <CardContent>
               <motion.div className="space-y-4" variants={container}>
-                {rooms.slice(0, 5).map((room) => (
-                  <motion.div
-                    key={room.id}
-                    className="flex items-center justify-between cursor-pointer hover:bg-sky-glint/50 transition-all ease-in-out px-2 py-1 rounded-md"
-                    variants={item}
-                    onClick={() =>
-                      router.push(`/dashboard/rooms?room=${room.room_number}`)
-                    }
-                  >
-                    <div className="flex items-center space-x-3">
-                      <motion.div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        whileHover={{ scale: 1.1 }}
-                      >
-                        <DoorOpen />
-                      </motion.div>
-                      <div>
-                        <p className="font-medium">اتاق {room.room_number}</p>
-                      </div>
-                    </div>
-                    <Badge
-                      className={`${
-                        room.status == "AVAILABLE"
-                          ? "text-deep-ocean bg-lime-zest"
-                          : "text-pearl-luster bg-red-500"
-                      }`}
-                    >
-                      {room.status == "AVAILABLE" ? (
-                        <BadgeCheck />
-                      ) : (
-                        <Construction />
-                      )}
-                      {
-                        roomStatusTypes.find(
-                          (status) => room.status == status.value
-                        ).label
+                {rooms.length > 0 ? (
+                  rooms.slice(0, 5).map((room) => (
+                    <motion.div
+                      key={room.id}
+                      className="flex items-center justify-between cursor-pointer hover:bg-sky-glint/50 transition-all ease-in-out px-2 py-1 rounded-md"
+                      variants={item}
+                      onClick={() =>
+                        router.push(`/dashboard/rooms?room=${room.room_number}`)
                       }
-                    </Badge>
-                  </motion.div>
-                ))}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <motion.div
+                          className="w-10 h-10 rounded-lg flex items-center justify-center"
+                          whileHover={{ scale: 1.1 }}
+                        >
+                          <DoorOpen />
+                        </motion.div>
+                        <div>
+                          <p className="font-medium">اتاق {room.room_number}</p>
+                        </div>
+                      </div>
+                      <Badge
+                        className={`${
+                          room.status == "AVAILABLE"
+                            ? "text-deep-ocean bg-lime-zest"
+                            : "text-pearl-luster bg-red-500"
+                        }`}
+                      >
+                        {room.status == "AVAILABLE" ? (
+                          <BadgeCheck />
+                        ) : (
+                          <Construction />
+                        )}
+                        {
+                          roomStatusTypes.find(
+                            (status) => room.status == status.value
+                          ).label
+                        }
+                      </Badge>
+                    </motion.div>
+                  ))
+                ) : (
+                  <motion.p
+                    className="text-gray-500 text-center py-4"
+                    variants={item}
+                  >
+                    اتاقی یافت نشد.
+                  </motion.p>
+                )}
 
                 {rooms.length > 5 && (
                   <motion.div variants={item}>
