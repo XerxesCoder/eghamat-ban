@@ -38,7 +38,7 @@ export default function Hero() {
         >
           از مدیریت اتاق‌ها تا پیگیری مالی‌ - همه در یک سیستم ساده و کاربردی
         </motion.p>
-{/*         <motion.p
+        {/*         <motion.p
           className="text-sm text-deep-ocean/60 mt-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -57,7 +57,7 @@ export default function Hero() {
             asChild
             size={"lg"}
           >
-            <Link href={"/dashboard"}>شروع رایگان</Link>
+            <Link href={"/dashboard"}> ورود به داشبورد</Link>
           </Button>
           <Button
             className="bg-deep-ocean text-pearl-luster hover:text-white hover:bg-deep-ocean/80 text-lg"

@@ -47,6 +47,7 @@ import {
   convertToPersianDigits,
   getJalaliDateDifference,
   persianDate,
+  sortByCheckInDateDesc,
   updateReservationStatuses,
 } from "@/lib/jalali";
 import { deleteReservation } from "@/app/actions/reserve";
@@ -95,6 +96,7 @@ export default function ReservationsPage() {
 
   const filteredReservations = useMemo(() => {
     const rawData = updateReservationStatuses(reservations);
+
     let filtered = rawData;
 
     if (searchTerm) {
@@ -118,7 +120,7 @@ export default function ReservationsPage() {
       );
     }
 
-    return filtered;
+    return sortByCheckInDateDesc(filtered);
   }, [rooms, searchTerm, statusFilter, roomFilter, reservations]);
 
   const resetForm = () => {
@@ -233,13 +235,13 @@ export default function ReservationsPage() {
       const url = canvas.toDataURL("image/png");
       const link = document.createElement("a");
       link.href = url;
-      link.download = `invoice-${selectedReservation?.id || "reservation"}.png`;
+      link.download = `invoice-${
+        selectedReservation.id.slice(-6) || "reservation"
+      }.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      toast.success("Invoice exported", {
-        description: `Invoice has been exported as png.`,
-      });
+      toast.success("فاکتور صادر شد");
       setIsInvoiceDialogOpen(false);
     } catch (error) {
       console.error("Export error:", error);
@@ -255,21 +257,21 @@ export default function ReservationsPage() {
     const checkInDate = selectedReservation.check_in;
     const checkOutDate = selectedReservation.check_out;
     const nights = getJalaliDateDifference(checkInDate, checkOutDate);
-    const roomType = room?.price_tag === "night" ? "شب" : "نفر";
+    const roomPriceType = room?.price_tag === "night" ? "شبانه" : "نفر";
 
     return (
       <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
-        <DialogContent className="min-w-[620px] max-h-[90vh] overflow-y-auto p-3">
+        <DialogContent className="min-w-full sm:min-w-[620px] max-h-[90vh] overflow-y-auto p-3">
           <DialogHeader>
             <DialogTitle className="flex items-center">
               <FileText className="w-5 h-5 ml-2" />
-              فاکتور رزرو
+              پیش فاکتور
             </DialogTitle>
           </DialogHeader>
 
           <div
             ref={invoiceRef}
-            className="p-4 mx-auto border rounded-md bg-white text-black"
+            className="p-2 mx-auto border rounded-md bg-white text-black"
             style={{
               width: "140mm",
               //minHeight: "200mm",
@@ -290,35 +292,50 @@ export default function ReservationsPage() {
               </div>
             </div>
 
+            <div className="w-full border mb-2 p-2 border-black  space-y-2 text-sm">
+              <p>
+                نام:{" "}
+                <span className="font-bold ">
+                  {selectedReservation.guest_name}
+                </span>
+              </p>
+              <p>
+                تلفن:{" "}
+                <span className="font-bold ">
+                  {convertToPersianDigits(selectedReservation.guest_phone)}
+                </span>
+              </p>
+            </div>
+
             <table className="w-full text-sm border border-black">
               <thead className="bg-gray-100">
-                <tr className="border-b border-black text-center">
-                  <th className="border-l border-black p-1">تاریخ ورود</th>
-                  <th className="border-l border-black p-1">تاریخ خروج</th>
-                  <th className="border-l border-black p-1">اتاق</th>
-                  <th className="border-l border-black p-1">مدت اقامت</th>
-                  <th className="border-l border-black p-1">نفرات</th>
-                  <th className="border-l border-black p-1">قیمت واحد</th>
+                <tr className="border-b border-black text-center text-xs">
+                  <th className="border-l border-black p-0.5">تاریخ ورود</th>
+                  <th className="border-l border-black p-0.5">تاریخ خروج</th>
+                  <th className="border-l border-black p-0.5">اتاق</th>
+                  <th className="border-l border-black p-0.5">مدت اقامت</th>
+                  <th className="border-l border-black p-0.5">نفرات</th>
+                  <th className="border-l border-black p-0.5">قیمت واحد</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="text-center">
-                  <td className="border-t border-black p-1">
+                  <td className="p-1 border-l border-black ">
                     {convertToPersianDigits(checkInDate)}
                   </td>
-                  <td className="border-t border-black p-1">
+                  <td className=" p-1 border-l border-black">
                     {convertToPersianDigits(checkOutDate)}
                   </td>
-                  <td className="border-t border-black p-1">
+                  <td className=" p-1 border-l border-black">
                     {room?.room_number}
                   </td>
-                  <td className="border-t border-black p-1">
+                  <td className=" p-1 border-l border-black">
                     {nights.toLocaleString("fa-IR")}
                   </td>
-                  <td className="border-t border-black p-1">
+                  <td className="border-l border-black p-1">
                     {(selectedReservation?.adults).toLocaleString("fa-IR")}
                   </td>
-                  <td className="border-t border-black p-1">
+                  <td className="p-1">
                     {room?.price_per_night.toLocaleString("fa-IR")}
                   </td>
                 </tr>
@@ -327,28 +344,53 @@ export default function ReservationsPage() {
 
             <div className="text-sm mt-4 space-y-2">
               <p>
-                قیمت کل:{" "}
+                محاسبه قیمت بر اساس:
+                <span className="font-bold "> {roomPriceType}</span>
+              </p>
+
+              <p>
+                ساعت تحویل اتاق:{" "}
                 <span className="font-bold ">
+                  {convertToPersianDigits(motelData.motel_checkin)}
+                </span>
+              </p>
+
+              <p>
+                ساعت تخلیه اتاق:{" "}
+                <span className="font-bold ">
+                  {convertToPersianDigits(motelData.motel_checkout)}
+                </span>
+              </p>
+
+              <p className="border-t border-black">
+                مبلغ قابل پرداخت :{" "}
+                <span className="font-bold text-lg">
                   {" "}
                   {selectedReservation.total_price.toLocaleString("fa-IR")}{" "}
                   تومان
                 </span>
               </p>
-              <p>ساعت تحویل اتاق: 14:00</p>
+              {motelData.motel_card && (
+                <p>
+                  شماره کارت :{" "}
+                  <span className="font-bold ">
+                    {convertToPersianDigits(motelData.motel_card)}
+                  </span>
+                </p>
+              )}
 
-              <p>ساعت تخلیه اتاق: 12:00</p>
-              <p>
-                شماره کارت :{" "}
-                <span className="font-bold ">
-                  {convertToPersianDigits("6063360223658520")}
-                </span>
-              </p>
-              <p>
-                شماره شبا :{" "}
-                <span className="font-bold ">
-                  {convertToPersianDigits("6063360223658520")}
-                </span>
-              </p>
+              {motelData.motel_iban && (
+                <p>
+                  شماره شبا :{" "}
+                  <span className="font-bold ">
+                    {convertToPersianDigits(motelData.motel_iban)}
+                  </span>
+                </p>
+              )}
+
+              {motelData.motel_card_name && (
+                <p>به نام {motelData.motel_card_name}</p>
+              )}
             </div>
 
             <div className="text-center text-xs text-gray-700 mt-3 border-t pt-2 ">
@@ -739,7 +781,7 @@ export default function ReservationsPage() {
                                     " border hover:scale-90 transition-all ease-in-out"
                                   }
                                 >
-                                  <Printer />
+                                  <FileText />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>

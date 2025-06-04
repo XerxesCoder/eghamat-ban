@@ -21,27 +21,34 @@ import { createOrUpdateMotel } from "@/app/actions/lodge";
 import { toast } from "sonner";
 import { useLodgeData } from "../DashbaordProvider";
 import { convertToPersianDigits } from "@/lib/jalali";
+import { validatePersianCard } from "@/lib/utils";
 
 export default function LodgeInfo() {
   const { userLodgeInfo, getUserLodgeInformation } = useLodgeData();
   const [motelData, setMotelData] = useState({
     name: userLodgeInfo?.motel_name || "",
     address: userLodgeInfo?.motel_address || "",
-    city: userLodgeInfo?.motel_city || "",
-    county: userLodgeInfo?.motel_state || "",
+    card: userLodgeInfo?.motel_card || "",
+    iban: userLodgeInfo?.motel_iban || "",
     phone: userLodgeInfo?.motel_phone || "",
     amenities: userLodgeInfo?.motel_amenities
       ? JSON.parse(userLodgeInfo?.motel_amenities)
       : [],
     checkInTime: userLodgeInfo?.motel_checkin || "14:00",
     checkOutTime: userLodgeInfo?.motel_checkout || "12:00",
+    cardName: userLodgeInfo?.motel_card_name || "",
   });
   const [newAmenity, setNewAmenity] = useState("");
 
   const [saving, setSaving] = useState(false);
 
   const handleInputChange = (field, value) => {
-    setMotelData((prev) => ({ ...prev, [field]: value }));
+    const onlyNumbers = value.replace(/\D/g, "");
+    if (field === "phone" || field === "card" || field === "iban") {
+      setMotelData((prev) => ({ ...prev, [field]: onlyNumbers }));
+    } else {
+      setMotelData((prev) => ({ ...prev, [field]: value }));
+    }
   };
 
   const addAmenity = () => {
@@ -66,6 +73,11 @@ export default function LodgeInfo() {
     toast.loading("در حال ذخیره ...");
     setSaving(true);
     try {
+      const isCardValid = validatePersianCard(motelData.card);
+      if (motelData.card && !isCardValid) {
+        toast.warning("کارت بانکی وارد شده معتبر نمی باشد");
+        return;
+      }
       const data = await createOrUpdateMotel(motelData);
       if (data.success) {
         toast.dismiss();
@@ -185,25 +197,34 @@ export default function LodgeInfo() {
             </div>
             <div className="flex flex-col md:flex-row justify-center items-center w-full gap-4 md:gap-5">
               <div className={"w-full  space-y-2"}>
-                <Label htmlFor="address">استان</Label>
+                <Label htmlFor="card">شماره کارت</Label>
                 <Input
-                  id="address"
-                  value={motelData.county}
-                  onChange={(e) => handleInputChange("county", e.target.value)}
-                  placeholder="استان را وارد کنید"
+                  id="card"
+                  value={motelData.card}
+                  maxLength={16}
+                  onChange={(e) => handleInputChange("card", e.target.value)}
+                  placeholder="شماره کارت جهت درج در فاکتور"
                 />
               </div>
               <div className={"w-full  space-y-2"}>
-                <Label htmlFor="address">شهر</Label>
+                <Label htmlFor="iban">شماره شبا</Label>
                 <Input
-                  id="address"
-                  value={motelData.city}
-                  onChange={(e) => handleInputChange("city", e.target.value)}
-                  placeholder="شهر را وارد کنید"
+                  id="iban"
+                  value={motelData.iban}
+                  onChange={(e) => handleInputChange("iban", e.target.value)}
+                  placeholder=" شماره شبا جهت درج در فاکتور بدون IR"
                 />
               </div>
             </div>
-
+            <div className={"w-full  space-y-2"}>
+              <Label htmlFor="cardName">نام صاحب کارت </Label>
+              <Input
+                id="cardName"
+                value={motelData.cardName}
+                onChange={(e) => handleInputChange("cardName", e.target.value)}
+                placeholder="نام صاحب کارت جهت درج در فاکتور"
+              />
+            </div>
             <div className={"w-full  space-y-2"}>
               <Label htmlFor="address">آدرس</Label>
               <Textarea
@@ -258,9 +279,7 @@ export default function LodgeInfo() {
               <Button
                 onClick={addAmenity}
                 size="sm"
-                className={
-                  "bg-lime-zest text-deep-ocean hover:bg-lime-zest/70"
-                }
+                className={"bg-lime-zest text-deep-ocean hover:bg-lime-zest/70"}
               >
                 <Plus className="w-4 h-4" />
               </Button>
@@ -294,7 +313,7 @@ export default function LodgeInfo() {
       </motion.div>
       <motion.div variants={item}>
         <Card>
-{/*           <CardHeader>
+          {/*           <CardHeader>
             <CardTitle>پیش نمایش اقامتگاه</CardTitle>
           </CardHeader> */}
           <CardContent>
@@ -303,17 +322,14 @@ export default function LodgeInfo() {
             </h2>
             <div className="space-y-2">
               <div className="flex items-center">
-                <MapPinned className="w-4 h-4 ml-2" />
-                <span className="ml-1">{motelData.county || "استان"}</span>
-                <span>{motelData.city || "شهر"}</span>
-              </div>
-              <div className="flex items-center">
                 <MapPin className="w-4 h-4 ml-2" />
                 <span>{motelData.address || "آدرس"}</span>
               </div>
               <div className="flex items-center">
                 <Phone className="w-4 h-4 ml-2" />
-                <span>{convertToPersianDigits(motelData.phone) || "تلفن تماس"}</span>
+                <span>
+                  {convertToPersianDigits(motelData.phone) || "تلفن تماس"}
+                </span>
               </div>
             </div>
 
@@ -342,11 +358,15 @@ export default function LodgeInfo() {
               <div className="flex items-center space-x-6 text-sm">
                 <div className="flex items-center">
                   <Clock className="w-4 h-4 ml-2" />
-                  <span>زمان ورود: {convertToPersianDigits(motelData.checkInTime)}</span>
+                  <span>
+                    زمان ورود: {convertToPersianDigits(motelData.checkInTime)}
+                  </span>
                 </div>
                 <div className="flex items-center">
                   <Clock className="w-4 h-4 ml-2" />
-                  <span>زمان خروج: {convertToPersianDigits(motelData.checkOutTime) }</span>
+                  <span>
+                    زمان خروج: {convertToPersianDigits(motelData.checkOutTime)}
+                  </span>
                 </div>
               </div>
             </div>

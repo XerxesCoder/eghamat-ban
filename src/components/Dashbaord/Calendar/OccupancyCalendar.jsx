@@ -209,7 +209,7 @@ export default function OccupancyPage() {
 
       monthDays.forEach((day) => {
         const status = getRoomStatusForDate(room, day);
-        csv += `${status.isOccupied ? "پر" : "خالی"},`;
+        csv += `${status.isOccupied ? "X" : "خالی"},`;
       });
       csv += "\n";
     });

@@ -210,13 +210,6 @@ export const updateReservationStatuses = (reservations) => {
   const todayMoment = moment(today, "jYYYY/jM/jD");
 
   return reservations.map((reservation) => {
-    if (
-      ["ENDED", "OUTDATED", "CHECKED_IN", "STAY"].includes(reservation.status)
-    ) {
-      return reservation;
-    }
-
-    // Parse dates
     const checkInDate = moment(reservation.check_in, "jYYYY/jMM/jDD").format(
       "jYYYY/jM/jD"
     );
@@ -292,4 +285,25 @@ export function getDetailedTodayMovements(reservations) {
   });
 
   return result;
+}
+
+export function sortByCheckInDateDesc(data) {
+  function parseJalaliDate(dateStr) {
+    const normalized = dateStr.replace(/[\/\-]/g, "/");
+
+    const m = moment(dateStr, "jYYYY/jM/jD", "fa");
+    if (!m.isValid()) {
+      console.warn(`Invalid date format: ${dateStr}`);
+      return moment.invalid();
+    }
+    return m;
+  }
+  return [...data].sort((a, b) => {
+    const dateA = parseJalaliDate(a.check_in);
+    const dateB = parseJalaliDate(b.check_in);
+
+    if (dateA.isAfter(dateB)) return -1;
+    if (dateA.isBefore(dateB)) return 1;
+    return 0;
+  });
 }

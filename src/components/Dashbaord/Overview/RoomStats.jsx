@@ -9,6 +9,7 @@ import { BadgeCheck, Construction, DoorOpen, HomeIcon } from "lucide-react";
 import { useMemo } from "react";
 import {
   convertToPersianDigits,
+  sortByCheckInDateDesc,
   updateReservationStatuses,
 } from "@/lib/jalali";
 import { useLodgeData } from "../DashbaordProvider";
@@ -22,7 +23,7 @@ export default function RoomStats() {
   const filteredReservations = useMemo(() => {
     const rawData = updateReservationStatuses(reservations);
 
-    return rawData;
+    return sortByCheckInDateDesc(rawData);
   }, [reservations]);
 
   const router = useRouter();

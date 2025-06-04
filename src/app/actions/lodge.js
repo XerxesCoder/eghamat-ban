@@ -14,8 +14,9 @@ export async function createOrUpdateMotel(motelData) {
         {
           motel_name: motelData.name,
           motel_address: motelData.address,
-          motel_city: motelData.city,
-          motel_state: motelData.county,
+          motel_card: motelData.card,
+          motel_card_name: motelData.cardName,
+          motel_iban: motelData.iban,
           motel_phone: motelData.phone,
           motel_amenities: motelData.amenities,
           motel_checkin: motelData.checkInTime,

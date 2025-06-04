@@ -193,22 +193,19 @@ export default function ReserveDialog({
     }
   };
 
-  const handleDelete = async (reservation, roomId) => {
+  const handleDelete = async (reservation) => {
     toast(`آیا از حذف رزرواسیون ${reservation.guest_name} اطمینان دارید؟`, {
       action: {
         label: "حذف",
         onClick: async () => {
-          toast.promise(
-            await deleteReservation(reservation.id, reservation.room_id),
-            {
-              loading: `در حال حذف رزرواسیون ${reservation.guest_name}...`,
-              success: () => {
-                getLodgeData();
-                return `رزرواسیون ${reservation.guest_name} با موفقیت حذف شد`;
-              },
-              error: "خطا در حذف رزرواسیون",
-            }
-          );
+          toast.promise(await deleteReservation(reservation.id), {
+            loading: `در حال حذف رزرواسیون ${reservation.guest_name}...`,
+            success: () => {
+              getLodgeData();
+              return `رزرواسیون ${reservation.guest_name} با موفقیت حذف شد`;
+            },
+            error: "خطا در حذف رزرواسیون",
+          });
         },
       },
       cancel: {

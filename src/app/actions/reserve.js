@@ -8,7 +8,6 @@ export async function addNewReserve(reserveData) {
   if (!userId) return { error: "User ID is required" };
 
   try {
-
     const { data, error } = await supabase
       .from("reservations")
       .insert([
@@ -45,7 +44,7 @@ export async function editReservation(reserveData, reserveID) {
   if (!userId) return { error: "User ID is required" };
 
   try {
-        console.log(reserveData.checkIn, reserveData.checkOut);
+    console.log(reserveData.checkIn, reserveData.checkOut);
     const { data, error } = await supabase
       .from("reservations")
       .update([
@@ -90,7 +89,7 @@ export async function editReservation(reserveData, reserveID) {
   }
 }
 
-export async function deleteReservation(reserveID, roomID) {
+export async function deleteReservation(reserveID) {
   const { userId } = await auth();
 
   if (!userId) return { error: "User ID is required" };
@@ -102,18 +101,6 @@ export async function deleteReservation(reserveID, roomID) {
       .eq("owner_id", userId)
       .eq("id", reserveID)
       .select();
-
-    /*     const { data: roomData, error: roomErr } = await supabase
-      .from("rooms")
-      .update([
-        {
-          enter_date: null,
-          exit_date: null,
-        },
-      ])
-      .eq("id", roomID)
-      .eq("owner_id", userId)
-      .select(); */
 
     if (error) {
       console.error("Supabase error:", error);

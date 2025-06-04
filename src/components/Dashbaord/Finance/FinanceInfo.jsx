@@ -139,8 +139,7 @@ const FinancePage = () => {
   }, [reservations, rooms, selectedYear, selectedMonth]);
 
   const exportFinancialData = () => {
-    const monthlyData = calculateMonthlyRevenue();
-    const roomData = calculateRevenueByRoom(selectedYear, selectedMonth);
+    const roomData = roomRevenueData;
 
     let csv = "گزارش مالی\n\nخلاصه درآمد ماهانه\n";
     csv +=
