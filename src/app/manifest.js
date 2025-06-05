@@ -6,7 +6,7 @@ export default function manifest() {
     start_url: "/dashboard",
     id: "EghamatBan",
     display: "standalone",
-    background_color: "#f5f7fa",
+    background_color: "#E9DAC7",
     theme_color: "#f5f7fa",
     icons: [
       {
