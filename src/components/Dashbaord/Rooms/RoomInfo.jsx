@@ -119,7 +119,7 @@ export default function RoomsPage() {
       if (editingRoom) {
         toast.loading(`در حال بروزرسانی اتاق ${editingRoom.room_number}...`);
         const editRes = await editRoom(roomData, editingRoom.id);
-        if (editRes.success) {
+        if (editRes?.success) {
           getLodgeData();
           toast.dismiss();
           toast.success("اتاق ویرایش شد", {
@@ -133,7 +133,7 @@ export default function RoomsPage() {
       } else {
         toast.loading("در حال اضافه کردن اتاق جدید...");
         const response = await addNewRoom(roomData);
-        if (response.success) {
+        if (response?.success) {
           getLodgeData();
           toast.dismiss();
           toast.success("اتاق اضافه شد", {

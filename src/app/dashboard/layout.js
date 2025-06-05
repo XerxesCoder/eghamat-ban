@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import DashbaordProvider from "@/components/Dashbaord/DashbaordProvider";
 
 export default function DashboardLayout({ children }) {
+
   return (
     <SidebarProvider defaultOpen>
       <AppSidebar />
