@@ -63,13 +63,15 @@ import {
 import { reserveStatus, roomTypes } from "@/lib/roomsData";
 import moment from "moment-jalaali";
 import ReserveDialog from "./ReserveDialog";
-import { useLodgeData } from "../DashbaordProvider";
 import { useSearchParams } from "next/navigation";
 import { getStatusColor } from "@/lib/badgeColors";
 import html2canvas from "html2canvas-pro";
 
-export default function ReservationsPage() {
-  const { rooms, reservations, userLodgeInfo, getLodgeData } = useLodgeData();
+export default function ReservationsPage({
+  rooms,
+  reservations,
+  userLodgeInfo,
+}) {
   const searchParams = useSearchParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -168,7 +170,6 @@ export default function ReservationsPage() {
             {
               loading: `در حال حذف رزرواسیون ${reservation.guest_name}...`,
               success: () => {
-                getLodgeData();
                 return `رزرواسیون ${reservation.guest_name} با موفقیت حذف شد`;
               },
               error: "خطا در حذف رزرواسیون",

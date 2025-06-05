@@ -4,10 +4,8 @@ import { Button } from "@/components/ui/button";
 import { PlusCircle, Calendar, CalendarDays, Hotel } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
-import { useLodgeData } from "../DashbaordProvider";
 
 export default function QuickActions() {
-  const { isDataLoaded } = useLodgeData();
   const container = {
     hidden: { opacity: 0 },
     visible: {
@@ -78,7 +76,6 @@ export default function QuickActions() {
                   variant="outline"
                   className="flex flex-col h-24 items-center justify-center shadow-lg w-full "
                   asChild
-                  disabled={!isDataLoaded}
                 >
                   <Link href={action.href}>
                     {action.icon}

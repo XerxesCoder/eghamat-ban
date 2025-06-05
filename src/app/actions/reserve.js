@@ -1,6 +1,7 @@
 "use server";
 import { auth } from "@clerk/nextjs/server";
 import { supabaseClient as supabase } from "@/lib/supabse";
+import { revalidateTag, unstable_cache } from "next/cache";
 
 export async function addNewReserve(reserveData) {
   const { userId } = await auth();
@@ -30,7 +31,7 @@ export async function addNewReserve(reserveData) {
       console.error("Supabase error:", error);
       return { error: error.message };
     }
-
+    revalidateTag("userReserves");
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
@@ -65,23 +66,11 @@ export async function editReservation(reserveData, reserveID) {
       .eq("id", reserveID)
       .select();
 
-    /*     const { data: roomData, error: roomErr } = await supabase
-      .from("rooms")
-      .update([
-        {
-          enter_date: reserveData.checkIn,
-          exit_date: reserveData.checkOut,
-        },
-      ])
-      .eq("id", reserveData.roomId)
-      .eq("owner_id", userId)
-      .select(); */
-
     if (error) {
       console.error("Supabase error:", error);
       return { error: error.message };
     }
-
+    revalidateTag("userReserves");
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
@@ -106,7 +95,7 @@ export async function deleteReservation(reserveID) {
       console.error("Supabase error:", error);
       return { error: error.message };
     }
-
+    revalidateTag("userReserves");
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
@@ -114,22 +103,27 @@ export async function deleteReservation(reserveID) {
   }
 }
 
+const getUserReservationsCache = unstable_cache(
+  async (userId) => {
+    const { data, error } = await supabase
+      .from("reservations")
+      .select()
+      .eq("owner_id", userId);
+
+    if (error) throw error;
+    return data;
+  },
+  ["user-data"],
+  { tags: ["userReserves"] }
+);
+
 export async function getUserReservations() {
   const { userId } = await auth();
 
   if (!userId) return { error: "User ID is required" };
 
   try {
-    const { data, error } = await supabase
-      .from("reservations")
-      .select()
-      .eq("owner_id", userId);
-
-    if (error) {
-      console.error("DB error:", error);
-      return { error: error.message };
-    }
-
+    const data = await getUserReservationsCache(userId);
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);

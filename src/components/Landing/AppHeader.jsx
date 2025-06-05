@@ -74,7 +74,7 @@ export default function AppHeader() {
         <div className="hidden lg:flex items-center gap-3">
           {isSignedIn ? (
             <Button
-              className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90 px-6 font-bold"
+              className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90 font-bold"
               asChild
             >
               <Link href="/dashboard">داشبورد مدیریت</Link>
@@ -136,7 +136,7 @@ export default function AppHeader() {
                   asChild
                 >
                   <Link href="/dashboard" onClick={() => setIsOpen(false)}>
-                    ورود به داشبورد
+                    داشبورد مدیریت
                   </Link>
                 </Button>
               ) : (

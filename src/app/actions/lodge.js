@@ -1,6 +1,7 @@
 "use server";
 import { auth } from "@clerk/nextjs/server";
 import { supabaseClient as supabase } from "@/lib/supabse";
+import { revalidateTag, unstable_cache } from "next/cache";
 
 export async function createOrUpdateMotel(motelData) {
   const { userId } = await auth();
@@ -30,7 +31,7 @@ export async function createOrUpdateMotel(motelData) {
       console.error("Supabase error:", error);
       return { error: error.message };
     }
-
+    revalidateTag("userLodge");
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
@@ -38,21 +39,27 @@ export async function createOrUpdateMotel(motelData) {
   }
 }
 
+const getCachedUserLodge = unstable_cache(
+  async (userId) => {
+    const { data, error } = await supabase
+      .from("users")
+      .select()
+      .eq("clerk", userId);
+
+    if (error) throw error;
+    return data;
+  },
+  ["user-data"],
+  { tags: ["userLodge"] }
+);
+
 export async function getUserLodge() {
   const { userId } = await auth();
 
   if (!userId) return { error: "User ID is required" };
 
   try {
-    const { data, error } = await supabase
-      .from("users")
-      .select()
-      .eq("clerk", userId);
-
-    if (error) {
-      console.error("DB error:", error);
-      return { error: error.message };
-    }
+    const data = await getCachedUserLodge(userId);
 
     return { success: true, data };
   } catch (err) {

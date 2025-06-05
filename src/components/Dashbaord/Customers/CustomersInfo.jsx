@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { useLodgeData } from "../DashbaordProvider";
+
 import {
   Select,
   SelectContent,
@@ -40,8 +40,7 @@ import { toast } from "sonner";
 
 moment.loadPersian({ dialect: "persian-modern" });
 
-const CustomersPage = () => {
-  const { reservations } = useLodgeData();
+const CustomersPage = ({ reservations }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("lastVisit");

@@ -40,12 +40,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { roomAmenities, roomStatusTypes, roomTypes } from "@/lib/roomsData";
 import { addNewRoom, deleteRoom, editRoom } from "@/app/actions/rooms";
-
-import { useLodgeData } from "../DashbaordProvider";
 import { useSearchParams } from "next/navigation";
 
-export default function RoomsPage() {
-  const { rooms, getLodgeData } = useLodgeData();
+export default function RoomsPage({ rooms }) {
   const [searchTerm, setSearchTerm] = useState("");
   const searchParams = useSearchParams();
   const [typeFilter, setTypeFilter] = useState("all");
@@ -120,7 +117,6 @@ export default function RoomsPage() {
         toast.loading(`در حال بروزرسانی اتاق ${editingRoom.room_number}...`);
         const editRes = await editRoom(roomData, editingRoom.id);
         if (editRes?.success) {
-          getLodgeData();
           toast.dismiss();
           toast.success("اتاق ویرایش شد", {
             description: `اتاق ${formData.number} با موفقیت ویرایش شد`,
@@ -134,7 +130,6 @@ export default function RoomsPage() {
         toast.loading("در حال اضافه کردن اتاق جدید...");
         const response = await addNewRoom(roomData);
         if (response?.success) {
-          getLodgeData();
           toast.dismiss();
           toast.success("اتاق اضافه شد", {
             description: `اتاق ${formData.number} با موفقیت اضافه شد`,
@@ -175,7 +170,6 @@ export default function RoomsPage() {
           toast.promise(await deleteRoom(room.id), {
             loading: `در حال حذف اتاق ${room.room_number}...`,
             success: () => {
-              getLodgeData();
               return `اتاق ${room.room_number} با موفقیت حذف شد`;
             },
             error: "خطا در حذف اتاق",
@@ -277,7 +271,7 @@ export default function RoomsPage() {
             </Button>
           </DialogTrigger>
           <DialogContent
-         className={"p-3 sm:p-6 sm:max-w-md"}
+            className={"p-3 sm:p-6 sm:max-w-md"}
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
             <DialogHeader

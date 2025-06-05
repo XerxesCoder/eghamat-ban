@@ -12,14 +12,11 @@ import {
   sortByCheckInDateDesc,
   updateReservationStatuses,
 } from "@/lib/jalali";
-import { useLodgeData } from "../DashbaordProvider";
-import { RoomsCardSkeleton } from "./RoomsSkeleton";
-import { ReservationsCardSkeleton } from "./ReservationSkeletonCard";
+
 import { useRouter } from "next/navigation";
 import { getStatusColor } from "@/lib/badgeColors";
 
-export default function RoomStats() {
-  const { rooms, reservations, isDataLoaded } = useLodgeData();
+export default function RoomStats({ rooms, reservations }) {
   const filteredReservations = useMemo(() => {
     const rawData = updateReservationStatuses(reservations);
 
@@ -59,167 +56,159 @@ export default function RoomStats() {
       variants={container}
     >
       <motion.div variants={item}>
-        {isDataLoaded ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>اتاق ها</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <motion.div className="space-y-4" variants={container}>
-                {rooms.length > 0 ? (
-                  rooms.slice(0, 5).map((room) => (
-                    <motion.div
-                      key={room.id}
-                      className="flex items-center justify-between cursor-pointer hover:bg-sky-glint/50 transition-all ease-in-out px-2 py-1 rounded-md"
-                      variants={item}
-                      onClick={() =>
-                        router.push(`/dashboard/rooms?room=${room.room_number}`)
-                      }
-                    >
-                      <div className="flex items-center space-x-3">
-                        <motion.div
-                          className="w-10 h-10 rounded-lg flex items-center justify-center"
-                          whileHover={{ scale: 1.1 }}
-                        >
-                          <DoorOpen />
-                        </motion.div>
-                        <div>
-                          <p className="font-medium">اتاق {room.room_number}</p>
-                        </div>
-                      </div>
-                      <Badge
-                        className={`${
-                          room.status == "AVAILABLE"
-                            ? "text-deep-ocean bg-lime-zest"
-                            : "text-pearl-luster bg-red-500"
-                        }`}
-                      >
-                        {room.status == "AVAILABLE" ? (
-                          <BadgeCheck />
-                        ) : (
-                          <Construction />
-                        )}
-                        {
-                          roomStatusTypes.find(
-                            (status) => room.status == status.value
-                          ).label
-                        }
-                      </Badge>
-                    </motion.div>
-                  ))
-                ) : (
-                  <motion.p
-                    className="text-gray-500 text-center py-4"
+        <Card>
+          <CardHeader>
+            <CardTitle>اتاق ها</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <motion.div className="space-y-4" variants={container}>
+              {rooms.length > 0 ? (
+                rooms.slice(0, 5).map((room) => (
+                  <motion.div
+                    key={room.id}
+                    className="flex items-center justify-between cursor-pointer hover:bg-sky-glint/50 transition-all ease-in-out px-2 py-1 rounded-md"
                     variants={item}
+                    onClick={() =>
+                      router.push(`/dashboard/rooms?room=${room.room_number}`)
+                    }
                   >
-                    اتاقی یافت نشد.
-                  </motion.p>
-                )}
-
-                {rooms.length > 5 && (
-                  <motion.div variants={item}>
-                    <Link href="/dashboard/rooms">
-                      <Button
-                        variant="ghost"
-                        className="w-full"
-                        whileHover={{ scale: 1.02 }}
+                    <div className="flex items-center space-x-3">
+                      <motion.div
+                        className="w-10 h-10 rounded-lg flex items-center justify-center"
+                        whileHover={{ scale: 1.1 }}
                       >
-                        مشاهده همه اتاق ها ({rooms.length})
-                      </Button>
-                    </Link>
+                        <DoorOpen />
+                      </motion.div>
+                      <div>
+                        <p className="font-medium">اتاق {room.room_number}</p>
+                      </div>
+                    </div>
+                    <Badge
+                      className={`${
+                        room.status == "AVAILABLE"
+                          ? "text-deep-ocean bg-lime-zest"
+                          : "text-pearl-luster bg-red-500"
+                      }`}
+                    >
+                      {room.status == "AVAILABLE" ? (
+                        <BadgeCheck />
+                      ) : (
+                        <Construction />
+                      )}
+                      {
+                        roomStatusTypes.find(
+                          (status) => room.status == status.value
+                        ).label
+                      }
+                    </Badge>
                   </motion.div>
-                )}
-              </motion.div>
-            </CardContent>
-          </Card>
-        ) : (
-          <RoomsCardSkeleton />
-        )}
+                ))
+              ) : (
+                <motion.p
+                  className="text-gray-500 text-center py-4"
+                  variants={item}
+                >
+                  اتاقی یافت نشد.
+                </motion.p>
+              )}
+
+              {rooms.length > 5 && (
+                <motion.div variants={item}>
+                  <Link href="/dashboard/rooms">
+                    <Button
+                      variant="ghost"
+                      className="w-full"
+                      whileHover={{ scale: 1.02 }}
+                    >
+                      مشاهده همه اتاق ها ({rooms.length})
+                    </Button>
+                  </Link>
+                </motion.div>
+              )}
+            </motion.div>
+          </CardContent>
+        </Card>
       </motion.div>
 
       <motion.div variants={item}>
-        {isDataLoaded ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>رزروهای اخیر</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <motion.div className="space-y-4" variants={container}>
-                {reservations.length > 0 ? (
-                  filteredReservations.slice(0, 5).map((reservation) => {
-                    const room = rooms.find(
-                      (r) => String(r.id) === String(reservation.room_id)
-                    );
+        <Card>
+          <CardHeader>
+            <CardTitle>رزروهای اخیر</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <motion.div className="space-y-4" variants={container}>
+              {reservations.length > 0 ? (
+                filteredReservations.slice(0, 5).map((reservation) => {
+                  const room = rooms.find(
+                    (r) => String(r.id) === String(reservation.room_id)
+                  );
 
-                    return (
-                      <motion.div
-                        key={reservation.id}
-                        className="flex items-center justify-between cursor-pointer hover:bg-sky-glint/50 transition-all ease-in-out px-2 py-1 rounded-md"
-                        variants={item}
-                        whileHover={{ x: 3 }}
-                        onClick={() =>
-                          router.push(
-                            `/dashboard/reservation?reserve=${reservation.guest_name}`
-                          )
-                        }
+                  return (
+                    <motion.div
+                      key={reservation.id}
+                      className="flex items-center justify-between cursor-pointer hover:bg-sky-glint/50 transition-all ease-in-out px-2 py-1 rounded-md"
+                      variants={item}
+                      whileHover={{ x: 3 }}
+                      onClick={() =>
+                        router.push(
+                          `/dashboard/reservation?reserve=${reservation.guest_name}`
+                        )
+                      }
+                    >
+                      <div>
+                        <p className="font-medium text-deep-ocean">
+                          {reservation.guest_name} -{" "}
+                          <span className="font-normal text-sm">
+                            (اتاق {room?.room_number})
+                          </span>
+                        </p>
+                        <p className="text-sm">
+                          <span className="text-lime-600">
+                            {convertToPersianDigits(reservation.check_in)}
+                          </span>{" "}
+                          -
+                          <span className="text-red-600">
+                            {convertToPersianDigits(reservation.check_out)}
+                          </span>
+                        </p>
+                      </div>
+                      <Badge
+                        className={getStatusColor(
+                          String(reservation.status).toLowerCase()
+                        )}
                       >
-                        <div>
-                          <p className="font-medium text-deep-ocean">
-                            {reservation.guest_name} -{" "}
-                            <span className="font-normal text-sm">
-                              (اتاق {room?.room_number})
-                            </span>
-                          </p>
-                          <p className="text-sm">
-                            <span className="text-lime-600">
-                              {convertToPersianDigits(reservation.check_in)}
-                            </span>{" "}
-                            -
-                            <span className="text-red-600">
-                              {convertToPersianDigits(reservation.check_out)}
-                            </span>
-                          </p>
-                        </div>
-                        <Badge
-                          className={getStatusColor(
-                            String(reservation.status).toLowerCase()
-                          )}
-                        >
-                          {
-                            reserveStatus.find(
-                              (res) =>
-                                res.value ===
-                                String(reservation.status).toLowerCase()
-                            )?.label
-                          }
-                        </Badge>
-                      </motion.div>
-                    );
-                  })
-                ) : (
-                  <motion.p
-                    className="text-gray-500 text-center py-4"
-                    variants={item}
-                  >
-                    رزروی یافت نشد.
-                  </motion.p>
-                )}
+                        {
+                          reserveStatus.find(
+                            (res) =>
+                              res.value ===
+                              String(reservation.status).toLowerCase()
+                          )?.label
+                        }
+                      </Badge>
+                    </motion.div>
+                  );
+                })
+              ) : (
+                <motion.p
+                  className="text-gray-500 text-center py-4"
+                  variants={item}
+                >
+                  رزروی یافت نشد.
+                </motion.p>
+              )}
 
-                {reservations.length > 5 && (
-                  <motion.div variants={item}>
-                    <Button variant="outline" asChild className="w-full">
-                      <Link href="/dashboard/reservation">
-                        مشاهده همه رزروها ({reservations.length})
-                      </Link>
-                    </Button>
-                  </motion.div>
-                )}
-              </motion.div>
-            </CardContent>
-          </Card>
-        ) : (
-          <ReservationsCardSkeleton />
-        )}
+              {reservations.length > 5 && (
+                <motion.div variants={item}>
+                  <Button variant="outline" asChild className="w-full">
+                    <Link href="/dashboard/reservation">
+                      مشاهده همه رزروها ({reservations.length})
+                    </Link>
+                  </Button>
+                </motion.div>
+              )}
+            </motion.div>
+          </CardContent>
+        </Card>
       </motion.div>
     </motion.div>
   );

@@ -39,7 +39,6 @@ import {
   editReservation,
 } from "@/app/actions/reserve";
 import { toast } from "sonner";
-import { useLodgeData } from "../DashbaordProvider";
 
 export default function ReserveDialog({
   setEditingReservation,
@@ -53,7 +52,6 @@ export default function ReserveDialog({
   rooms,
   withButton,
 }) {
-  const { getLodgeData } = useLodgeData();
   const [isAddingOrEditing, setIsAddingOrEditing] = useState(false);
 
   const handleInputChange = useCallback((e) => {
@@ -167,7 +165,6 @@ export default function ReserveDialog({
           editingReservation.id
         );
         if (editReserve.success) {
-          getLodgeData();
           toast.dismiss();
           toast.success("با موفقیت ویرایش شد");
           setEditingReservation(null);
@@ -177,7 +174,6 @@ export default function ReserveDialog({
         toast.loading("درحال افزودن اطلاعات");
         const addReserve = await addNewReserve(reservationData);
         if (addReserve.success) {
-          getLodgeData();
           toast.dismiss();
           toast.success("با موفقیت افزوده شد");
           resetForm();
@@ -201,7 +197,6 @@ export default function ReserveDialog({
           toast.promise(await deleteReservation(reservation.id), {
             loading: `در حال حذف رزرواسیون ${reservation.guest_name}...`,
             success: () => {
-              getLodgeData();
               return `رزرواسیون ${reservation.guest_name} با موفقیت حذف شد`;
             },
             error: "خطا در حذف رزرواسیون",

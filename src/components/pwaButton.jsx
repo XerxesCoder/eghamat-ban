@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Button } from "./ui/button";
 
 export default function PWAInstallButton() {
   const [deferredPrompt, setDeferredPrompt] = useState(null);
@@ -41,11 +42,8 @@ export default function PWAInstallButton() {
   if (!deferredPrompt || isAppInstalled) return null;
 
   return (
-    <button
-      onClick={handleInstallClick}
-      className="fixed bottom-6 right-6 bg-deep-ocean hover:bg-deep-ocean/50 text-white font-medium p-2 cursor-pointer rounded-full text-sm transition-colors z-50"
-    >
+    <Button size={"sm"} className={'fixed right-5 bottom-5 z-30'} onClick={handleInstallClick}>
       نصب اپلیکیشن
-    </button>
+    </Button>
   );
 }

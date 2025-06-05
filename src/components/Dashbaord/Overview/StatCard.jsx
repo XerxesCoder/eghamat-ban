@@ -9,7 +9,6 @@ export default function StatCard({
   value,
   description,
   cardIndex,
-  isDataLoaded,
 }) {
   const cardVariants = {
     hidden: { opacity: 0, y: -20 },
@@ -43,11 +42,7 @@ export default function StatCard({
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 + cardIndex * 0.1 }} // Extra delay for content
           >
-            {isDataLoaded ? (
-              convertToPersianDigits(value)
-            ) : (
-              <Skeleton className={"h-8 w-8"} />
-            )}
+            {convertToPersianDigits(value)}
           </motion.h3>
           <motion.p
             className="text-xs text-muted-foreground mt-1"

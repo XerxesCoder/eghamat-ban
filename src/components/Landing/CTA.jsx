@@ -5,6 +5,7 @@ import { useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Rocket, ChevronLeft } from "lucide-react";
+import PWAInstallButton from "../pwaButton";
 
 export default function CTA() {
   const { isSignedIn } = useAuth();
@@ -12,10 +13,6 @@ export default function CTA() {
   return (
     <section className="py-20 bg-gradient-to-r from-deep-ocean to-deep-ocean/90 w-full relative overflow-hidden">
       {/* Decorative elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-10 left-1/4 w-32 h-32 rounded-full bg-aqua-spark blur-3xl"></div>
-        <div className="absolute bottom-20 right-1/3 w-40 h-40 rounded-full bg-lime-zest blur-3xl"></div>
-      </div>
 
       <motion.div
         className="container px-4 md:px-6 max-w-7xl mx-auto relative z-10"
@@ -51,7 +48,7 @@ export default function CTA() {
             transition={{ delay: 0.3 }}
           >
             <Button
-              className="bg-lime-zest text-deep-ocean hover:bg-lime-zest/90 hover:text-deep-ocean/90 px-8 py-6 text-lg font-bold shadow-lg transition-all hover:shadow-xl"
+              className="bg-lime-zest text-deep-ocean hover:bg-lime-zest/90 hover:text-deep-ocean/90 sm:text-lg font-bold "
               asChild
             >
               <Link
@@ -64,8 +61,7 @@ export default function CTA() {
             </Button>
 
             <Button
-              variant="outline"
-              className="bg-transparent text-pearl-luster border-pearl-luster hover:bg-pearl-luster/10 hover:text-pearl-luster px-8 py-6 text-lg font-bold"
+              className="bg-pearl-luster text-deep-ocean border-pearl-luster hover:bg-pearl-luster/80 sm:text-lg font-bold"
               asChild
             >
               <Link href="/sign-in" className="flex items-center gap-2">

@@ -19,12 +19,11 @@ import {
 } from "lucide-react";
 import { createOrUpdateMotel } from "@/app/actions/lodge";
 import { toast } from "sonner";
-import { useLodgeData } from "../DashbaordProvider";
+
 import { convertToPersianDigits } from "@/lib/jalali";
 import { validatePersianCard } from "@/lib/utils";
 
-export default function LodgeInfo() {
-  const { userLodgeInfo, getUserLodgeInformation } = useLodgeData();
+export default function LodgeInfo({ userLodgeInfo }) {
   const [motelData, setMotelData] = useState({
     name: userLodgeInfo?.motel_name || "",
     address: userLodgeInfo?.motel_address || "",
@@ -82,7 +81,6 @@ export default function LodgeInfo() {
       if (data.success) {
         toast.dismiss();
         toast.success("اطلاعات با موفقیت ذخیره شد");
-        getUserLodgeInformation();
       }
     } catch (error) {
       console.log(error);

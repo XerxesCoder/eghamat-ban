@@ -3,8 +3,10 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { motion } from "framer-motion";
 import PWAInstallButton from "../pwaButton";
+import { useAuth } from "@clerk/nextjs";
 
 export default function Hero() {
+  const { isSignedIn } = useAuth();
   return (
     <section className="flex w-full overflow-hidden py-20 md:py-32 bg-pearl-luster">
       <motion.div
@@ -39,32 +41,35 @@ export default function Hero() {
         >
           از مدیریت اتاق‌ها تا پیگیری مالی‌ - همه در یک سیستم ساده و کاربردی
         </motion.p>
-        {/*         <motion.p
-          className="text-sm text-deep-ocean/60 mt-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.7 }}
-        >
-          بدون نیاز به اشتراک - همیشه رایگان
-        </motion.p> */}
+
         <motion.div
           className="flex flex-col gap-2 sm:flex-row mt-6"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
+          {isSignedIn ? (
+            <Button
+              className="bg-lime-zest text-deep-ocean hover:bg-lime-zest/80 font-bold  sm:text-lg"
+              asChild
+              size={"lg"}
+            >
+              <Link href="/dashboard">داشبورد مدیریت</Link>
+            </Button>
+          ) : (
+            <Button
+              className="bg-lime-zest text-deep-ocean hover:bg-lime-zest/80 font-bold  sm:text-lg"
+              asChild
+              size={"lg"}
+            >
+              <Link href="/sign-up">شروع رایگان</Link>
+            </Button>
+          )}
+
           <Button
-            className="bg-lime-zest text-deep-ocean hover:bg-lime-zest/70  text-lg font-bold "
+            className="bg-deep-ocean text-pearl-luster hover:text-white hover:bg-deep-ocean/80 sm:text-lg"
             asChild
             size={"lg"}
-          >
-            <Link href={"/dashboard"}> ورود به داشبورد</Link>
-          </Button>
-          <Button
-            className="bg-deep-ocean text-pearl-luster hover:text-white hover:bg-deep-ocean/80 text-lg"
-            asChild
-            size={"lg"}
-            variant="outline"
           >
             <a href={"#features"}>امکانات بیشتر</a>
           </Button>

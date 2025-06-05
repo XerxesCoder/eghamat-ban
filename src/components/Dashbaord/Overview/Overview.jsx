@@ -15,10 +15,8 @@ import {
   persianTodayNumber,
   persianYear,
 } from "@/lib/jalali";
-import { useLodgeData } from "../DashbaordProvider";
 
-export default function Overview() {
-  const { rooms, reservations, isDataLoaded } = useLodgeData();
+export default function Overview({ rooms, reservations }) {
   const overviewData = getDetailedTodayMovements(reservations);
 
   const OverviewData = [
@@ -78,7 +76,6 @@ export default function Overview() {
             icon={item.icon}
             value={item.value}
             description={item.description}
-            isDataLoaded={isDataLoaded}
           />
         ))}
       </div>

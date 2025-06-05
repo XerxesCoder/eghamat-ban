@@ -27,14 +27,13 @@ import {
 import { cn } from "@/lib/utils";
 
 import { toast } from "sonner";
-import { useLodgeData } from "../DashbaordProvider";
+
 import { updateReservationStatuses } from "@/lib/jalali";
 import { Input } from "@/components/ui/input";
 
 moment.loadPersian({ dialect: "persian-modern" });
 
-const FinancePage = () => {
-  const { rooms, reservations } = useLodgeData();
+const FinancePage = ({ rooms, reservations }) => {
   const [selectedYear, setSelectedYear] = useState(moment().jYear());
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");

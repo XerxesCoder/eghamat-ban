@@ -32,12 +32,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useLodgeData } from "../DashbaordProvider";
 import { convertToPersianDigits } from "@/lib/jalali";
-export default function OccupancyPage() {
-  const { rooms, reservations } = useLodgeData();
+export default function OccupancyPage({ rooms, reservations }) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-
   const [selectedDate, setSelectedDate] = useState(moment());
   const [selectedRoomType, setSelectedRoomType] = useState("all");
   const [selectedRoomName, setSelectedRoomName] = useState("all");
@@ -310,7 +307,7 @@ export default function OccupancyPage() {
       <div className="space-y-4">
         <motion.div variants={item}>
           {" "}
-          <Card className={'p-0'}>
+          <Card className={"p-0"}>
             <div className="p-6 space-y-6">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>

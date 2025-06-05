@@ -1,6 +1,7 @@
 "use server";
 import { auth } from "@clerk/nextjs/server";
 import { supabaseClient as supabase } from "@/lib/supabse";
+import { revalidateTag, unstable_cache } from "next/cache";
 
 export async function addNewRoom(roomData) {
   const { userId } = await auth();
@@ -28,6 +29,7 @@ export async function addNewRoom(roomData) {
       console.error("Supabase error:", error);
       return { error: error.message };
     }
+    revalidateTag("userRooms");
 
     return { success: true, data };
   } catch (err) {
@@ -63,6 +65,7 @@ export async function editRoom(roomData, roomID) {
       console.error("Supabase error:", error);
       return { error: error.message };
     }
+    revalidateTag("userRooms");
 
     return { success: true, data };
   } catch (err) {
@@ -88,7 +91,7 @@ export async function deleteRoom(roomID) {
       console.error("Supabase error:", error);
       return { error: error.message };
     }
-
+    revalidateTag("userRooms");
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
@@ -96,7 +99,35 @@ export async function deleteRoom(roomID) {
   }
 }
 
+const getCachedUserRooms = unstable_cache(
+  async (userId) => {
+    const { data, error } = await supabase
+      .from("rooms")
+      .select()
+      .eq("owner_id", userId);
+
+    if (error) throw error;
+    return data;
+  },
+  ["user-data"],
+  { tags: ["userRooms"] }
+);
+
 export async function getUserRooms() {
+  const { userId } = await auth();
+  if (!userId) return { error: "User ID is required" };
+
+  try {
+    const data = await getCachedUserRooms(userId);
+
+    return { success: true, data };
+  } catch (err) {
+    console.error("Error:", err);
+    return { error: "Failed to get rooms" };
+  }
+}
+
+/* export async function getUserRooms() {
   const { userId } = await auth();
 
   if (!userId) return { error: "User ID is required" };
@@ -118,3 +149,4 @@ export async function getUserRooms() {
     return { error: "Failed to create motel" };
   }
 }
+ */

@@ -3,10 +3,11 @@ export default function manifest() {
     name: "اقامت بان",
     short_name: "اقامت بان",
     description: 'مدیریت هوشمند اقامتگاه‌ها"',
-    start_url: "/",
+    start_url: "/dashboard",
+    id: "EghamatBan",
     display: "standalone",
-    background_color: "#ffffff",
-    theme_color: "#000000",
+    background_color: "#f5f7fa",
+    theme_color: "#f5f7fa",
     icons: [
       {
         src: "/icon-192x192.png",
