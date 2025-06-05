@@ -24,7 +24,7 @@ const nextConfig = {
     connect-src 'self' https://clerk.dev https://*.clerk.dev https://*.clerk.com https://mint-chimp-59.clerk.accounts.dev;
     script-src 'self' 'unsafe-inline' 'unsafe-eval' https://clerk.dev https://*.clerk.dev https://*.clerk.com https://mint-chimp-59.clerk.accounts.dev;
     style-src 'self' 'unsafe-inline';
-    img-src 'self' https://images.clerk.dev data:;
+    img-src 'self' https://images.clerk.dev https://img.clerk.com data:;
     frame-src 'self' https://*.clerk.dev https://*.clerk.com https://mint-chimp-59.clerk.accounts.dev;
     child-src 'self' https://*.clerk.dev https://*.clerk.com https://mint-chimp-59.clerk.accounts.dev;
   `
@@ -58,7 +58,7 @@ const nextConfig = {
       },
     ];
   },
-/*   {
+  /*   {
         source: '/(.*)',
         headers: [
           {
