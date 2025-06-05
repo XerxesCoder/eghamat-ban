@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { motion } from "framer-motion";
+import PWAInstallButton from "../pwaButton";
 
 export default function Hero() {
   return (
@@ -67,6 +68,7 @@ export default function Hero() {
           >
             <a href={"#features"}>امکانات بیشتر</a>
           </Button>
+          <PWAInstallButton />
         </motion.div>
       </motion.div>
     </section>

@@ -35,6 +35,19 @@ const nextConfig = {
             key: "Referrer-Policy",
             value: "strict-origin-when-cross-origin",
           },
+          {
+            key: "Content-Security-Policy",
+            value: `
+              default-src 'self';
+              connect-src 'self' https://mint-chimp-59.clerk.accounts.dev https://*.clerk.accounts.dev;
+              script-src 'self' 'unsafe-eval' 'unsafe-inline' https://mint-chimp-59.clerk.accounts.dev https://*.clerk.accounts.dev;
+              img-src 'self' https://images.clerk.dev;
+              frame-src 'self' https://mint-chimp-59.clerk.accounts.dev https://*.clerk.accounts.dev;
+              style-src 'self' 'unsafe-inline';
+            `
+              .replace(/\s{2,}/g, " ")
+              .trim(),
+          },
         ],
       },
       {
