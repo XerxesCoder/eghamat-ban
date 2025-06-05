@@ -223,7 +223,7 @@ export default function ReserveDialog({
           e.stopPropagation();
           openCalendar();
         }}
-        className={`flex justify-between items-center gap-5 border w-40 rounded-sm bg-transparent px-3 py-1 cursor-pointer
+        className={`flex justify-between items-center gap-5 border sm:w-40 rounded-sm bg-transparent px-3 py-1 cursor-pointer
         border-deep-ocean focus-visible:border-deep-ocean/50 focus-visible:ring-aqua-spark/50 focus-visible:ring-[1px]`}
       >
         <CalendarDays className="w-4 h-4 " />
@@ -239,7 +239,7 @@ export default function ReserveDialog({
           e.stopPropagation();
           openCalendar();
         }}
-        className={`flex justify-between items-center gap-5 border w-40 rounded-sm bg-transparent px-3 py-1 cursor-pointer
+        className={`flex justify-between items-center gap-5 border sm:w-40 rounded-sm bg-transparent px-3 py-1 cursor-pointer
        ${
          !formData.checkIn && "opacity-50 pointer-events-none"
        } border-deep-ocean focus-visible:border-deep-ocean/50 focus-visible:ring-aqua-spark/50 focus-visible:ring-[1px]`}
@@ -267,8 +267,8 @@ export default function ReserveDialog({
         </DialogTrigger>
       )}
       <DialogContent
+        className={"p-3 sm:p-6 sm:max-w-md"}
         onOpenAutoFocus={(e) => e.preventDefault()}
-        className={"max-w-md"}
       >
         <DialogHeader
           className={
@@ -279,8 +279,11 @@ export default function ReserveDialog({
             {editingReservation ? "ویرایش رزرو" : "رزرو جدید"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4"
+        >
+          <div className="grid grid-cols-2 gap-6 ">
             <div className="space-y-2">
               <Label htmlFor="guestName">نام مسافر</Label>
               <Input
@@ -304,7 +307,7 @@ export default function ReserveDialog({
               />
             </div>
           </div>
-          <div className="flex justify-start items-center gap-8 w-full">
+          <div className="flex justify-start items-center gap-8">
             <div className="space-y-2 w-full">
               <Label htmlFor="roomId">اتاق</Label>
               <Select
@@ -342,7 +345,7 @@ export default function ReserveDialog({
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2 w-full">
+            <div className="space-y-2 max-w-[90%] sm:w-full">
               <Label htmlFor="adults">نفرات</Label>
               <Select
                 value={formData.adults}
@@ -373,7 +376,7 @@ export default function ReserveDialog({
             </div>
           </div>
 
-          <div className="flex justify-around gap-8 items-center w-full">
+          <div className="flex justify-around gap-8 items-center">
             <div className="space-y-2">
               <Label htmlFor="checkIn">تاریخ ورود</Label>
               <DatePicker

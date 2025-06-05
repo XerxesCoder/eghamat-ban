@@ -43,10 +43,10 @@ export default function PWAInstallButton() {
   return (
     <button
       onClick={handleInstallClick}
-      className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-full shadow-lg transition-colors z-50"
+      className="fixed bottom-6 right-6 bg-deep-ocean hover:bg-deep-ocean/50 text-white font-medium py-2 px-4 rounded-full shadow-lg transition-colors z-50"
       aria-label="Install app"
     >
-      Install App
+      نصب اپلیکیشن
     </button>
   );
 }

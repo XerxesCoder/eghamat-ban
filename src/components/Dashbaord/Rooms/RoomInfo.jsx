@@ -277,7 +277,7 @@ export default function RoomsPage() {
             </Button>
           </DialogTrigger>
           <DialogContent
-            className="max-w-md"
+         className={"p-3 sm:p-6 sm:max-w-md"}
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
             <DialogHeader
