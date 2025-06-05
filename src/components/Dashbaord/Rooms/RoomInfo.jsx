@@ -163,7 +163,7 @@ export default function RoomsPage({ rooms }) {
   };
 
   const handleDelete = async (room) => {
-    toast(`آیا از حذف اتاق ${room.room_number} اطمینان دارید؟`, {
+    toast.warning(`آیا از حذف اتاق ${room.room_number} اطمینان دارید؟`, {
       action: {
         label: "حذف",
         onClick: async () => {

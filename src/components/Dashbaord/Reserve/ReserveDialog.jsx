@@ -190,25 +190,28 @@ export default function ReserveDialog({
   };
 
   const handleDelete = async (reservation) => {
-    toast(`آیا از حذف رزرواسیون ${reservation.guest_name} اطمینان دارید؟`, {
-      action: {
-        label: "حذف",
-        onClick: async () => {
-          toast.promise(await deleteReservation(reservation.id), {
-            loading: `در حال حذف رزرواسیون ${reservation.guest_name}...`,
-            success: () => {
-              return `رزرواسیون ${reservation.guest_name} با موفقیت حذف شد`;
-            },
-            error: "خطا در حذف رزرواسیون",
-          });
+    toast.warning(
+      `آیا از حذف رزرواسیون ${reservation.guest_name} اطمینان دارید؟`,
+      {
+        action: {
+          label: "حذف",
+          onClick: async () => {
+            toast.promise(await deleteReservation(reservation.id), {
+              loading: `در حال حذف رزرواسیون ${reservation.guest_name}...`,
+              success: () => {
+                return `رزرواسیون ${reservation.guest_name} با موفقیت حذف شد`;
+              },
+              error: "خطا در حذف رزرواسیون",
+            });
+          },
         },
-      },
-      cancel: {
-        label: "انصراف",
-        onClick: () => {},
-      },
-      duration: 10000,
-    });
+        cancel: {
+          label: "انصراف",
+          onClick: () => {},
+        },
+        duration: 10000,
+      }
+    );
   };
 
   const CustomDateInputEnter = ({ openCalendar, value }) => {
@@ -274,10 +277,7 @@ export default function ReserveDialog({
             {editingReservation ? "ویرایش رزرو" : "رزرو جدید"}
           </DialogTitle>
         </DialogHeader>
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4"
-        >
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-6 ">
             <div className="space-y-2">
               <Label htmlFor="guestName">نام مسافر</Label>

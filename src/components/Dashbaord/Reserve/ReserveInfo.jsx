@@ -161,7 +161,7 @@ export default function ReservationsPage({
   };
 
   const handleDelete = async (reservation) => {
-    toast(`آیا از حذف رزرواسیون ${reservation.guest_name} اطمینان دارید؟`, {
+    toast.warning(`آیا از حذف رزرواسیون ${reservation.guest_name} اطمینان دارید؟`, {
       action: {
         label: "حذف",
         onClick: async () => {
