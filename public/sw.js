@@ -9,11 +9,11 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  if (
+/*   if (
     url.origin.includes("clerk.accounts.dev") ||
     url.origin.includes("clerk.com")
   ) {
     return;
-  }
+  } */
   event.respondWith(fetch(event.request));
 });

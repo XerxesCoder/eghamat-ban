@@ -17,7 +17,8 @@ const nextConfig = {
             key: "Referrer-Policy",
             value: "strict-origin-when-cross-origin",
           },
-          {
+
+          /*           {
             key: "Content-Security-Policy",
             value: `
     default-src 'self';
@@ -27,6 +28,20 @@ const nextConfig = {
     img-src 'self' https://images.clerk.dev https://img.clerk.com data:;
     frame-src 'self' https://*.clerk.dev https://*.clerk.com https://mint-chimp-59.clerk.accounts.dev;
     child-src 'self' https://*.clerk.dev https://*.clerk.com https://mint-chimp-59.clerk.accounts.dev;
+  `
+              .replace(/\s{2,}/g, " ")
+              .trim(),
+          }, */
+          {
+            key: "Content-Security-Policy",
+            value: `
+    default-src * data: blob:;
+    script-src * 'unsafe-inline' 'unsafe-eval';
+    style-src * 'unsafe-inline';
+    img-src * data: blob:;
+    connect-src *;
+    frame-src *;
+    child-src *;
   `
               .replace(/\s{2,}/g, " ")
               .trim(),
