@@ -24,7 +24,7 @@ export default function manifest() {
       {
         src: "s1.png",
         type: "image/png",
-        sizes: "350*570",
+        sizes: "1080x1920",
         form_factor: "narrow",
       },
     ],
