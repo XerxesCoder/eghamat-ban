@@ -8,5 +8,5 @@ export const metadata = {
 export default async function Lodge() {
   const lodgeData = await getUserLodge();
 
-  return <LodgeInfo userLodgeInfo={lodgeData?.data} />;
+  return <LodgeInfo userLodgeInfo={lodgeData?.data[0]} />;
 }

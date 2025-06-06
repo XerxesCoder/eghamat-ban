@@ -92,7 +92,8 @@ export default function ReserveDialog({
   const todayDate = new DateObject({ calendar: persian, locale: persian_fa });
 
   const handleDatePick = (state, value) => {
-    const choosenDate = value.format();
+    const choosenDate = value.format('YYYY/M/D');
+
 
     if (state == "in") {
       setFormData((prev) => ({

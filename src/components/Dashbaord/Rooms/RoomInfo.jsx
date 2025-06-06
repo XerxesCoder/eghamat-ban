@@ -327,6 +327,8 @@ export default function RoomsPage({ rooms }) {
                     type="number"
                     placeholder={Number(1000000).toLocaleString("fa-IR")}
                     value={formData.price}
+                    step={100000}
+                    min={0}
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,

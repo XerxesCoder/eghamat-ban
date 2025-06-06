@@ -306,7 +306,7 @@ export default function OccupancyPage({ rooms, reservations }) {
       />
       <div className="space-y-4">
         <motion.div variants={item}>
-          {" "}
+ 
           <Card className={"p-0"}>
             <div className="p-6 space-y-6">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -329,7 +329,7 @@ export default function OccupancyPage({ rooms, reservations }) {
                   </motion.p>
                 </div>
                 <motion.div
-                  className="flex flex-wrap gap-2"
+                  className="flex justify-center items-center gap-2"
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.6 }}
@@ -496,7 +496,7 @@ export default function OccupancyPage({ rooms, reservations }) {
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  className="bg-gray-50 rounded-lg p-4 flex flex-col items-center justify-center"
+                  className="bg-gray-50 rounded-lg p-4 hidden lg:flex flex-col items-center justify-center"
                 >
                   <motion.h3
                     initial={{ y: -20, opacity: 0 }}

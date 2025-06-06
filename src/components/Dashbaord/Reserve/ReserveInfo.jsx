@@ -161,28 +161,31 @@ export default function ReservationsPage({
   };
 
   const handleDelete = async (reservation) => {
-    toast.warning(`آیا از حذف رزرواسیون ${reservation.guest_name} اطمینان دارید؟`, {
-      action: {
-        label: "حذف",
-        onClick: async () => {
-          toast.promise(
-            await deleteReservation(reservation.id, reservation.room_id),
-            {
-              loading: `در حال حذف رزرواسیون ${reservation.guest_name}...`,
-              success: () => {
-                return `رزرواسیون ${reservation.guest_name} با موفقیت حذف شد`;
-              },
-              error: "خطا در حذف رزرواسیون",
-            }
-          );
+    toast.warning(
+      `آیا از حذف رزرواسیون ${reservation.guest_name} اطمینان دارید؟`,
+      {
+        action: {
+          label: "حذف",
+          onClick: async () => {
+            toast.promise(
+              await deleteReservation(reservation.id, reservation.room_id),
+              {
+                loading: `در حال حذف رزرواسیون ${reservation.guest_name}...`,
+                success: () => {
+                  return `رزرواسیون ${reservation.guest_name} با موفقیت حذف شد`;
+                },
+                error: "خطا در حذف رزرواسیون",
+              }
+            );
+          },
         },
-      },
-      cancel: {
-        label: "انصراف",
-        onClick: () => {},
-      },
-      duration: 10000,
-    });
+        cancel: {
+          label: "انصراف",
+          onClick: () => {},
+        },
+        duration: 10000,
+      }
+    );
   };
 
   const getReservationsForDate = (jalaliDate) => {
@@ -396,6 +399,7 @@ export default function ReservationsPage({
 
             <div className="text-center text-xs text-gray-700 mt-3 border-t pt-2 ">
               <p>از انتخاب شما متشکریم</p>
+              <p> {convertToPersianDigits(motelData.motel_phone)}</p>
             </div>
           </div>
 

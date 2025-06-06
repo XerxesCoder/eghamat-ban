@@ -25,9 +25,11 @@ export const completeOnboarding = async (formData) => {
           lastname: formData.lastName,
           phone: formData.phone,
           motel_name: formData.lodge,
+          motel_phone: formData.lodgephone,
           email: user.emailAddresses[0].emailAddress,
-          username: user.username,
           clerk: userId,
+          motel_checkin: "14:00",
+          motel_checkout: "12:00",
         },
       ])
       .select();

@@ -15,7 +15,7 @@ export default async function Reservation() {
       <ReservationsPage
         reservations={reserveData?.data}
         rooms={roomData?.data}
-        userLodgeInfo={lodgeData?.data}
+        userLodgeInfo={lodgeData?.data[0]}
       />
     </div>
   );

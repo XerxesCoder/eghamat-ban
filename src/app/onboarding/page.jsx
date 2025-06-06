@@ -23,6 +23,7 @@ export default function OnboardingComponent() {
       lastName: formData.get("lastName"),
       lodge: formData.get("lodge"),
       phone: formData.get("phone"),
+      lodgephone: formData.get("lodgephone"),
     };
     if (!data.firstName) {
       setError("لطفا نام خود را وارد کنید");
@@ -111,6 +112,27 @@ export default function OnboardingComponent() {
 
           <div>
             <label
+              htmlFor="phone"
+              className="block text-sm font-medium text-deep-ocean mb-1"
+            >
+              شماره تماس شما<span className="text-coral-pulse">*</span>
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              required
+              pattern="(\+98|0)?9\d{9}"
+              className="w-full px-4 py-2 border border-sky-glint rounded-lg focus:ring-2 focus:ring-aqua-spark focus:border-transparent"
+              placeholder="09123456789"
+            />
+            <p className="text-xs text-deep-ocean/70 mt-1">
+              فرمت صحیح: 09123456789
+            </p>
+          </div>
+
+          <div>
+            <label
               htmlFor="lodge"
               className="block text-sm font-medium text-deep-ocean mb-1"
             >
@@ -128,17 +150,16 @@ export default function OnboardingComponent() {
 
           <div>
             <label
-              htmlFor="phone"
+              htmlFor="lodgephone"
               className="block text-sm font-medium text-deep-ocean mb-1"
             >
-              شماره تماس <span className="text-coral-pulse">*</span>
+              شماره تماس اقامتگاه<span className="text-coral-pulse">*</span>
             </label>
             <input
               type="tel"
-              id="phone"
-              name="phone"
+              id="lodgephone"
+              name="lodgephone"
               required
-              pattern="(\+98|0)?9\d{9}"
               className="w-full px-4 py-2 border border-sky-glint rounded-lg focus:ring-2 focus:ring-aqua-spark focus:border-transparent"
               placeholder="09123456789"
             />
