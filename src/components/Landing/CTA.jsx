@@ -12,8 +12,6 @@ export default function CTA() {
 
   return (
     <section className="py-20 bg-gradient-to-r from-deep-ocean to-deep-ocean/90 w-full relative overflow-hidden">
-      {/* Decorative elements */}
-
       <motion.div
         className="container px-4 md:px-6 max-w-7xl mx-auto relative z-10"
         initial={{ opacity: 0, y: 20 }}

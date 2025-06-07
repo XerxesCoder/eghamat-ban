@@ -28,14 +28,14 @@ export async function createOrUpdateMotel(motelData) {
       .eq("clerk", userId);
 
     if (error) {
-      console.error("Supabase error:", error);
+      console.error("Server error:", error);
       return { error: error.message };
     }
     revalidateTag("userLodge");
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
-    return { error: "Failed to create motel" };
+    return { error: "Failed to create user" };
   }
 }
 
@@ -64,6 +64,6 @@ export async function getUserLodge() {
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
-    return { error: "Failed to create motel" };
+    return { error: "Failed to get user data" };
   }
 }

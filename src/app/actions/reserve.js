@@ -35,7 +35,7 @@ export async function addNewReserve(reserveData) {
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
-    return { error: "Failed to create motel" };
+    return { error: "Failed to create new reserve" };
   }
 }
 
@@ -74,7 +74,7 @@ export async function editReservation(reserveData, reserveID) {
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
-    return { error: "Failed to create motel" };
+    return { error: "Failed to edit reserve" };
   }
 }
 
@@ -99,7 +99,7 @@ export async function deleteReservation(reserveID) {
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
-    return { error: "Failed to create motel" };
+    return { error: "Failed to delete reserve" };
   }
 }
 

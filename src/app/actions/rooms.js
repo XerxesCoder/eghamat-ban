@@ -34,7 +34,7 @@ export async function addNewRoom(roomData) {
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
-    return { error: "Failed to create motel" };
+    return { error: "Failed to create room" };
   }
 }
 
@@ -70,7 +70,7 @@ export async function editRoom(roomData, roomID) {
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
-    return { error: "Failed to create motel" };
+    return { error: "Failed to edit room" };
   }
 }
 
@@ -95,7 +95,7 @@ export async function deleteRoom(roomID) {
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
-    return { error: "Failed to create motel" };
+    return { error: "Failed to delete room" };
   }
 }
 
@@ -122,31 +122,7 @@ export async function getUserRooms() {
 
     return { success: true, data };
   } catch (err) {
-    console.error("Error:", err);
+    console.error("Server Error:", err);
     return { error: "Failed to get rooms" };
   }
 }
-
-/* export async function getUserRooms() {
-  const { userId } = await auth();
-
-  if (!userId) return { error: "User ID is required" };
-
-  try {
-    const { data, error } = await supabase
-      .from("rooms")
-      .select()
-      .eq("owner_id", userId);
-
-    if (error) {
-      console.error("DB error:", error);
-      return { error: error.message };
-    }
-
-    return { success: true, data };
-  } catch (err) {
-    console.error("Server error:", err);
-    return { error: "Failed to create motel" };
-  }
-}
- */

@@ -41,6 +41,21 @@ export function convertToPersianDigits(input) {
   return input.replace(/\d/g, (d) => persianDigits[d]);
 }
 
+export const persianMonths = [
+  "فروردین",
+  "اردیبهشت",
+  "خرداد",
+  "تیر",
+  "مرداد",
+  "شهریور",
+  "مهر",
+  "آبان",
+  "آذر",
+  "دی",
+  "بهمن",
+  "اسفند",
+];
+
 export const convertToEnglishDigits = (str) => {
   return str.replace(/[۰-۹]/g, (d) => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
 };

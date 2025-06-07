@@ -250,7 +250,6 @@ const CustomersPage = ({ reservations }) => {
       variants={container}
       className="space-y-6"
     >
-      {/* Header */}
       <motion.div
         variants={item}
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between"
@@ -280,7 +279,7 @@ const CustomersPage = ({ reservations }) => {
           </Button>
         </div>
       </motion.div>
-      {/* Filters and Search */}
+
       <motion.div variants={item}>
         <Card>
           <CardHeader>
@@ -340,7 +339,7 @@ const CustomersPage = ({ reservations }) => {
           </CardContent>
         </Card>
       </motion.div>
-      {/* Customer Statistics */}
+
       <motion.div
         variants={container}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
@@ -407,7 +406,6 @@ const CustomersPage = ({ reservations }) => {
           </motion.div>
         ))}
       </motion.div>
-      {/* Customer List */}
 
       <motion.div
         variants={container}
@@ -456,7 +454,6 @@ const CustomersPage = ({ reservations }) => {
                     </Badge>
                   </div>
 
-                  {/* Info Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-right">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-gray-400" />
@@ -486,7 +483,6 @@ const CustomersPage = ({ reservations }) => {
                     </div>
                   </div>
 
-                  {/* Footer Info */}
                   <div className="pt-4 border-t border-gray-200 text-sm text-right space-y-1">
                     <p>
                       <span className="text-gray-600">مشتری از: </span>
@@ -509,7 +505,6 @@ const CustomersPage = ({ reservations }) => {
                     </p>
                   </div>
 
-                  {/* Recent Reservations */}
                   {customer.reservations.length > 0 && (
                     <div className="pt-4 border-t border-gray-200">
                       <h4 className="text-sm font-medium text-gray-700 mb-2 text-right">

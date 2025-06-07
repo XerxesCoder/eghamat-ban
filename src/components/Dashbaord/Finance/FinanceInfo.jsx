@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils";
 
 import { toast } from "sonner";
 
-import { updateReservationStatuses } from "@/lib/jalali";
+import { persianMonths, updateReservationStatuses } from "@/lib/jalali";
 import { Input } from "@/components/ui/input";
 
 moment.loadPersian({ dialect: "persian-modern" });
@@ -206,20 +206,6 @@ const FinancePage = ({ rooms, reservations }) => {
   const availableYears = [
     ...new Set(monthlyData.map((data) => data.year)),
   ].sort((a, b) => b - a);
-  const persianMonths = [
-    "فروردین",
-    "اردیبهشت",
-    "خرداد",
-    "تیر",
-    "مرداد",
-    "شهریور",
-    "مهر",
-    "آبان",
-    "آذر",
-    "دی",
-    "بهمن",
-    "اسفند",
-  ];
 
   const container = {
     hidden: { opacity: 0 },
@@ -257,7 +243,6 @@ const FinancePage = ({ rooms, reservations }) => {
       variants={container}
       className="space-y-6"
     >
-      {/* Header */}
       <motion.div
         variants={item}
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between"
@@ -291,7 +276,6 @@ const FinancePage = ({ rooms, reservations }) => {
         </div>
       </motion.div>
 
-      {/* Search and Period Selection */}
       <motion.div variants={item}>
         <Card className={"gap-3"}>
           <CardHeader>
@@ -376,7 +360,6 @@ const FinancePage = ({ rooms, reservations }) => {
         </Card>
       </motion.div>
 
-      {/* Key Metrics */}
       <motion.div
         variants={container}
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"

@@ -311,9 +311,6 @@ export default function LodgeInfo({ userLodgeInfo }) {
       </motion.div>
       <motion.div variants={item}>
         <Card>
-          {/*           <CardHeader>
-            <CardTitle>پیش نمایش اقامتگاه</CardTitle>
-          </CardHeader> */}
           <CardContent>
             <h2 className="text-2xl font-bold mb-2">
               {motelData.name || "نام اقامتگاه"}
