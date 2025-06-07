@@ -36,7 +36,7 @@ export default function AppHeader() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <div className="grid grid-cols-3 container max-w-7xl mx-auto  h-16  px-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 container max-w-7xl mx-auto  h-16  px-4">
         <Link href="/" className="flex items-center gap-2">
           <motion.h3
             className="text-xl font-bold text-deep-ocean"
@@ -101,17 +101,19 @@ export default function AppHeader() {
           )}
         </div>
 
-        <button
-          className="lg:hidden text-deep-ocean hover:text-aqua-spark transition-colors p-1"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="منو"
-        >
-          {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        <div className="flex items-center justify-end lg:hidden">
+          <button
+            className=" text-deep-ocean hover:text-aqua-spark transition-colors"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="منو"
+          >
+            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
 
         {isOpen && (
           <motion.div
-            className="absolute top-16 left-0 w-full bg-pearl-luster/95 backdrop-blur-lg shadow-md flex flex-col items-center py-4 gap-4 md:hidden"
+            className="absolute top-16 left-0 w-full bg-pearl-luster/95 backdrop-blur flex flex-col items-center py-4 gap-4 lg:hidden"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
