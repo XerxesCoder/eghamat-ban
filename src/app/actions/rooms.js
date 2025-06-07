@@ -110,7 +110,7 @@ const getCachedUserRooms = unstable_cache(
     return data;
   },
   ["user-data"],
-  { tags: ["userRooms"] }
+  { tags: ["userRooms"], revalidate: 3600 }
 );
 
 export async function getUserRooms() {

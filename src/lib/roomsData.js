@@ -33,5 +33,4 @@ export const reserveStatus = [
   { value: "ended", label: "تخلیه امروز" },
   { value: "checked_in", label: "ورود امروز" },
   { value: "stay", label: "در حال اقامت" },
-  ,
 ];

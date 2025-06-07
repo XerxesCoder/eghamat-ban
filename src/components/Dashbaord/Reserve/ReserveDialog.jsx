@@ -89,11 +89,14 @@ export default function ReserveDialog({
       formData.adults
     );
   }, [formData.roomId, formData.checkIn, formData.checkOut, formData.adults]);
-  const todayDate = new DateObject({ calendar: persian, locale: persian_fa });
+  const todayDate = new DateObject({
+    calendar: persian,
+    locale: persian_fa,
+    format: "YYYY/M/D",
+  });
 
   const handleDatePick = (state, value) => {
-    const choosenDate = value.format('YYYY/M/D');
-
+    const choosenDate = value.format("YYYY/M/D");
 
     if (state == "in") {
       setFormData((prev) => ({

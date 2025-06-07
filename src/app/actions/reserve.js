@@ -114,7 +114,7 @@ const getUserReservationsCache = unstable_cache(
     return data;
   },
   ["user-data"],
-  { tags: ["userReserves"] }
+  { tags: ["userReserves"], revalidate: 3600 }
 );
 
 export async function getUserReservations() {

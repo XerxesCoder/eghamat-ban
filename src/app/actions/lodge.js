@@ -50,7 +50,7 @@ const getCachedUserLodge = unstable_cache(
     return data;
   },
   ["user-data"],
-  { tags: ["userLodge"] }
+  { tags: ["userLodge"], revalidate: 3600 }
 );
 
 export async function getUserLodge() {

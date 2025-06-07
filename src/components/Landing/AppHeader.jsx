@@ -36,7 +36,7 @@ export default function AppHeader() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      <div className="container max-w-7xl mx-auto flex h-16 items-center justify-between px-4">
+      <div className="grid grid-cols-3 container max-w-7xl mx-auto  h-16  px-4">
         <Link href="/" className="flex items-center gap-2">
           <motion.h3
             className="text-xl font-bold text-deep-ocean"
@@ -47,7 +47,7 @@ export default function AppHeader() {
         </Link>
 
         <motion.nav
-          className="hidden lg:flex items-center gap-8"
+          className="hidden lg:flex items-center gap-8 justify-center"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
@@ -71,7 +71,7 @@ export default function AppHeader() {
           ))}
         </motion.nav>
 
-        <div className="hidden lg:flex items-center gap-3">
+        <div className="hidden lg:flex items-center gap-3 justify-end">
           {isSignedIn ? (
             <Button
               className="bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/90 font-bold"
