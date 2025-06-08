@@ -692,7 +692,7 @@ export default function RoomsPage({ rooms }) {
                         >
                           <td className="px-4 py-4 whitespace-nowrap text-right">
                             <div className="font-medium text-gray-900">
-                              اتاق {room.room_number}
+                              {room.room_number}
                             </div>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-right">

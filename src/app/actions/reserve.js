@@ -22,6 +22,8 @@ export async function addNewReserve(reserveData) {
           adults: reserveData.adults,
           total_price: reserveData.totalAmount,
           status: "CONFIRMED",
+          discount: reserveData.discount,
+          discounttotal: reserveData.discounttotal,
           owner_id: userId,
         },
       ])
@@ -60,6 +62,8 @@ export async function editReservation(reserveData, reserveID) {
           total_price: reserveData.totalAmount,
           status: String(reserveData.status).toUpperCase(),
           owner_id: userId,
+          discount: reserveData.discount,
+          discounttotal: reserveData.discounttotal,
         },
       ])
       .eq("owner_id", userId)

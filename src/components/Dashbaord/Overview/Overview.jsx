@@ -36,13 +36,13 @@ export default function Overview({ rooms, reservations }) {
       title: "ورودی امروز",
       icon: <UserPlus className="h-6 w-6" />,
       value: `${overviewData?.checkingIn?.guests}`,
-      description: `مهمان ورودی امروز | (${overviewData?.checkingIn?.count} اتاق)`,
+      description: `مهمان ورودی امروز | ${overviewData?.checkingIn?.count} اتاق`,
     },
     {
       title: "خروجی امروز",
       icon: <UserMinus className="h-6 w-6" />,
       value: `${overviewData?.checkingOut?.guests}`,
-      description: `مهمان خروجی امروز | (${overviewData?.checkingOut?.count} اتاق) `,
+      description: `مهمان خروجی امروز | ${overviewData?.checkingOut?.count} اتاق `,
     },
   ];
 

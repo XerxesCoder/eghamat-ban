@@ -94,6 +94,7 @@ export default function ReservationsPage({
     adults: "1",
     notes: "",
     status: "pending",
+    discount: 0,
   });
 
   const filteredReservations = useMemo(() => {
@@ -135,6 +136,7 @@ export default function ReservationsPage({
       adults: "1",
       notes: "",
       status: "pending",
+      discount: 0,
     });
   };
 
@@ -156,6 +158,7 @@ export default function ReservationsPage({
       status: reserveStatus.find(
         (res) => res.value === String(reservation.status).toLowerCase()
       )?.value,
+      discount: reservation.discount,
     });
     setIsAddDialogOpen(true);
   };
@@ -252,7 +255,7 @@ export default function ReservationsPage({
     }
   };
 
-  const InvoiceDialog = () => {
+  /*   const InvoiceDialog = () => {
     if (!selectedReservation) return null;
     const motelData = userLodgeInfo;
     const room = rooms.find(
@@ -278,7 +281,6 @@ export default function ReservationsPage({
             className="p-2 mx-auto border rounded-md bg-white text-black"
             style={{
               width: "140mm",
-              //minHeight: "200mm",
               maxHeight: "205mm",
               direction: "rtl",
             }}
@@ -296,16 +298,16 @@ export default function ReservationsPage({
               </div>
             </div>
 
-            <div className="w-full border mb-2 p-2 border-black  space-y-2 text-sm">
+            <div className="w-full border mb-2 p-2 border-black space-y-2 text-sm">
               <p>
-                نام:{" "}
-                <span className="font-bold ">
+                مهمان:{" "}
+                <span className="font-bold">
                   {selectedReservation.guest_name}
                 </span>
               </p>
               <p>
                 تلفن:{" "}
-                <span className="font-bold ">
+                <span className="font-bold">
                   {convertToPersianDigits(selectedReservation.guest_phone)}
                 </span>
               </p>
@@ -319,65 +321,88 @@ export default function ReservationsPage({
                   <th className="border-l border-black p-0.5">اتاق</th>
                   <th className="border-l border-black p-0.5">مدت اقامت</th>
                   <th className="border-l border-black p-0.5">نفرات</th>
-                  <th className="border-l border-black p-0.5">قیمت واحد</th>
+                  <th className="border-l border-black p-0.5">قیمت پایه</th>
+                  <th className="border-l border-black p-0.5">مبلغ کل</th>
+                  <th className="p-0.5 font-bold" rowSpan="2">
+                    قابل پرداخت
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr className="text-center">
-                  <td className="p-1 border-l border-black ">
+                  <td className="p-1 border-l border-black">
                     {convertToPersianDigits(checkInDate)}
                   </td>
-                  <td className=" p-1 border-l border-black">
+                  <td className="p-1 border-l border-black">
                     {convertToPersianDigits(checkOutDate)}
                   </td>
-                  <td className=" p-1 border-l border-black">
+                  <td className="p-1 border-l border-black">
                     {room?.room_number}
                   </td>
-                  <td className=" p-1 border-l border-black">
+                  <td className="p-1 border-l border-black">
                     {nights.toLocaleString("fa-IR")}
                   </td>
-                  <td className="border-l border-black p-1">
+                  <td className="p-1 border-l border-black">
                     {(selectedReservation?.adults).toLocaleString("fa-IR")}
                   </td>
-                  <td className="p-1">
+                  <td className="p-1 border-l border-black">
                     {room?.price_per_night.toLocaleString("fa-IR")}
+                  </td>
+                  <td className="p-1 border-l border-black">
+                    {selectedReservation.total_price.toLocaleString("fa-IR")}
+                  </td>
+                  <td className="p-1" rowSpan="2">
+                    {selectedReservation?.discounttotal?.toLocaleString(
+                      "fa-IR"
+                    ) ||
+                      selectedReservation.total_price.toLocaleString("fa-IR")}
+                  </td>
+                </tr>
+                <tr className="text-center">
+                  <td
+                    className="p-1 border-l border-t border-black"
+                    colSpan={7}
+                  >
+                    {selectedReservation.discount > 0 && (
+                      <>
+                        تخفیف:{" "}
+                        {Number(selectedReservation.discount).toLocaleString(
+                          "fa-IR"
+                        )}{" "}
+                        درصد
+                      </>
+                    )}
+                    <p className="text-xs">تمامی قیمت ها به تومان میباشد</p>
                   </td>
                 </tr>
               </tbody>
             </table>
 
             <div className="text-sm mt-4 space-y-2">
-              <p>
-                محاسبه قیمت بر اساس:
-                <span className="font-bold "> {roomPriceType}</span>
+              <p className="font-bold">
+                {roomPriceType !== "شبانه"
+                  ? "مبلغ بر اساس تعداد شب‌های اقامت، تعداد نفرات و قیمت پایه هر نفر در هر شب محاسبه شده است."
+                  : "مبلغ بر اساس تعداد شب‌های اقامت و قیمت پایه هر شب محاسبه شده است."}
               </p>
 
               <p>
                 ساعت تحویل اتاق:{" "}
-                <span className="font-bold ">
+                <span className="font-bold">
                   {convertToPersianDigits(motelData.motel_checkin)}
                 </span>
               </p>
 
               <p>
                 ساعت تخلیه اتاق:{" "}
-                <span className="font-bold ">
+                <span className="font-bold">
                   {convertToPersianDigits(motelData.motel_checkout)}
                 </span>
               </p>
 
-              <p className="border-t border-black">
-                مبلغ قابل پرداخت :{" "}
-                <span className="font-bold text-lg">
-                  {" "}
-                  {selectedReservation.total_price.toLocaleString("fa-IR")}{" "}
-                  تومان
-                </span>
-              </p>
               {motelData.motel_card && (
                 <p>
                   شماره کارت :{" "}
-                  <span className="font-bold ">
+                  <span className="font-bold">
                     {convertToPersianDigits(motelData.motel_card)}
                   </span>
                 </p>
@@ -386,7 +411,7 @@ export default function ReservationsPage({
               {motelData.motel_iban && (
                 <p>
                   شماره شبا :{" "}
-                  <span className="font-bold ">
+                  <span className="font-bold">
                     {convertToPersianDigits(motelData.motel_iban)}
                   </span>
                 </p>
@@ -397,9 +422,9 @@ export default function ReservationsPage({
               )}
             </div>
 
-            <div className="text-center text-xs text-gray-700 mt-3 border-t pt-2 ">
+            <div className="text-center text-xs text-gray-700 mt-3 border-t pt-2">
               <p>از انتخاب شما متشکریم</p>
-              <p> {convertToPersianDigits(motelData.motel_phone)}</p>
+              <p>{convertToPersianDigits(motelData.motel_phone)}</p>
             </div>
           </div>
 
@@ -412,8 +437,232 @@ export default function ReservationsPage({
         </DialogContent>
       </Dialog>
     );
-  };
+  }; */
 
+  const InvoiceDialog = () => {
+    if (!selectedReservation) return null;
+    const motelData = userLodgeInfo;
+    const room = rooms.find(
+      (r) => String(r.id) === selectedReservation.room_id
+    );
+    const checkInDate = selectedReservation.check_in;
+    const checkOutDate = selectedReservation.check_out;
+    const nights = getJalaliDateDifference(checkInDate, checkOutDate);
+    const roomPriceType = room?.price_tag === "night" ? "شبانه" : "نفر";
+
+    return (
+      <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
+        <DialogContent className="min-w-full sm:min-w-[650px] max-h-[90vh] overflow-y-auto p-3 no-print">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <FileText className="w-5 h-5 ml-2" />
+              پیش فاکتور
+            </DialogTitle>
+          </DialogHeader>
+
+          <div
+            ref={invoiceRef}
+            className="p-2 mx-auto border rounded-md bg-white text-black"
+            style={{
+              width: "140mm",
+              maxHeight: "205mm",
+              direction: "rtl",
+            }}
+          >
+            <div className="flex justify-between items-start mb-2 border-b pb-2">
+              <div className="text-right">
+                <h1 className="text-xl font-bold">
+                  اقامتگاه {motelData.motel_name}
+                </h1>
+                <p className="text-sm mt-1">وب اپلیکشن اقامت بان</p>
+              </div>
+              <div className="text-left p-1">
+                <div>
+                  <p className="text-sm">
+                  {selectedReservation.id.slice(-6)} #
+                  </p>
+                  <p className="text-sm">
+                    <span>تاریخ:</span> {convertToPersianDigits(persianDate)}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="w-full border border-gray-300 mb-4 p-3 space-y-2 text-sm rounded-md">
+              <div className="flex justify-between">
+                <p>
+                  <span className="font-semibold">مهمان:</span>{" "}
+                  <span className="font-bold">
+                    {selectedReservation.guest_name}
+                  </span>
+                </p>
+                <p>
+                  <span className="font-semibold">تلفن:</span>{" "}
+                  <span className="font-bold dir-ltr text-left inline-block">
+                    {convertToPersianDigits(selectedReservation.guest_phone)}
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            <table className="w-full text-sm border border-black  overflow-hidden">
+              <thead>
+                <tr className="text-center text-xs border border-black">
+                  {[
+                    "تاریخ ورود",
+                    "تاریخ خروج",
+                    "اتاق",
+                    "مدت اقامت",
+                    "نفرات",
+                    "قیمت پایه",
+                    "مبلغ کل",
+                  ].map((header, idx) => (
+                    <th
+                      key={idx}
+                      className={`p-2 ${
+                        idx !== 0 ? "border-r border-black" : ""
+                      }`}
+                    >
+                      {header}
+                    </th>
+                  ))}
+                  <th
+                    className="p-2 font-bold border-r border-black"
+                    rowSpan="2"
+                  >
+                    قابل پرداخت
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="text-center">
+                  {[
+                    convertToPersianDigits(checkInDate),
+                    convertToPersianDigits(checkOutDate),
+                    room?.room_number,
+                    `${nights.toLocaleString("fa-IR")} `,
+                    `${selectedReservation?.adults.toLocaleString("fa-IR")}`,
+                    `${room?.price_per_night.toLocaleString("fa-IR")}`,
+                    `${selectedReservation.total_price.toLocaleString(
+                      "fa-IR"
+                    )}`,
+                  ].map((cell, idx) => (
+                    <td
+                      key={idx}
+                      className={`p-2 ${
+                        idx !== 0 ? "border-r border-black" : ""
+                      }`}
+                    >
+                      {cell}
+                    </td>
+                  ))}
+                  <td
+                    className="p-2 font-bold border-r border-black"
+                    rowSpan="2"
+                  >
+                    {(
+                      selectedReservation?.discounttotal ||
+                      selectedReservation.total_price
+                    ).toLocaleString("fa-IR")}{" "}
+                  </td>
+                </tr>
+                <tr className="text-center">
+                  <td
+                    colSpan={7}
+                    className="p-2 border-t border-black text-right"
+                  >
+                    {selectedReservation.discount > 0 ? (
+                      <div className="flex justify-center flex-col">
+                        <span className="font-medium">
+                          تخفیف:{" "}
+                          {Number(selectedReservation.discount).toLocaleString(
+                            "fa-IR"
+                          )}{" "}
+                          درصد
+                        </span>
+                        <span className="text-xs">
+                          تمامی قیمت ها به تومان می‌باشد
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-xs">
+                        تمامی قیمت ها به تومان می‌باشد
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            {/* Calculation Explanation */}
+            <div className="text-sm mt-3 p-2 rounded-md border">
+              <p>
+                {roomPriceType !== "شبانه"
+                  ? "مبلغ بر اساس تعداد شب‌های اقامت، تعداد نفرات و قیمت پایه هر نفر در هر شب محاسبه شده است."
+                  : "مبلغ بر اساس تعداد شب‌های اقامت و قیمت پایه هر شب محاسبه شده است."}
+              </p>
+            </div>
+
+            {/* Payment Information Grid */}
+            <div className="mt-3 grid grid-cols-2 gap-4">
+              <div className="border border-gray-300 rounded-md p-3">
+                <div className="space-y-2">
+                  <p className="flex justify-between">
+                    <span className="text-xs">ساعت ورود:</span>
+                    <span className="font-semibold">
+                      {convertToPersianDigits(motelData.motel_checkin)}
+                    </span>
+                  </p>
+                  <p className="flex justify-between">
+                    <span className="text-xs">ساعت تخلیه:</span>
+                    <span className="font-semibold">
+                      {convertToPersianDigits(motelData.motel_checkout)}
+                    </span>
+                  </p>
+                  <p className="text-xs"></p>
+                </div>
+              </div>
+
+              <div className="border border-gray-300 rounded-md p-3">
+                {motelData.motel_card && (
+                  <p className="flex justify-between items-center">
+                    <span className="text-xs">شماره کارت:</span>
+                    <span>{convertToPersianDigits(motelData.motel_card)}</span>
+                  </p>
+                )}
+                {motelData.motel_iban && (
+                  <p className="flex justify-between items-center mt-2">
+                    <span className="text-xs">شماره شبا:</span>
+                    <span>{convertToPersianDigits(motelData.motel_iban)}</span>
+                  </p>
+                )}
+                {motelData.motel_card_name && (
+                  <p className="text-right mt-2 text-sm">
+                    {motelData.motel_card_name}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="text-center text-sm mt-6 border-t pt-4">
+              <p className="font-medium">از اعتماد شما سپاسگزاریم</p>
+              <p className="mt-1">
+                برای پشتیبانی: {convertToPersianDigits(motelData.motel_phone)}
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="no-print">
+            <Button onClick={exportInvoice} className="gap-2">
+              <Download className="w-4 h-4" />
+              ذخیره فاکتور
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  };
   useEffect(() => {
     const searchParam = searchParams.get("reserve");
     if (searchParam) {
@@ -768,9 +1017,10 @@ export default function ReservationsPage({
                               هزینه اقامت:{" "}
                             </span>
                             <span className="font-semibold text-lg">
-                              {Number(reservation.total_price).toLocaleString(
-                                "fa-IR"
-                              )}{" "}
+                              {Number(
+                                reservation.discounttotal ||
+                                  reservation.total_price
+                              ).toLocaleString("fa-IR")}{" "}
                               تومان
                             </span>
                           </div>

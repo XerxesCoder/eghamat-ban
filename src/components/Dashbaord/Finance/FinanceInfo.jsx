@@ -65,7 +65,7 @@ const FinancePage = ({ rooms, reservations }) => {
         };
       }
 
-      monthlyData[key].totalRevenue += reservation.total_price;
+      monthlyData[key].totalRevenue += reservation?.discounttotal || reservation.total_price;
       monthlyData[key].totalReservations += 1;
 
       const checkIn = moment(reservation.check_in, "jYYYY/jM/jD");
@@ -123,7 +123,7 @@ const FinancePage = ({ rooms, reservations }) => {
 
     filteredReservations.forEach((reservation) => {
       if (roomRevenue[reservation.room_id]) {
-        roomRevenue[reservation.room_id].revenue += reservation.total_price;
+        roomRevenue[reservation.room_id].revenue += reservation?.discounttotal || reservation.total_price;
         roomRevenue[reservation.room_id].bookings += 1;
       }
     });

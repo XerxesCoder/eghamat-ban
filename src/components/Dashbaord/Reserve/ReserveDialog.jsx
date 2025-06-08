@@ -68,27 +68,53 @@ export default function ReserveDialog({
     if (formData.checkIn == formData.checkOut) return 1;
     return getJalaliDateDifference(formData.checkIn, formData.checkOut);
   }, [formData.checkIn, formData.checkOut]);
-  const calculateTotalAmount = (roomId, checkIn, checkOut, adults) => {
+  const calculateTotalAmount = (
+    roomId,
+    checkIn,
+    checkOut,
+    adults,
+    discount
+  ) => {
     const room = rooms.find((r) => String(r.id) === String(roomId));
     if (!room || !checkIn || !checkOut) return 0;
     const roomPrice = room.price_per_night;
 
     const nights =
-      room.price_tag == "night"
+      room.price_tag === "night"
         ? dateDifference
         : Number(adults) * dateDifference;
 
-    return nights * roomPrice;
+    const total = nights * roomPrice;
+    const discounedAmount = (total * discount) / 100;
+    const discountedTotal = total - discounedAmount;
+
+    return {
+      total: total,
+      discountedTotal: Math.round(discountedTotal),
+      discounedAmount: discounedAmount,
+    };
   };
 
   const totalAmount = useMemo(() => {
-    return calculateTotalAmount(
+    const calcute = calculateTotalAmount(
       formData.roomId,
       formData.checkIn,
       formData.checkOut,
-      formData.adults
+      formData.adults,
+      formData.discount
     );
-  }, [formData.roomId, formData.checkIn, formData.checkOut, formData.adults]);
+    return {
+      total: calcute.total,
+      discountedTotal: calcute.discountedTotal,
+      discounedAmount: calcute.discounedAmount,
+    };
+  }, [
+    formData.roomId,
+    formData.checkIn,
+    formData.checkOut,
+    formData.adults,
+    formData.discount,
+  ]);
   const todayDate = new DateObject({
     calendar: persian,
     locale: persian_fa,
@@ -159,7 +185,9 @@ export default function ReserveDialog({
         adults: Number(formData.adults),
         notes: formData.notes,
         status: formData.status,
-        totalAmount: totalAmount,
+        totalAmount: totalAmount.total,
+        discount: formData.discount,
+        discounttotal: totalAmount.discountedTotal,
       };
 
       if (editingReservation) {
@@ -417,6 +445,20 @@ export default function ReserveDialog({
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="discount"> تخفیف % </Label>
+            <Input
+              id="discount"
+              name="discount"
+              placeholder="10"
+              type={"number"}
+              min={0}
+              max={100}
+              value={formData.discount}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="notes">یادداشت</Label>
             <Textarea
               id="notes"
@@ -454,14 +496,38 @@ export default function ReserveDialog({
                   </strong>
                 </p>
                 <p className="text-sm text-deep-ocean">
-                  <strong>مدت اقامت: {dateDifference} شب</strong>
+                  <strong>
+                    مدت اقامت: {Number(dateDifference).toLocaleString("fa-IR")}{" "}
+                    شب
+                  </strong>
                 </p>
                 <p className="text-sm text-deep-ocean">
-                  <strong>تعداد نفرات: {formData.adults} نفر</strong>
+                  <strong>
+                    تعداد نفرات:{" "}
+                    {Number(formData.adults).toLocaleString("fa-IR")} نفر
+                  </strong>
                 </p>
+                {formData.discount > 0 && (
+                  <p className="text-sm text-deep-ocean">
+                    <strong>
+                      تخفیف: % {Number(formData.discount).toLocaleString("fa-IR")}{" "}
+                      <span className="font-medium">
+                        (
+                        {Number(totalAmount.discounedAmount).toLocaleString(
+                          "fa-IR"
+                        )}{" "}
+                        تومان)
+                      </span>
+                    </strong>
+                  </p>
+                )}
                 <p className="text-base text-deep-ocean font-bold">
                   <strong>
-                    مبلغ کل: {Number(totalAmount).toLocaleString("fa-IR")} تومان
+                    مبلغ کل:{" "}
+                    {Number(totalAmount.discountedTotal).toLocaleString(
+                      "fa-IR"
+                    )}{" "}
+                    تومان
                   </strong>
                 </p>
               </div>

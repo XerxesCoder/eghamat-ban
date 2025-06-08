@@ -49,6 +49,7 @@ export default function OccupancyPage({ rooms, reservations }) {
     adults: "1",
     notes: "",
     status: "pending",
+    discount: 0,
   });
 
   const resetForm = () => {
@@ -61,6 +62,7 @@ export default function OccupancyPage({ rooms, reservations }) {
       adults: "1",
       notes: "",
       status: "pending",
+      discount: 0,
     });
   };
   const filteredRooms = useMemo(() => {
@@ -306,7 +308,6 @@ export default function OccupancyPage({ rooms, reservations }) {
       />
       <div className="space-y-4">
         <motion.div variants={item}>
- 
           <Card className={"p-0"}>
             <div className="p-6 space-y-6">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -653,7 +654,7 @@ export default function OccupancyPage({ rooms, reservations }) {
                                           toast.dismiss();
 
                                           if (dayStatus.isOccupied) {
-                                            toast.warning(
+                                            toast.info(
                                               `اتاق ${room.room_number} در این تاریخ رزرو شده است`,
                                               {
                                                 description: `مهمان: ${

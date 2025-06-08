@@ -3,7 +3,7 @@ import { MobileHeader } from "@/components/Dashbaord/MobileHeader";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "sonner";
 
-export default function DashboardLayout({ children }) {
+export default async function DashboardLayout({ children }) {
   return (
     <SidebarProvider defaultOpen>
       <AppSidebar />
