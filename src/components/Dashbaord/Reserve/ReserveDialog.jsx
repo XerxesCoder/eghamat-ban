@@ -510,7 +510,8 @@ export default function ReserveDialog({
                 {formData.discount > 0 && (
                   <p className="text-sm text-deep-ocean">
                     <strong>
-                      تخفیف: % {Number(formData.discount).toLocaleString("fa-IR")}{" "}
+                      تخفیف: %{" "}
+                      {Number(formData.discount).toLocaleString("fa-IR")}{" "}
                       <span className="font-medium">
                         (
                         {Number(totalAmount.discounedAmount).toLocaleString(

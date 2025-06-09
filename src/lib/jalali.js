@@ -56,6 +56,8 @@ export const persianMonths = [
   "اسفند",
 ];
 
+export const weekDays = ["ی", "د", "س", "چ", "پ", "ج", "ش"];
+
 export const convertToEnglishDigits = (str) => {
   return str.replace(/[۰-۹]/g, (d) => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
 };

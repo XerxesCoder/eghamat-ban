@@ -43,7 +43,7 @@ export default function QuickActions() {
     },
     {
       icon: <Calendar className="h-5 w-5 mb-1" />,
-      text: "تقویم سکونت",
+      text: "تقویم رزرو",
       href: "/dashboard/calendar",
     },
     {

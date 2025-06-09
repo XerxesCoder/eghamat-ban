@@ -22,6 +22,7 @@ import { toast } from "sonner";
 
 import { convertToPersianDigits } from "@/lib/jalali";
 import { validatePersianCard } from "@/lib/utils";
+import PersianTimeInput from "./TimePicker";
 
 export default function LodgeInfo({ userLodgeInfo }) {
   const [motelData, setMotelData] = useState({
@@ -68,8 +69,6 @@ export default function LodgeInfo({ userLodgeInfo }) {
   };
 
   const handleSave = async () => {
-    toast.dismiss();
-    toast.loading("در حال ذخیره ...");
     setSaving(true);
     try {
       const isCardValid = validatePersianCard(motelData.card);
@@ -77,6 +76,8 @@ export default function LodgeInfo({ userLodgeInfo }) {
         toast.warning("کارت بانکی وارد شده معتبر نمی باشد");
         return;
       }
+      toast.dismiss();
+      toast.loading("در حال ذخیره ...");
       const data = await createOrUpdateMotel(motelData);
       if (data.success) {
         toast.dismiss();

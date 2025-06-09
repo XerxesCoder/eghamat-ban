@@ -479,7 +479,7 @@ export default function ReservationsPage({
               <div className="text-left p-1">
                 <div>
                   <p className="text-sm">
-                  {selectedReservation.id.slice(-6)} #
+                    {selectedReservation.id.slice(-6)} #
                   </p>
                   <p className="text-sm">
                     <span>تاریخ:</span> {convertToPersianDigits(persianDate)}
@@ -733,7 +733,7 @@ export default function ReservationsPage({
                     <div className="relative">
                       <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
-                        placeholder="جستجو"
+                        placeholder="جستجو بر اساس نام یا تلفن"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-10 pr-8"

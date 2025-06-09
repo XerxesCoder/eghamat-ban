@@ -16,6 +16,9 @@ export default async function DashboardLayout({ children }) {
           position="top-center"
           visibleToasts={3}
           dir="rtl"
+          style={{
+            fontFamily: "Vazirmatn, sans-serif",
+          }}
         />
         {children}
       </SidebarInset>

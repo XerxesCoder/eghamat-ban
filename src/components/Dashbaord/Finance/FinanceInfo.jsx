@@ -422,7 +422,7 @@ const FinancePage = ({ rooms, reservations }) => {
                 : 0,
             icon: <CreditCard className="h-4 w-4 text-purple-600" />,
             subtitle: "به ازای هر رزرو (تومان)",
-            format: (val) => `${val.toLocaleString("fa-IR")}`,
+            format: (val) => `${val.toLocaleString("fa-IR", {maximumFractionDigits: 0})}`,
           },
           {
             title: "میانگین درآمد ماهانه",

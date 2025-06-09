@@ -20,6 +20,8 @@ import {
   CircleDot,
   CircleDashed,
   BanIcon,
+  BadgeCheck,
+  Construction,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -32,7 +34,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { convertToPersianDigits } from "@/lib/jalali";
+import { convertToPersianDigits, persianMonths, weekDays } from "@/lib/jalali";
 export default function OccupancyPage({ rooms, reservations }) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(moment());
@@ -104,8 +106,8 @@ export default function OccupancyPage({ rooms, reservations }) {
       if (res.room_id !== room.id) return false;
       if (res.status === "cancelled") return false;
 
-      const checkIn = moment(res.check_in, "jYYYY/jMM/jDD").startOf("day");
-      const checkOut = moment(res.check_out, "jYYYY/jMM/jDD").startOf("day");
+      const checkIn = moment(res.check_in, "jYYYY/jM/jDD").startOf("day");
+      const checkOut = moment(res.check_out, "jYYYY/jM/jDD").startOf("day");
 
       return checkDate.isSameOrAfter(checkIn) && checkDate.isBefore(checkOut);
     });
@@ -141,49 +143,6 @@ export default function OccupancyPage({ rooms, reservations }) {
     setSelectedDate(newDate);
   };
 
-  /*   const exportToCSV = () => {
-    const calendarDays = generateCalendarDays();
-    const monthDays = calendarDays.filter(
-      (day) => day.jMonth() === selectedDate.jMonth()
-    );
-
-    let csv = "اتاق,نوع,";
-    monthDays.forEach((day) => {
-      csv += `${day.jDate()},`;
-    });
-    csv += "\n";
-
-    filteredRooms.forEach((room) => {
-      csv += `${room.room_number},${
-        roomTypes.find((type) => type.value == String(room.type).toLowerCase())
-          ?.label
-      },`;
-      monthDays.forEach((day) => {
-        const status = getRoomStatusForDate(room, day);
-        csv += `${status.isOccupied ? "پر" : "خالی"},`;
-      });
-      csv += "\n";
-    });
-
-    const blob = new Blob(["\uFEFF" + csv], {
-      type: "text/csv;charset=utf-8;",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `occupancy-${selectedDate.jYear()}-${
-      selectedDate.jMonth() + 1
-    }.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    toast.success("با موفقیت صادر شد.", {
-      description: "تقویم  به صورت CSV دانلود شد.",
-    });
-  }; */
-
   const exportToCSV = () => {
     const calendarDays = generateCalendarDays();
     const monthDays = calendarDays.filter(
@@ -198,7 +157,7 @@ export default function OccupancyPage({ rooms, reservations }) {
 
     filteredRooms.forEach((room) => {
       const jalaliMonthYear = `${
-        months[selectedDate.jMonth()]
+        persianMonths[selectedDate.jMonth()]
       } - ${selectedDate.jYear()}`;
 
       csv += `${room.room_number},${
@@ -248,22 +207,6 @@ export default function OccupancyPage({ rooms, reservations }) {
     totalRoomDays > 0
       ? Math.round((occupiedRoomDays / totalRoomDays) * 100)
       : 0;
-
-  const weekDays = ["ی", "د", "س", "چ", "پ", "ج", "ش"];
-  const months = [
-    "فروردین",
-    "اردیبهشت",
-    "خرداد",
-    "تیر",
-    "مرداد",
-    "شهریور",
-    "مهر",
-    "آبان",
-    "آذر",
-    "دی",
-    "بهمن",
-    "اسفند",
-  ];
 
   const container = {
     hidden: { opacity: 0 },
@@ -424,7 +367,7 @@ export default function OccupancyPage({ rooms, reservations }) {
                     </div>
 
                     <h3 className="text-center font-bold text-deep-ocean">
-                      {months[selectedDate.jMonth()]}{" "}
+                      {persianMonths[selectedDate.jMonth()]}{" "}
                       {selectedDate
                         .jYear()
                         .toLocaleString("fa-IR", { useGrouping: false })}
@@ -559,7 +502,7 @@ export default function OccupancyPage({ rooms, reservations }) {
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <h1 className="sticky right-5  w-fit text-center  text-lg sm:text-xl text-deep-ocean font-bold mb-2">
-                  {months[selectedDate.jMonth()]}{" "}
+                  {persianMonths[selectedDate.jMonth()]}{" "}
                   {selectedDate
                     .jYear()
                     .toLocaleString("fa-IR", { useGrouping: false })}
@@ -597,7 +540,12 @@ export default function OccupancyPage({ rooms, reservations }) {
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <td className="sticky right-0 z-10 bg-white px-3 py-2 border-l border-gray-200 h-12">
-                                  <div className="text-right">
+                                  <div className="text-right flex items-center gap-0.5">
+                                    {room.status == "AVAILABLE" ? (
+                                      <BadgeCheck className="w-3 h-3" />
+                                    ) : (
+                                      <Construction className="w-3 h-3" />
+                                    )}
                                     <h4 className="font-medium text-deep-ocean text-sm">
                                       {room.room_number}{" "}
                                     </h4>
@@ -667,23 +615,24 @@ export default function OccupancyPage({ rooms, reservations }) {
                                               }
                                             );
                                           } else {
+                                            if (room.status == "MAINTENANCE") {
+                                              toast.error(
+                                                `اتاق ${room.room_number} در حال تعمیرات است`,
+                                              );
+                                              return;
+                                            }
                                             toast(
                                               `اتاق ${room.room_number} در این تاریخ خالی است`,
                                               {
                                                 action: {
                                                   label: "رزرو",
                                                   onClick: () => {
-                                                    console.log(
-                                                      day.format(
-                                                        "jYYYY/jMM/jDD"
-                                                      )
-                                                    );
                                                     setFormData((prev) => ({
                                                       ...prev,
                                                       roomId: room.id,
                                                       checkIn: String(
                                                         day.format(
-                                                          "jYYYY/jMM/jDD"
+                                                          "jYYYY/jM/jD"
                                                         )
                                                       ),
                                                     }));
