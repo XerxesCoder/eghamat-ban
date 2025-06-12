@@ -70,7 +70,10 @@ const CustomersPage = ({ reservations }) => {
       customer.reservations.push(reservation);
       customer.totalBookings++;
 
-      customer.totalSpent += reservation?.discounttotal || reservation.total_price;
+      customer.totalSpent +=
+        reservation?.discounttotal !== null && reservation.discounttotal >= 0
+          ? reservation.discounttotal
+          : reservation.total_price;
 
       const checkInDate = moment(reservation.check_in, "jYYYY/jM/jD");
       const lastVisitDate = moment(customer.lastVisit, "jYYYY/jM/jD");
@@ -547,9 +550,10 @@ const CustomersPage = ({ reservations }) => {
                               <span>
                                 {reservation?.discounttotal?.toLocaleString(
                                   "fa-IR"
-                                ) || reservation.total_price.toLocaleString(
-                                  "fa-IR"
-                                )}{" "}
+                                ) ||
+                                  reservation.total_price.toLocaleString(
+                                    "fa-IR"
+                                  )}{" "}
                                 تومان
                               </span>
                             </p>

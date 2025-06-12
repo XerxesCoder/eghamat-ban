@@ -65,7 +65,10 @@ const FinancePage = ({ rooms, reservations }) => {
         };
       }
 
-      monthlyData[key].totalRevenue += reservation?.discounttotal || reservation.total_price;
+      monthlyData[key].totalRevenue +=
+        reservation?.discounttotal !== null && reservation.discounttotal >= 0
+          ? reservation.discounttotal
+          : reservation.total_price;
       monthlyData[key].totalReservations += 1;
 
       const checkIn = moment(reservation.check_in, "jYYYY/jM/jD");
@@ -123,7 +126,10 @@ const FinancePage = ({ rooms, reservations }) => {
 
     filteredReservations.forEach((reservation) => {
       if (roomRevenue[reservation.room_id]) {
-        roomRevenue[reservation.room_id].revenue += reservation?.discounttotal || reservation.total_price;
+        roomRevenue[reservation.room_id].revenue +=
+          reservation?.discounttotal !== null && reservation.discounttotal >= 0
+            ? reservation.discounttotal
+            : reservation.total_price;
         roomRevenue[reservation.room_id].bookings += 1;
       }
     });
@@ -422,7 +428,8 @@ const FinancePage = ({ rooms, reservations }) => {
                 : 0,
             icon: <CreditCard className="h-4 w-4 text-purple-600" />,
             subtitle: "به ازای هر رزرو (تومان)",
-            format: (val) => `${val.toLocaleString("fa-IR", {maximumFractionDigits: 0})}`,
+            format: (val) =>
+              `${val.toLocaleString("fa-IR", { maximumFractionDigits: 0 })}`,
           },
           {
             title: "میانگین درآمد ماهانه",

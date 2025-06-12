@@ -41,6 +41,7 @@ import { toast } from "sonner";
 import { roomAmenities, roomStatusTypes, roomTypes } from "@/lib/roomsData";
 import { addNewRoom, deleteRoom, editRoom } from "@/app/actions/rooms";
 import { useSearchParams } from "next/navigation";
+import RoomCard from "./RoomCard";
 
 export default function RoomsPage({ rooms }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -546,104 +547,11 @@ export default function RoomsPage({ rooms }) {
                 custom={index}
                 whileHover={{ y: -5 }}
               >
-                <Card className="hover:shadow-lg transition-shadow">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">
-                        اتاق {room.room_number}
-                      </CardTitle>
-                      <Badge
-                        className={`${
-                          room.status == "AVAILABLE"
-                            ? "text-deep-ocean bg-lime-zest"
-                            : "text-pearl-luster bg-red-500"
-                        }`}
-                      >
-                        {room.status == "AVAILABLE" ? (
-                          <BadgeCheck />
-                        ) : (
-                          <Construction />
-                        )}
-                        {
-                          roomStatusTypes.find(
-                            (status) => room.status == status.value
-                          ).label
-                        }
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">نوع:</span>
-                      <span className="font-medium">
-                        {
-                          roomTypes.find(
-                            (type) =>
-                              room.type == String(type.value).toUpperCase()
-                          ).label
-                        }
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">نرخ:</span>
-                      <span className="font-medium">
-                        {Number(room.price_per_night).toLocaleString("fa-IR")} /{" "}
-                        {room.price_tag == "night" ? "شب" : "نفر"}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600">ظرفیت:</span>
-                      <span className="font-medium">
-                        {Number(room.capacity).toLocaleString("fa-IR", {
-                          useGrouping: false,
-                        })}{" "}
-                        مهمان
-                      </span>
-                    </div>
-
-                    {room.amenities.length > 0 && (
-                      <div>
-                        <p className="text-sm text-gray-600 mb-2">امکانات:</p>
-                        <div className="flex flex-wrap gap-1">
-                          {room.amenities.slice(0, 5).map((amenity) => (
-                            <Badge
-                              key={amenity}
-                              variant="outline"
-                              className="text-xs text-deep-ocean"
-                            >
-                              {amenity}
-                            </Badge>
-                          ))}
-                          {room.amenities.length > 5 && (
-                            <Badge variant="outline" className="text-xs">
-                              +{room.amenities.length - 5} بیشتر
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex space-x-2 pt-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(room)}
-                        className="flex-1"
-                      >
-                        <Edit className="w-4 h-4 mr-1" />
-                        ویرایش
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDelete(room)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                <RoomCard
+                  room={room}
+                  handleDelete={handleDelete}
+                  handleEdit={handleEdit}
+                />
               </motion.div>
             ))}
           </motion.div>

@@ -9,27 +9,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar } from "react-multi-date-picker";
-import persian from "react-date-object/calendars/persian";
-import persian_fa from "react-date-object/locales/persian_fa";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+
 import {
   Plus,
   Search,
   CalendarIcon,
-  User,
-  Phone,
-  Edit,
-  Trash2,
   X,
-  Printer,
   FileText,
   Download,
 } from "lucide-react";
@@ -64,8 +52,9 @@ import { reserveStatus, roomTypes } from "@/lib/roomsData";
 import moment from "moment-jalaali";
 import ReserveDialog from "./ReserveDialog";
 import { useSearchParams } from "next/navigation";
-import { getStatusColor } from "@/lib/badgeColors";
+
 import html2canvas from "html2canvas-pro";
+import ReserveCard from "./ReserveCard";
 
 export default function ReservationsPage({
   rooms,
@@ -78,8 +67,6 @@ export default function ReservationsPage({
   const [roomFilter, setRoomFilter] = useState("all");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingReservation, setEditingReservation] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(persianDate);
-  const [viewMode, setViewMode] = useState("list");
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
 
@@ -138,11 +125,6 @@ export default function ReservationsPage({
       status: "pending",
       discount: 0,
     });
-  };
-
-  const handleCalendarDatePick = (value) => {
-    const choosenDate = `${value?.year}/${value?.month.number}/${value?.day}`;
-    setSelectedDate(String(choosenDate));
   };
 
   const handleEdit = (reservation) => {
@@ -255,190 +237,6 @@ export default function ReservationsPage({
     }
   };
 
-  /*   const InvoiceDialog = () => {
-    if (!selectedReservation) return null;
-    const motelData = userLodgeInfo;
-    const room = rooms.find(
-      (r) => String(r.id) === selectedReservation.room_id
-    );
-    const checkInDate = selectedReservation.check_in;
-    const checkOutDate = selectedReservation.check_out;
-    const nights = getJalaliDateDifference(checkInDate, checkOutDate);
-    const roomPriceType = room?.price_tag === "night" ? "شبانه" : "نفر";
-
-    return (
-      <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
-        <DialogContent className="min-w-full sm:min-w-[620px] max-h-[90vh] overflow-y-auto p-3">
-          <DialogHeader>
-            <DialogTitle className="flex items-center">
-              <FileText className="w-5 h-5 ml-2" />
-              پیش فاکتور
-            </DialogTitle>
-          </DialogHeader>
-
-          <div
-            ref={invoiceRef}
-            className="p-2 mx-auto border rounded-md bg-white text-black"
-            style={{
-              width: "140mm",
-              maxHeight: "205mm",
-              direction: "rtl",
-            }}
-          >
-            <div className="flex justify-between items-start mb-4">
-              <div className="text-right">
-                <h1 className="text-xl font-bold">
-                  اقامتگاه {motelData.motel_name}
-                </h1>
-                <p className="text-sm">وب اپلیکشن اقامت بان</p>
-              </div>
-              <div className="text-left text-sm">
-                <p>شماره فاکتور: #{selectedReservation.id.slice(-6)}</p>
-                <p>تاریخ: {convertToPersianDigits(persianDate)}</p>
-              </div>
-            </div>
-
-            <div className="w-full border mb-2 p-2 border-black space-y-2 text-sm">
-              <p>
-                مهمان:{" "}
-                <span className="font-bold">
-                  {selectedReservation.guest_name}
-                </span>
-              </p>
-              <p>
-                تلفن:{" "}
-                <span className="font-bold">
-                  {convertToPersianDigits(selectedReservation.guest_phone)}
-                </span>
-              </p>
-            </div>
-
-            <table className="w-full text-sm border border-black">
-              <thead className="bg-gray-100">
-                <tr className="border-b border-black text-center text-xs">
-                  <th className="border-l border-black p-0.5">تاریخ ورود</th>
-                  <th className="border-l border-black p-0.5">تاریخ خروج</th>
-                  <th className="border-l border-black p-0.5">اتاق</th>
-                  <th className="border-l border-black p-0.5">مدت اقامت</th>
-                  <th className="border-l border-black p-0.5">نفرات</th>
-                  <th className="border-l border-black p-0.5">قیمت پایه</th>
-                  <th className="border-l border-black p-0.5">مبلغ کل</th>
-                  <th className="p-0.5 font-bold" rowSpan="2">
-                    قابل پرداخت
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="text-center">
-                  <td className="p-1 border-l border-black">
-                    {convertToPersianDigits(checkInDate)}
-                  </td>
-                  <td className="p-1 border-l border-black">
-                    {convertToPersianDigits(checkOutDate)}
-                  </td>
-                  <td className="p-1 border-l border-black">
-                    {room?.room_number}
-                  </td>
-                  <td className="p-1 border-l border-black">
-                    {nights.toLocaleString("fa-IR")}
-                  </td>
-                  <td className="p-1 border-l border-black">
-                    {(selectedReservation?.adults).toLocaleString("fa-IR")}
-                  </td>
-                  <td className="p-1 border-l border-black">
-                    {room?.price_per_night.toLocaleString("fa-IR")}
-                  </td>
-                  <td className="p-1 border-l border-black">
-                    {selectedReservation.total_price.toLocaleString("fa-IR")}
-                  </td>
-                  <td className="p-1" rowSpan="2">
-                    {selectedReservation?.discounttotal?.toLocaleString(
-                      "fa-IR"
-                    ) ||
-                      selectedReservation.total_price.toLocaleString("fa-IR")}
-                  </td>
-                </tr>
-                <tr className="text-center">
-                  <td
-                    className="p-1 border-l border-t border-black"
-                    colSpan={7}
-                  >
-                    {selectedReservation.discount > 0 && (
-                      <>
-                        تخفیف:{" "}
-                        {Number(selectedReservation.discount).toLocaleString(
-                          "fa-IR"
-                        )}{" "}
-                        درصد
-                      </>
-                    )}
-                    <p className="text-xs">تمامی قیمت ها به تومان میباشد</p>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div className="text-sm mt-4 space-y-2">
-              <p className="font-bold">
-                {roomPriceType !== "شبانه"
-                  ? "مبلغ بر اساس تعداد شب‌های اقامت، تعداد نفرات و قیمت پایه هر نفر در هر شب محاسبه شده است."
-                  : "مبلغ بر اساس تعداد شب‌های اقامت و قیمت پایه هر شب محاسبه شده است."}
-              </p>
-
-              <p>
-                ساعت تحویل اتاق:{" "}
-                <span className="font-bold">
-                  {convertToPersianDigits(motelData.motel_checkin)}
-                </span>
-              </p>
-
-              <p>
-                ساعت تخلیه اتاق:{" "}
-                <span className="font-bold">
-                  {convertToPersianDigits(motelData.motel_checkout)}
-                </span>
-              </p>
-
-              {motelData.motel_card && (
-                <p>
-                  شماره کارت :{" "}
-                  <span className="font-bold">
-                    {convertToPersianDigits(motelData.motel_card)}
-                  </span>
-                </p>
-              )}
-
-              {motelData.motel_iban && (
-                <p>
-                  شماره شبا :{" "}
-                  <span className="font-bold">
-                    {convertToPersianDigits(motelData.motel_iban)}
-                  </span>
-                </p>
-              )}
-
-              {motelData.motel_card_name && (
-                <p>به نام {motelData.motel_card_name}</p>
-              )}
-            </div>
-
-            <div className="text-center text-xs text-gray-700 mt-3 border-t pt-2">
-              <p>از انتخاب شما متشکریم</p>
-              <p>{convertToPersianDigits(motelData.motel_phone)}</p>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button onClick={exportInvoice}>
-              <Download className="w-4 h-4" />
-              ذخیره فاکتور
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    );
-  }; */
-
   const InvoiceDialog = () => {
     if (!selectedReservation) return null;
     const motelData = userLodgeInfo;
@@ -449,7 +247,10 @@ export default function ReservationsPage({
     const checkOutDate = selectedReservation.check_out;
     const nights = getJalaliDateDifference(checkInDate, checkOutDate);
     const roomPriceType = room?.price_tag === "night" ? "شبانه" : "نفر";
-
+    const finalPayPrice =
+      selectedReservation?.discounttotal >= 0
+        ? selectedReservation.discounttotal
+        : selectedReservation.total_price;
     return (
       <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
         <DialogContent className="min-w-full sm:min-w-[650px] max-h-[90vh] overflow-y-auto p-3 no-print">
@@ -560,10 +361,7 @@ export default function ReservationsPage({
                     className="p-2 font-bold border-r border-black"
                     rowSpan="2"
                   >
-                    {(
-                      selectedReservation?.discounttotal ||
-                      selectedReservation.total_price
-                    ).toLocaleString("fa-IR")}{" "}
+                    {finalPayPrice.toLocaleString("fa-IR")}{" "}
                   </td>
                 </tr>
                 <tr className="text-center">
@@ -594,7 +392,6 @@ export default function ReservationsPage({
               </tbody>
             </table>
 
-            {/* Calculation Explanation */}
             <div className="text-sm mt-3 p-2 rounded-md border">
               <p>
                 {roomPriceType !== "شبانه"
@@ -712,391 +509,122 @@ export default function ReservationsPage({
             resetForm={resetForm}
             withButton={true}
           />
-          {/*           <Button
-            variant="outline"
-            onClick={() =>
-              setViewMode(viewMode === "list" ? "calendar" : "list")
-            }
-          >
-            <CalendarIcon className="w-4 h-4 mr-2" />
-            {viewMode === "list" ? "نمای تقویم" : "نمای لیست"}
-          </Button> */}
         </div>
       </motion.div>
       <AnimatePresence mode="wait">
-        {viewMode === "list" && (
-          <motion.div variants={item}>
-            <Card>
-              <CardContent>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <div className="flex-1">
-                    <div className="relative">
-                      <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                      <Input
-                        placeholder="جستجو بر اساس نام یا تلفن"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10 pr-8"
-                      />
-                      {searchTerm && (
-                        <button
-                          onClick={() => setSearchTerm("")}
-                          className="absolute cursor-pointer left-3  top-1/2 transform -translate-y-1/2 text-deep-ocean hover:text-deep-ocean/80 focus:outline-none"
-                        >
-                          <X className="w-4 h-4" />{" "}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex justify-center items-center gap-3">
-                    <Select
-                      value={statusFilter}
-                      onValueChange={setStatusFilter}
-                    >
-                      <SelectTrigger className="w-40">
-                        <SelectValue placeholder="وضعیت" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">همه وضعیت ها</SelectItem>
-                        {reserveStatus.map((status) => (
-                          <SelectItem key={status.value} value={status.value}>
-                            {status.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Select value={roomFilter} onValueChange={setRoomFilter}>
-                      <SelectTrigger className="w-40">
-                        <SelectValue placeholder="اتاق" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">همه اتاق ها</SelectItem>
-                        {rooms.map((room) => (
-                          <SelectItem key={room.id} value={room.id}>
-                            {room.room_number}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence mode="wait">
-        {viewMode === "calendar" && (
-          <motion.div
-            className="grid grid-cols-1 lg:grid-cols-3 gap-6"
-            variants={item}
-          >
-            <Card className={"w-full  flex justify-center items-center"}>
-              <CardHeader>
-                <CardTitle>تقویم</CardTitle>
-              </CardHeader>
-              <CardContent className={"p-0"}>
-                <Calendar
-                  value={selectedDate}
-                  onChange={handleCalendarDatePick}
-                  calendar={persian}
-                  locale={persian_fa}
-                />
-              </CardContent>
-            </Card>
-
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle>
-                  رزروهای {convertToPersianDigits(String(selectedDate))}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {getReservationsForDate(selectedDate).map((reservation) => {
-                    const room = rooms.find(
-                      (r) => String(r.id) === String(reservation.room_id)
-                    );
-
-                    return (
-                      <div
-                        key={reservation.id}
-                        className="p-4 border rounded-lg"
+        <motion.div variants={item}>
+          <Card>
+            <CardContent>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                      placeholder="جستجو بر اساس نام یا تلفن"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 pr-8"
+                    />
+                    {searchTerm && (
+                      <button
+                        onClick={() => setSearchTerm("")}
+                        className="absolute cursor-pointer left-3  top-1/2 transform -translate-y-1/2 text-deep-ocean hover:text-deep-ocean/80 focus:outline-none"
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium">
-                            {reservation.guest_name}
-                          </h4>
-                          <Badge
-                            className={getStatusColor(
-                              String(reservation.status).toLowerCase()
-                            )}
-                          >
-                            {
-                              reserveStatus.find(
-                                (res) =>
-                                  res.value ===
-                                  String(reservation.status).toLowerCase()
-                              )?.label
-                            }
-                          </Badge>
-                        </div>
-                        <div className="text-sm text-gray-600 space-y-1">
-                          <p className="font-bold text-deep-ocean text-sm">
-                            اتاق {room?.room_number} -{" "}
-                            {
-                              roomTypes.find(
-                                (type) =>
-                                  room.type == String(type.value).toUpperCase()
-                              ).label
-                            }
-                          </p>
-                          <p>
-                            <span className="text-lime-600">
-                              {convertToPersianDigits(reservation.check_in)}
-                            </span>{" "}
-                            -{" "}
-                            <span className="text-red-600">
-                              {convertToPersianDigits(reservation.check_out)}
-                            </span>
-                          </p>
-                          <p className="font-bold">
-                            {Number(reservation.adults).toLocaleString(
-                              "fa-IR",
-                              { useGrouping: false }
-                            )}{" "}
-                            نفر
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {getReservationsForDate(selectedDate).length === 0 && (
-                    <p className="text-gray-500 text-center py-8">
-                      رزروی برای این تاریخ موجود نیست
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence mode="wait">
-        {viewMode === "list" && (
-          <motion.div
-            className="grid grid-cols-1 lg:grid-cols-2  xl:grid-cols-3 gap-4"
-            variants={container}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-          >
-            {filteredReservations.map((reservation, index) => {
-              const room = rooms.find(
-                (r) => String(r.id) === String(reservation.room_id)
-              );
-              return (
-                <motion.div
-                  key={reservation.id}
-                  variants={item}
-                  custom={index}
-                  //whileHover={{ y: -5 }}
-                >
-                  <Card className={"gap-0"}>
-                    <CardContent className="p-6">
-                      <div className="flex flex-col md:flex-row gap-2 md:gap-0 md:items-center justify-between mb-4">
-                        <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <User className="w-6 h-6 text-blue-600" />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-lg">
-                              {reservation.guest_name}
-                            </h3>
-                            <p className="text-gray-600">
-                              اتاق {room?.room_number} -{" "}
-                              {
-                                roomTypes.find(
-                                  (type) =>
-                                    room.type ==
-                                    String(type.value).toUpperCase()
-                                ).label
-                              }
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Badge
-                            className={getStatusColor(
-                              String(reservation.status).toLowerCase()
-                            )}
-                          >
-                            {
-                              reserveStatus.find(
-                                (res) =>
-                                  res.value ===
-                                  String(reservation.status).toLowerCase()
-                              )?.label
-                            }
-                          </Badge>
-                          <div className="flex space-x-1">
-                            {String(reservation.status) !== "OUTDATED" && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleEdit(reservation)}
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                            )}
-
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleDelete(reservation)}
-                              className="text-red-600 hover:text-red-700"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-between items-center  gap-4 text-sm">
-                        <div className="flex flex-col  items-start justify-center gap-4 enter text-sm w-full">
-                          <div className="flex items-center space-x-2">
-                            <Phone className="w-4 h-4 text-gray-400" />
-                            <span>
-                              {convertToPersianDigits(reservation.guest_phone)}
-                            </span>
-                          </div>
-                          <div className="flex items-center space-x-2 w-full">
-                            <User className="w-4 h-4 text-gray-400" />
-                            <span>
-                              {Number(reservation.adults).toLocaleString(
-                                "fa-IR",
-                                { useGrouping: false }
-                              )}{" "}
-                              نفر
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col  items-end justify-center gap-4 enter text-sm w-full">
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Badge className={"bg-lime-200 text-lime-900"}>
-                                {convertToPersianDigits(reservation.check_in)}
-                              </Badge>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>تاریخ ورود</p>
-                            </TooltipContent>
-                          </Tooltip>
-
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Badge className={"bg-red-200 text-red-900"}>
-                                {convertToPersianDigits(reservation.check_out)}
-                              </Badge>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>تاریخ خروج</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
-                      </div>
-                    </CardContent>
-                    <CardFooter>
-                      <div className="mt-4 pt-4 border-t w-full border-gray-200">
-                        <div className="flex justify-between items-center">
-                          <div className="text-right">
-                            <span className="text-gray-600 sm:text-sm text-xs">
-                              هزینه اقامت:{" "}
-                            </span>
-                            <span className="font-semibold text-lg">
-                              {Number(
-                                reservation.discounttotal ||
-                                  reservation.total_price
-                              ).toLocaleString("fa-IR")}{" "}
-                              تومان
-                            </span>
-                          </div>
-                          <div>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant={"icon"}
-                                  onClick={() =>
-                                    handlePrintInvoice(reservation)
-                                  }
-                                  className={
-                                    " border hover:scale-90 transition-all ease-in-out"
-                                  }
-                                >
-                                  <FileText />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p> دریافت فاکتور</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </div>
-                        </div>
-                        {reservation.special_requests !== "" && (
-                          <div className="mt-4">
-                            <span className="text-gray-600 sm:text-sm text-xs">
-                              یادداشت:{" "}
-                            </span>
-                            <span className="text-gray-800">
-                              {reservation.special_requests}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </CardFooter>
-                  </Card>
-                </motion.div>
-              );
-            })}
-
-            {filteredReservations.length > 0 && <InvoiceDialog />}
-            {filteredReservations.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-                className="lg:col-span-2  xl:col-span-3"
-              >
-                <Card>
-                  <CardContent className="text-center">
-                    <CalendarIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      رزروی پیدا نشد
-                    </h3>
-                    <p className="text-gray-600 mb-4">
-                      {reservations.length === 0 &&
-                        "اولین رزرو خود را ایجاد کنید"}
-                    </p>
-                    {reservations.length === 0 && (
-                      <Button
-                        onClick={() => setIsAddDialogOpen(true)}
-                        className={
-                          "bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/70"
-                        }
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        ایجاد رزرو
-                      </Button>
+                        <X className="w-4 h-4" />{" "}
+                      </button>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
+                <div className="flex justify-center items-center gap-3">
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="وضعیت" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">همه وضعیت ها</SelectItem>
+                      {reserveStatus.map((status) => (
+                        <SelectItem key={status.value} value={status.value}>
+                          {status.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={roomFilter} onValueChange={setRoomFilter}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="اتاق" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">همه اتاق ها</SelectItem>
+                      {rooms.map((room) => (
+                        <SelectItem key={room.id} value={room.id}>
+                          {room.room_number}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </AnimatePresence>
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          className="grid grid-cols-1 lg:grid-cols-2  xl:grid-cols-3 gap-4"
+          variants={container}
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+        >
+          {filteredReservations.map((reservation, index) => {
+            return (
+              <motion.div key={reservation.id} variants={item} custom={index}>
+                <ReserveCard
+                  rooms={rooms}
+                  reservation={reservation}
+                  handleDelete={handleDelete}
+                  handleEdit={handleEdit}
+                  handlePrintInvoice={handlePrintInvoice}
+                />
               </motion.div>
-            )}
-          </motion.div>
-        )}
+            );
+          })}
+
+          {filteredReservations.length > 0 && <InvoiceDialog />}
+          {filteredReservations.length === 0 && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
+              className="lg:col-span-2  xl:col-span-3"
+            >
+              <Card>
+                <CardContent className="text-center">
+                  <CalendarIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    رزروی پیدا نشد
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {reservations.length === 0 &&
+                      "اولین رزرو خود را ایجاد کنید"}
+                  </p>
+                  {reservations.length === 0 && (
+                    <Button
+                      onClick={() => setIsAddDialogOpen(true)}
+                      className={
+                        "bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/70"
+                      }
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      ایجاد رزرو
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </motion.div>
       </AnimatePresence>
     </motion.div>
   );
