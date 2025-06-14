@@ -1,6 +1,7 @@
 "use client";
 import { motion } from "framer-motion";
 import {
+  BedDoubleIcon,
   CalendarCheck,
   Hotel,
   Percent,
@@ -18,7 +19,6 @@ import {
 
 export default function Overview({ rooms, reservations }) {
   const overviewData = getDetailedTodayMovements(reservations);
-
   const OverviewData = [
     {
       title: "تعداد اتاق ها",
@@ -27,22 +27,22 @@ export default function Overview({ rooms, reservations }) {
       description: "تعداد کل اتاق ها",
     },
     {
-      title: "تعداد رزروها",
-      icon: <CalendarCheck className="h-6 w-6" />,
-      value: `${reservations?.length}`,
-      description: "رزرو تا به امروز",
+      title: "در حال اقامت ",
+      icon: <BedDoubleIcon className="h-6 w-6" />,
+      value: `${overviewData?.staying?.guestCount}`,
+      description: `مهمان در حال اقامت | ${overviewData?.staying?.roomCount} اتاق`,
     },
     {
       title: "ورودی امروز",
       icon: <UserPlus className="h-6 w-6" />,
-      value: `${overviewData?.checkingIn?.guests}`,
-      description: `مهمان ورودی امروز | ${overviewData?.checkingIn?.count} اتاق`,
+      value: `${overviewData?.checkingIn?.guestCount}`,
+      description: `مهمان ورودی امروز | ${overviewData?.checkingIn?.roomCount} اتاق`,
     },
     {
       title: "خروجی امروز",
       icon: <UserMinus className="h-6 w-6" />,
-      value: `${overviewData?.checkingOut?.guests}`,
-      description: `مهمان خروجی امروز | ${overviewData?.checkingOut?.count} اتاق `,
+      value: `${overviewData?.checkingOut?.guestCount}`,
+      description: `مهمان خروجی امروز | ${overviewData?.checkingOut?.roomCount} اتاق `,
     },
   ];
 

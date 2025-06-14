@@ -274,36 +274,57 @@ export function getDetailedTodayMovements(reservations) {
 
   const result = {
     checkingIn: {
-      count: 0,
+      guestCount: 0,
+      roomCount: 0,
       reservations: [],
-      guests: 0,
+      rooms: [],
     },
     checkingOut: {
-      count: 0,
+      guestCount: 0,
+      roomCount: 0,
       reservations: [],
-      guests: 0,
+      rooms: [],
+    },
+    staying: {
+      guestCount: 0,
+      roomCount: 0,
+      reservations: [],
+      rooms: [],
     },
   };
 
-  reservations.forEach((reservation) => {
+  const updateCategory = (category, reservation) => {
     const adults = reservation.adults || 1;
+    const roomId = reservation.room_id;
 
-    if (reservation.check_in === today) {
-      result.checkingIn.count++;
-      result.checkingIn.guests += adults;
-      result.checkingIn.reservations.push(reservation);
+    category.guestCount += adults;
+    category.reservations.push(reservation);
+    if (!category.rooms.includes(roomId)) {
+      category.rooms.push(roomId);
+      category.roomCount++;
     }
+  };
 
-    if (reservation.check_out === today) {
-      result.checkingOut.count++;
-      result.checkingOut.guests += adults;
-      result.checkingOut.reservations.push(reservation);
+  reservations.forEach((reservation) => {
+    const checkIn = reservation.check_in;
+    const checkOut = reservation.check_out;
+    const mCheckIn = moment(checkIn, "jYYYY/jM/jD");
+    const mCheckOut = moment(checkOut, "jYYYY/jM/jD");
+    const mToday = moment(today, "jYYYY/jM/jD");
+
+    if (checkIn === today) {
+      updateCategory(result.checkingIn, reservation);
+    }
+    if (checkOut === today) {
+      updateCategory(result.checkingOut, reservation);
+    }
+    if (mToday.isAfter(mCheckIn) && mToday.isBefore(mCheckOut)) {
+      updateCategory(result.staying, reservation);
     }
   });
 
   return result;
 }
-
 export function sortByCheckInDateDesc(data) {
   function parseJalaliDate(dateStr) {
     const normalized = dateStr.replace(/[\/\-]/g, "/");

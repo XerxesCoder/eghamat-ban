@@ -67,3 +67,46 @@ export async function getUserLodge() {
     return { error: "Failed to get user data" };
   }
 }
+
+export async function getUserDataJson() {
+  const { userId } = await auth();
+
+  if (!userId) return { error: "User ID is required" };
+
+  try {
+    // Get user data
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select()
+      .eq("clerk", userId)
+      .single();
+
+    if (userError) throw userError;
+
+    const { data: roomData, error: roomError } = await supabase
+      .from("rooms")
+      .select()
+      .eq("owner_id", userId);
+
+    if (roomError) throw roomError;
+
+    const { data: reservationData, error: reservationError } = await supabase
+      .from("reservations")
+      .select()
+      .eq("owner_id", userId);
+
+    if (reservationError) throw reservationError;
+
+    return {
+      success: true,
+      data: {
+        lodge: userData,
+        rooms: roomData,
+        reservations: reservationData,
+      },
+    };
+  } catch (err) {
+    console.error("Server error:", err);
+    return { error: "Failed to get user data" };
+  }
+}

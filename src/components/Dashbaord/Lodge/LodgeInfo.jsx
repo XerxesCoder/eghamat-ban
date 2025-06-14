@@ -15,9 +15,10 @@ import {
   Plus,
   X,
   Save,
+  Download,
   MapPinned,
 } from "lucide-react";
-import { createOrUpdateMotel } from "@/app/actions/lodge";
+import { createOrUpdateMotel, getUserDataJson } from "@/app/actions/lodge";
 import { toast } from "sonner";
 
 import { convertToPersianDigits } from "@/lib/jalali";
@@ -92,6 +93,44 @@ export default function LodgeInfo({ userLodgeInfo }) {
     }
   };
 
+  async function downloadUserDataAsJson() {
+    try {
+      setSaving(true);
+      toast.dismiss();
+      toast.loading("در حال دانلود ...");
+      const data = await getUserDataJson();
+
+      if (data?.error) {
+        toast.dismiss();
+        toast.error("خطا در دانلود اطلاعات");
+        console.error(data.error);
+        return;
+      }
+      const jsonString = JSON.stringify(data.data, null, 2);
+
+      const blob = new Blob([jsonString], { type: "application/json" });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "user_data.json";
+
+      document.body.appendChild(a);
+      a.click();
+
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.dismiss();
+      toast.success("اطلاعات با موفقیت دانلود شد");
+    } catch (err) {
+      console.error("Error downloading data:", err);
+      toast.dismiss();
+      toast.error("خطا در دانلود اطلاعات");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   const container = {
     hidden: { opacity: 0 },
     visible: {
@@ -151,14 +190,24 @@ export default function LodgeInfo({ userLodgeInfo }) {
             تماس بگیرند.
           </motion.p>
         </div>
-        <Button
-          className={"bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/70"}
-          onClick={() => handleSave()}
-          disabled={saving}
-        >
-          <Save className="w-4 h-4 mr-2" />
-          {saving ? "در حال ذخیره" : "ذخیره تغییرات"}
-        </Button>
+        <div className="flex justify-center items-center gap-2">
+          <Button
+            className={"bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/70"}
+            onClick={() => handleSave()}
+            disabled={saving}
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {saving ? "در حال ذخیره" : "ذخیره تغییرات"}
+          </Button>
+          <Button
+            variant={"outline"}
+            onClick={() => downloadUserDataAsJson()}
+            disabled={saving}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            دانلود اطلاعات
+          </Button>
+        </div>
       </motion.div>
 
       <motion.div
