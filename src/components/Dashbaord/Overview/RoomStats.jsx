@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { reserveStatus, roomStatusTypes, roomTypes } from "@/lib/roomsData";
-import { BadgeCheck, Construction, DoorOpen, HomeIcon } from "lucide-react";
+import { BadgeCheck, CalendarFold, Construction, DoorOpen } from "lucide-react";
 import { useMemo } from "react";
 import {
   convertToPersianDigits,
@@ -61,26 +61,31 @@ export default function RoomStats({ rooms, reservations }) {
             <CardTitle>اتاق ها</CardTitle>
           </CardHeader>
           <CardContent>
-            <motion.div className="space-y-4" variants={container}>
+            <motion.div className="space-y-2" variants={container}>
               {rooms.length > 0 ? (
                 rooms.slice(0, 5).map((room) => (
                   <motion.div
                     key={room.id}
-                    className="flex items-center justify-between cursor-pointer hover:bg-sky-glint/50 transition-all ease-in-out px-2 py-1 rounded-md"
+                    className="flex items-center justify-between cursor-pointer hover:bg-sky-glint/50 transition-all ease-in-out p-3 rounded-md"
                     variants={item}
                     onClick={() =>
                       router.push(`/dashboard/rooms?room=${room.room_number}`)
                     }
                   >
-                    <div className="flex items-center space-x-3">
-                      <motion.div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        whileHover={{ scale: 1.1 }}
-                      >
-                        <DoorOpen />
-                      </motion.div>
+                    <div className="flex items-center space-x-2 ">
+                      <DoorOpen />
                       <div>
-                        <p className="font-medium">اتاق {room.room_number}</p>
+                        <p className="font-medium text-xs sm:text-sm">
+                          اتاق {room.room_number} |{" "}
+                          <span className="text-xs text-gray-600">
+                            {
+                              roomTypes.find(
+                                (type) =>
+                                  room.type == String(type.value).toUpperCase()
+                              )?.label
+                            }
+                          </span>
+                        </p>
                       </div>
                     </div>
                     <Badge
@@ -115,11 +120,7 @@ export default function RoomStats({ rooms, reservations }) {
               {rooms.length > 5 && (
                 <motion.div variants={item}>
                   <Link href="/dashboard/rooms">
-                    <Button
-                      variant="ghost"
-                      className="w-full"
-                      whileHover={{ scale: 1.02 }}
-                    >
+                    <Button variant="ghost" className="w-full">
                       مشاهده همه اتاق ها ({rooms.length})
                     </Button>
                   </Link>
@@ -136,54 +137,54 @@ export default function RoomStats({ rooms, reservations }) {
             <CardTitle>رزروهای اخیر</CardTitle>
           </CardHeader>
           <CardContent>
-            <motion.div className="space-y-4" variants={container}>
+            <motion.div className="space-y-2" variants={container}>
               {reservations.length > 0 ? (
                 filteredReservations.slice(0, 5).map((reservation) => {
                   const room = rooms.find(
                     (r) => String(r.id) === String(reservation.room_id)
                   );
+                  const reserveStats = reserveStatus.find(
+                    (res) =>
+                      res.value === String(reservation.status).toLowerCase()
+                  )?.label;
 
                   return (
                     <motion.div
                       key={reservation.id}
                       className="flex items-center justify-between cursor-pointer hover:bg-sky-glint/50 transition-all ease-in-out px-2 py-1 rounded-md"
                       variants={item}
-                      whileHover={{ x: 3 }}
                       onClick={() =>
                         router.push(
                           `/dashboard/reservation?reserve=${reservation.guest_name}`
                         )
                       }
                     >
-                      <div>
-                        <p className="font-medium text-deep-ocean">
-                          {reservation.guest_name} -{" "}
-                          <span className="font-normal text-sm">
-                            (اتاق {room?.room_number})
-                          </span>
-                        </p>
-                        <p className="text-sm">
-                          <span className="text-lime-600">
-                            {convertToPersianDigits(reservation.check_in)}
-                          </span>{" "}
-                          -
-                          <span className="text-red-600">
-                            {convertToPersianDigits(reservation.check_out)}
-                          </span>
-                        </p>
+                      <div className="flex justify-center items-center gap-2">
+                        <CalendarFold />
+                        <div>
+                          <p className="font-medium text-deep-ocean text-xs sm:text-sm">
+                            {reservation.guest_name} |{" "}
+                            <span className="font-normal text-xs sm:text-sm">
+                              اتاق {room?.room_number}
+                            </span>
+                          </p>
+                          <p className="text-sm">
+                            <span className="text-xs sm:text-sm text-lime-600">
+                              {convertToPersianDigits(reservation.check_in)}
+                            </span>{" "}
+                            -
+                            <span className="text-xs sm:text-sm  text-red-600">
+                              {convertToPersianDigits(reservation.check_out)}
+                            </span>
+                          </p>
+                        </div>
                       </div>
                       <Badge
                         className={getStatusColor(
                           String(reservation.status).toLowerCase()
                         )}
                       >
-                        {
-                          reserveStatus.find(
-                            (res) =>
-                              res.value ===
-                              String(reservation.status).toLowerCase()
-                          )?.label
-                        }
+                        {reserveStats}
                       </Badge>
                     </motion.div>
                   );

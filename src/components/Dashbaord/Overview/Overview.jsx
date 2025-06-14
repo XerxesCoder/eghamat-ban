@@ -1,13 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import {
-  BedDoubleIcon,
-  CalendarCheck,
-  Hotel,
-  Percent,
-  UserMinus,
-  UserPlus,
-} from "lucide-react";
+import { BedDoubleIcon, DoorClosed, UserMinus, UserPlus } from "lucide-react";
 import StatCard from "./StatCard";
 import {
   getDetailedTodayMovements,
@@ -22,7 +15,7 @@ export default function Overview({ rooms, reservations }) {
   const OverviewData = [
     {
       title: "تعداد اتاق ها",
-      icon: <Hotel className="h-6 w-6" />,
+      icon: <DoorClosed className="h-6 w-6" />,
       value: `${rooms?.length}`,
       description: "تعداد کل اتاق ها",
     },
