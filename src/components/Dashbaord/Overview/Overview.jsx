@@ -9,9 +9,13 @@ import {
   persianTodayNumber,
   persianYear,
 } from "@/lib/jalali";
+import { useMemo } from "react";
 
 export default function Overview({ rooms, reservations }) {
-  const overviewData = getDetailedTodayMovements(reservations);
+  const overviewData = useMemo(() => {
+    return getDetailedTodayMovements(reservations);
+  }, [reservations]);
+
   const OverviewData = [
     {
       title: "تعداد اتاق ها",

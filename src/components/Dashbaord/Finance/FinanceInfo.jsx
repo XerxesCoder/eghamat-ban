@@ -374,7 +374,11 @@ const FinancePage = ({ rooms, reservations }) => {
           {
             title:
               selectedMonth !== null
-                ? `درآمد ${persianMonths[selectedMonth]}`
+                ? `درآمد ${
+                    persianMonths[selectedMonth]
+                  } ${selectedYear.toLocaleString("fa-IR", {
+                    useGrouping: false,
+                  })}`
                 : `درآمد ${selectedYear.toLocaleString("fa-IR", {
                     useGrouping: false,
                   })}`,
@@ -414,7 +418,14 @@ const FinancePage = ({ rooms, reservations }) => {
                     ?.totalReservations || 0
                 : ytdReservations,
             icon: <Receipt className="h-4 w-4 text-blue-600" />,
-            subtitle: selectedMonth !== null ? "این ماه" : "تاکنون امسال",
+            subtitle:
+              selectedMonth !== null
+                ? `${
+                    persianMonths[selectedMonth]
+                  } ${selectedYear.toLocaleString("fa-IR", {
+                    useGrouping: false,
+                  })}`
+                : "تاکنون امسال",
             format: (val) => val.toLocaleString("fa-IR"),
           },
           {
@@ -522,13 +533,16 @@ const FinancePage = ({ rooms, reservations }) => {
                           {room.bookings.toLocaleString("fa-IR")}
                         </td>
                         <td className="px-3 py-3 text-left font-semibold text-sm sm:text-base whitespace-nowrap">
-                          {room.revenue.toLocaleString("fa-IR")}{" "}
+                          {room.revenue.toLocaleString("fa-IR", {
+                            maximumFractionDigits: 0,
+                          })}{" "}
                           <span className="text-xs font-normal">تومان</span>
                         </td>
                         <td className="px-3 py-3 text-left text-sm sm:text-base whitespace-nowrap font-semibold">
                           {room.bookings > 0
                             ? (room.revenue / room.bookings).toLocaleString(
-                                "fa-IR"
+                                "fa-IR",
+                                { maximumFractionDigits: 0 }
                               )
                             : "۰"}{" "}
                           <span className="text-xs font-normal">تومان</span>
