@@ -2,7 +2,7 @@ import { Vazirmatn } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { persianClerk } from "@/lib/clerkLocal";
-
+import { SpeedInsights } from "@vercel/speed-insights/next";
 const Vazir = Vazirmatn({
   variable: "--font-vazir",
   subsets: ["arabic"],
@@ -112,7 +112,10 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider localization={persianClerk} afterSignOutUrl="/">
       <html lang="fa-IR" dir="rtl">
-        <body className={`${Vazir.variable}`}>{children}</body>
+        <body className={`${Vazir.variable}`}>
+          {children}
+          <SpeedInsights />
+        </body>
       </html>
     </ClerkProvider>
   );
