@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { persianYear } from "@/lib/jalali";
-import { Home, Phone, Mail, Github } from "lucide-react";
+import { Mail, Github } from "lucide-react";
 
 export default function Footer() {
   const footerLinks = [
@@ -18,11 +17,6 @@ export default function Footer() {
     {
       title: "پشتیبانی",
       links: [
-        /*         {
-          name: "09120780370",
-          href: "tel:+989120780370",
-          icon: <Phone className="h-4 w-4" />,
-        }, */
         {
           name: "xerxescode@gmail.com",
           href: "mailto:xerxescode@gmail.com",
