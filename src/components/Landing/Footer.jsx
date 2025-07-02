@@ -18,11 +18,11 @@ export default function Footer() {
     {
       title: "پشتیبانی",
       links: [
-        {
-          name: "۰۲۱-۱۲۳۴۵۶۷",
-          href: "tel:+98211234567",
+        /*         {
+          name: "09120780370",
+          href: "tel:+989120780370",
           icon: <Phone className="h-4 w-4" />,
-        },
+        }, */
         {
           name: "xerxescode@gmail.com",
           href: "mailto:xerxescode@gmail.com",
@@ -86,11 +86,10 @@ export default function Footer() {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <p>
-            © {persianYear} اقامت‌ بان - تمامی حقوق برای تیم اقامت‌ بان محفوظ
-            است
+          <p>© {persianYear} اقامت‌ بان</p>
+          <p className="text-sm mt-2">
+            تمامی حقوق برای تیم اقامت‌ بان محفوظ است{" "}
           </p>
-          <p className="text-sm mt-2">نسخه ۱.۰.۰</p>
         </motion.div>
       </motion.div>
     </footer>

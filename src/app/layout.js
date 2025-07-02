@@ -14,7 +14,7 @@ export const metadata = {
   category: "webapp",
   creator: "Xerxes Coder",
   metadataBase: new URL("https://eghamatban.ir"),
-  category: "technology",
+
   keywords: [
     "سیستم مدیریت اقامتگاه",
     "نرم افزار مدیریت مهمانسرا",
@@ -47,6 +47,21 @@ export const metadata = {
     "دانلود نرم افزار مدیریت هتل",
     "ثبت نام سیستم مدیریت اقامتگاه",
     "راه اندازی سامانه رزرواسیون",
+    "مدیریت اقامتگاه",
+    "نرم افزار هتل",
+    "سیستم رزرواسیون آنلاین",
+    "مدیریت مهمانسرا",
+    "برنامه هتلداری",
+    "نرم افزار ایرانی",
+    "سامانه مدیریت اقامتگاه",
+    "یکپارچه‌سازی هتلداری",
+    "مدیریت اتاق‌ها",
+    "برنامه رزرواسیون",
+    "نرم افزار رایگان هتل",
+    "سامانه اقامتگاه",
+    "مدیریت مالی اقامتگاه",
+    "تقویم اتاق‌ها",
+    "گزارش‌ گیری هوشمند",
   ],
   openGraph: {
     title: "اقامت بان",
@@ -60,6 +75,7 @@ export const metadata = {
         url: "https://eghamatban.ir/opengraph-image.png",
         width: 800,
         height: 400,
+        alt: "اقامت بان - مدیریت هوشمند اقامتگاه‌ها",
       },
     ],
   },
@@ -73,15 +89,28 @@ export const metadata = {
   robots: {
     index: true,
     follow: true,
+    noarchive: false,
     nocache: false,
+    noimageindex: false,
     googleBot: {
       index: true,
       follow: true,
+      noarchive: false,
       noimageindex: false,
       "max-video-preview": -1,
       "max-image-preview": "large",
       "max-snippet": -1,
     },
+    bingBot: {
+      index: true,
+      follow: true,
+    },
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    minimumScale: 1,
+    maximumScale: 1,
   },
 };
 
