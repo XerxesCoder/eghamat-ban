@@ -14,6 +14,7 @@ export default async function Dashboard() {
   const roomData = await getUserRooms();
   const reserveData = await getUserReservations();
   const lodgeData = await getUserLodge();
+
   return (
     <div className="py-20 sm:py-14 px-6 w-full min-h-screen  container mx-auto">
       <Overview rooms={roomData?.data} reservations={reserveData?.data} />

@@ -13,6 +13,8 @@ export const metadata = {
   description: "مدیریت هوشمند اقامتگاه‌ها",
   category: "webapp",
   creator: "Xerxes Coder",
+  metadataBase: new URL("https://eghamatban.ir"),
+  category: "technology",
   keywords: [
     "سیستم مدیریت اقامتگاه",
     "نرم افزار مدیریت مهمانسرا",
@@ -49,20 +51,24 @@ export const metadata = {
   openGraph: {
     title: "اقامت بان",
     description: "مدیریت هوشمند اقامتگاه‌ها",
-    //url: 'https://nextjs.org',
+    url: "https://eghamatban.ir",
     siteName: "اقامت بان",
     locale: "fa_IR",
     type: "website",
+    images: [
+      {
+        url: "https://eghamatban.ir/opengraph-image.png",
+        width: 800,
+        height: 400,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "اقامت بان",
     description: "مدیریت هوشمند اقامتگاه‌ها",
-    //url: 'https://nextjs.org',
-    /*       siteId: '1467726470533754880',
-      creator: '@nextjs',
-      creatorId: '1467726470533754880',
-      images: ['https://nextjs.org/og.png']*/
+    url: "https://eghamatban.ir",
+    images: ["https://eghamatban.ir/twitter-image.png"],
   },
   robots: {
     index: true,
