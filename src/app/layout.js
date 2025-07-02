@@ -106,12 +106,6 @@ export const metadata = {
       follow: true,
     },
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    minimumScale: 1,
-    maximumScale: 1,
-  },
 };
 
 export default function RootLayout({ children }) {

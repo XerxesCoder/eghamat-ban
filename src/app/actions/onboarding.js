@@ -13,6 +13,7 @@ export const completeOnboarding = async (formData) => {
   if (!user) {
     return { message: "No User Found" };
   }
+  console.log(user, userId);
 
   const client = await clerkClient();
 
