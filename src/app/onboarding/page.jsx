@@ -57,7 +57,7 @@ export default function OnboardingComponent() {
         toast.dismiss();
         toast.success("ثبت نام با موفقیت انجام شد");
         await user?.reload();
-        router.push("/dashboard");
+        router.push("/dashboard/lodge");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "خطایی رخ داده است");
