@@ -3,6 +3,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { persianClerk } from "@/lib/clerkLocal";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 const Vazir = Vazirmatn({
   variable: "--font-vazir",
   subsets: ["arabic"],
@@ -115,6 +116,7 @@ export default function RootLayout({ children }) {
         <body className={`${Vazir.variable}`}>
           {children}
           <SpeedInsights />
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
