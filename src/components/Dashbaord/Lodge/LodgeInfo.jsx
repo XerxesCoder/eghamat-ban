@@ -16,14 +16,16 @@ import {
   X,
   Save,
   Download,
-  MapPinned,
 } from "lucide-react";
 import { createOrUpdateMotel, getUserDataJson } from "@/app/actions/lodge";
 import { toast } from "sonner";
-
 import { convertToPersianDigits } from "@/lib/jalali";
-import { validatePersianCard } from "@/lib/utils";
-import PersianTimeInput from "./TimePicker";
+import {
+  verifyCardNumber,
+  getBankNameFromCardNumber,
+  isShebaValid,
+  getShebaInfo,
+} from "@persian-tools/persian-tools";
 
 export default function LodgeInfo({ userLodgeInfo }) {
   const [motelData, setMotelData] = useState({
@@ -72,11 +74,15 @@ export default function LodgeInfo({ userLodgeInfo }) {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const isCardValid = validatePersianCard(motelData.card);
-      if (motelData.card && !isCardValid) {
+      if (motelData.card && !verifyCardNumber(motelData.card)) {
         toast.warning("کارت بانکی وارد شده معتبر نمی باشد");
         return;
       }
+      if (motelData.iban && !isShebaValid(motelData.iban)) {
+        toast.warning("شماره شبا وارد شده معتبر نمی باشد");
+        return;
+      }
+
       toast.dismiss();
       toast.loading("در حال ذخیره ...");
       const data = await createOrUpdateMotel(motelData);
