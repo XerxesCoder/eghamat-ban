@@ -108,6 +108,17 @@ export const metadata = {
       follow: true,
     },
   },
+  appleWebApp: {
+    capable: true,
+    title: "اقامت بان",
+    statusBarStyle: "default",
+
+  },
+  formatDetection: {
+    telephone: false,
+    address: false,
+    email: false,
+  },
 };
 
 export default function RootLayout({ children }) {

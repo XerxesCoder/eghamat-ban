@@ -1,5 +1,15 @@
-export default function sitemap() {
-  return [
+export default async function sitemap() {
+  const dashboardPages = [
+    "rooms",
+    "reservation",
+    "lodge",
+    "invoice",
+    "finance",
+    "customers",
+    "calendar",
+  ];
+
+  const baseUrls = [
     {
       url: "https://eghamatban.ir/",
       lastModified: new Date(),
@@ -25,4 +35,13 @@ export default function sitemap() {
       priority: 0.6,
     },
   ];
+
+  const dashboardUrls = dashboardPages.map((page) => ({
+    url: `https://eghamatban.ir/dashboard/${page}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.7,
+  }));
+
+  return [...baseUrls, ...dashboardUrls];
 }
