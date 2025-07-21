@@ -21,25 +21,29 @@ export default function Overview({ rooms, reservations }) {
       title: "تعداد اتاق ها",
       icon: <DoorClosed className="h-6 w-6" />,
       value: `${rooms?.length}`,
+      subValue: "اتاق",
       description: "تعداد کل اتاق ها",
     },
     {
       title: "در حال اقامت ",
       icon: <BedDoubleIcon className="h-6 w-6" />,
       value: `${overviewData?.staying?.guestCount}`,
-      description: `مهمان در حال اقامت | ${overviewData?.staying?.roomCount} اتاق`,
+      subValue: "مهمان",
+      description: `در ${overviewData?.staying?.roomCount}  اتاق`,
     },
     {
       title: "ورودی امروز",
       icon: <UserPlus className="h-6 w-6" />,
       value: `${overviewData?.checkingIn?.guestCount}`,
-      description: `مهمان ورودی امروز | ${overviewData?.checkingIn?.roomCount} اتاق`,
+      subValue: "مهمان",
+      description: `در ${overviewData?.checkingIn?.roomCount} اتاق`,
     },
     {
       title: "خروجی امروز",
       icon: <UserMinus className="h-6 w-6" />,
       value: `${overviewData?.checkingOut?.guestCount}`,
-      description: `مهمان خروجی امروز | ${overviewData?.checkingOut?.roomCount} اتاق `,
+      subValue: "مهمان",
+      description: `در ${overviewData?.checkingOut?.roomCount} اتاق `,
     },
   ];
 
@@ -72,6 +76,7 @@ export default function Overview({ rooms, reservations }) {
             title={item.title}
             icon={item.icon}
             value={item.value}
+            subval={item.subValue}
             description={item.description}
           />
         ))}

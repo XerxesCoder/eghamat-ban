@@ -42,6 +42,7 @@ import { roomAmenities, roomStatusTypes, roomTypes } from "@/lib/roomsData";
 import { addNewRoom, deleteRoom, editRoom } from "@/app/actions/rooms";
 import { useSearchParams } from "next/navigation";
 import RoomCard from "./RoomCard";
+import { numberToWords } from "@persian-tools/persian-tools";
 
 export default function RoomsPage({ rooms }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -99,56 +100,55 @@ export default function RoomsPage({ rooms }) {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    toast.dismiss();
-    setIsAddingRoom(true);
-    try {
-      const roomData = {
-        number: formData.number,
-        type: formData.type,
-        capacity: Number(formData.maxOccupancy),
-        price: Number(formData.price),
-        amenities: formData.amenities,
-        priceTag: formData.priceTag,
-        status: formData.status,
-      };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  toast.dismiss();
+  setIsAddingRoom(true);
 
-      if (editingRoom) {
-        toast.loading(`در حال بروزرسانی اتاق ${editingRoom.room_number}...`);
-        const editRes = await editRoom(roomData, editingRoom.id);
-        if (editRes?.success) {
-          toast.dismiss();
-          toast.success("اتاق ویرایش شد", {
-            description: `اتاق ${formData.number} با موفقیت ویرایش شد`,
-          });
-        }
-
-        setIsAddDialogOpen(false);
-        setEditingRoom(null);
-        resetForm();
-      } else {
-        toast.loading("در حال اضافه کردن اتاق جدید...");
-        const response = await addNewRoom(roomData);
-        if (response?.success) {
-          toast.dismiss();
-          toast.success("اتاق اضافه شد", {
-            description: `اتاق ${formData.number} با موفقیت اضافه شد`,
-          });
-          setIsAddDialogOpen(false);
-          setEditingRoom(null);
-          resetForm();
-        }
-      }
-    } catch (error) {
-      console.log(error);
-      toast.dismiss();
-      toast.error("خطا در ثبت اطلاعات اتاق");
-    } finally {
-      setIsAddingRoom(false);
-    }
+  const roomData = {
+    number: formData.number,
+    type: formData.type,
+    capacity: Number(formData.maxOccupancy),
+    price: Number(formData.price),
+    amenities: formData.amenities,
+    priceTag: formData.priceTag,
+    status: formData.status,
   };
 
+  try {
+    let response;
+    if (editingRoom) {
+      toast.loading(`در حال بروزرسانی اتاق ${editingRoom.room_number}...`);
+      response = await editRoom(roomData, editingRoom.id);
+    } else {
+      toast.loading("در حال اضافه کردن اتاق جدید...");
+      response = await addNewRoom(roomData);
+    }
+
+    if (response?.success) {
+      toast.dismiss();
+      toast.success(
+        editingRoom ? "اتاق ویرایش شد" : "اتاق اضافه شد",
+        {
+          description: `اتاق ${formData.number} با موفقیت ${editingRoom ? "ویرایش" : "اضافه"} شد`,
+        }
+      );
+      setIsAddDialogOpen(false);
+      setEditingRoom(null);
+      resetForm();
+    } else {
+      throw new Error(response?.error || "خطای نامشخص");
+    }
+  } catch (error) {
+    console.log(error);
+    toast.dismiss();
+    toast.error("خطا در ثبت اطلاعات اتاق", {
+      description: error.message,
+    });
+  } finally {
+    setIsAddingRoom(false);
+  }
+};
   const handleEdit = (room) => {
     setEditingRoom(room);
     setFormData({
@@ -337,6 +337,9 @@ export default function RoomsPage({ rooms }) {
                     }
                     required
                   />
+                  <p className="text-muted-foreground text-xs">
+                    {numberToWords(formData.price)} تومان
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="type">نوع اتاق</Label>

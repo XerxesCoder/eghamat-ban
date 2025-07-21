@@ -3,14 +3,13 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { roomTypes } from "@/lib/roomsData";
-import { Calendar, CalendarDays, Plus } from "lucide-react";
+import { CalendarDays, Plus } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -30,8 +29,8 @@ import { Input } from "@/components/ui/input";
 import {
   checkRoomAvailability,
   convertToEnglishDigits,
+  convertToPersianDigits,
   getJalaliDateDifference,
-  validateReservationDates,
 } from "@/lib/jalali";
 import {
   addNewReserve,
@@ -60,7 +59,10 @@ export default function ReserveDialog({
     if (name == "guestPhone") {
       setFormData((prev) => ({ ...prev, [name]: onlyNumbers }));
     } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({
+        ...prev,
+        [name]: name == "discount" ? (value > 100 ? 100 : value) : value,
+      }));
     }
   }, []);
 
@@ -456,6 +458,24 @@ export default function ReserveDialog({
               value={formData.discount}
               onChange={handleInputChange}
             />
+            <div className="flex justify-center items-center gap-2">
+              {[0, 10, 20, 30, 50, 100].map((num) => (
+                <Button
+                  key={num}
+                  size={"sm"}
+                  variant={"outline"}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setFormData((prev) => ({
+                      ...prev,
+                      ["discount"]: num,
+                    }));
+                  }}
+                >
+                  % {convertToPersianDigits(num.toString())}
+                </Button>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-2">

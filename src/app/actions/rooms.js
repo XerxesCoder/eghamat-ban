@@ -34,7 +34,7 @@ export async function addNewRoom(roomData) {
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
-    return { error: "Failed to create room" };
+    return { error: err.message };
   }
 }
 
@@ -70,7 +70,7 @@ export async function editRoom(roomData, roomID) {
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
-    return { error: "Failed to edit room" };
+    return { error: err.message };
   }
 }
 
@@ -95,7 +95,7 @@ export async function deleteRoom(roomID) {
     return { success: true, data };
   } catch (err) {
     console.error("Server error:", err);
-    return { error: "Failed to delete room" };
+    return { error: "خطای سرور" };
   }
 }
 

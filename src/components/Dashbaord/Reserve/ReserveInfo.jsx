@@ -1,15 +1,8 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef } from "react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -42,19 +35,21 @@ import { deleteReservation } from "@/app/actions/reserve";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { reserveStatus, roomTypes } from "@/lib/roomsData";
-import moment from "moment-jalaali";
+import { reserveStatus } from "@/lib/roomsData";
 import ReserveDialog from "./ReserveDialog";
 import { useSearchParams } from "next/navigation";
-
 import html2canvas from "html2canvas-pro";
 import ReserveCard from "./ReserveCard";
+import {
+  getBankNameFromCardNumber,
+  getShebaInfo,
+  numberToWords,
+} from "@persian-tools/persian-tools";
+import { Separator } from "@/components/ui/separator";
 
 export default function ReservationsPage({
   rooms,
@@ -173,16 +168,6 @@ export default function ReservationsPage({
     );
   };
 
-  const getReservationsForDate = (jalaliDate) => {
-    const targetDate = moment(jalaliDate, "jYYYY/jM/jD");
-    const updatedReservations = updateReservationStatuses(reservations);
-    return updatedReservations.filter((res) => {
-      const checkIn = moment(res.check_in, "jYYYY/jM/jD");
-      const checkOut = moment(res.check_out, "jYYYY/jM/jD");
-      return targetDate.isSameOrAfter(checkIn) && targetDate.isBefore(checkOut);
-    });
-  };
-
   const container = {
     hidden: { opacity: 0 },
     visible: {
@@ -251,6 +236,11 @@ export default function ReservationsPage({
       selectedReservation?.discounttotal >= 0
         ? selectedReservation.discounttotal
         : selectedReservation.total_price;
+    const discountedAmount =
+      selectedReservation.discount > 0
+        ? selectedReservation.total_price - selectedReservation.discounttotal
+        : 0;
+
     return (
       <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
         <DialogContent className="min-w-full sm:min-w-[650px] max-h-[90vh] overflow-y-auto p-3 no-print">
@@ -376,7 +366,8 @@ export default function ReservationsPage({
                           {Number(selectedReservation.discount).toLocaleString(
                             "fa-IR"
                           )}{" "}
-                          درصد
+                          درصد ({discountedAmount.toLocaleString("fa-IR")}{" "}
+                          تومان)
                         </span>
                         <span className="text-xs">
                           تمامی قیمت ها به تومان می‌باشد
@@ -398,55 +389,74 @@ export default function ReservationsPage({
                   ? "مبلغ بر اساس تعداد شب‌های اقامت، تعداد نفرات و قیمت پایه هر نفر در هر شب محاسبه شده است."
                   : "مبلغ بر اساس تعداد شب‌های اقامت و قیمت پایه هر شب محاسبه شده است."}
               </p>
+              <div className="flex justify-around mt-2 items-center">
+                <p className=" space-x-1">
+                  <span className="text-xs">ساعت ورود:</span>
+                  <span className="font-semibold">
+                    {convertToPersianDigits(motelData.motel_checkin)}
+                  </span>
+                </p>
+                <p className=" space-x-1">
+                  <span className="text-xs">ساعت تخلیه:</span>
+                  <span className="font-semibold">
+                    {convertToPersianDigits(motelData.motel_checkout)}
+                  </span>
+                </p>
+              </div>
             </div>
+            {(motelData.motel_card || motelData.motel_iban) && (
+              <div className="mt-3 gap-4">
+                <div className="border border-gray-300 rounded-md p-3">
+                  {motelData.motel_card && (
+                    <p className="flex justify-between items-center">
+                      <span className="text-xs">
+                        شماره کارت (
+                        {getBankNameFromCardNumber(motelData.motel_card)}):
+                      </span>
+                      <span>
+                        {convertToPersianDigits(motelData.motel_card)}
+                      </span>
+                    </p>
+                  )}
 
-            {/* Payment Information Grid */}
-            <div className="mt-3 grid grid-cols-2 gap-4">
-              <div className="border border-gray-300 rounded-md p-3">
-                <div className="space-y-2">
-                  <p className="flex justify-between">
-                    <span className="text-xs">ساعت ورود:</span>
-                    <span className="font-semibold">
-                      {convertToPersianDigits(motelData.motel_checkin)}
+                  {motelData.motel_iban && (
+                    <p className="flex justify-between items-center mt-2">
+                      <span className="text-xs">
+                        شماره شبا (
+                        {getShebaInfo("IR" + motelData.motel_iban).persianName}
+                        ):
+                      </span>
+                      <span>
+                        {convertToPersianDigits(motelData.motel_iban)}
+                      </span>
+                    </p>
+                  )}
+                  <Separator />
+                  <p className="text-sm mt-2">
+                    <span className="font-bold">
+                      {finalPayPrice.toLocaleString("fa-IR")} تومان
+                    </span>
+                    <span className="text-xs text-muted-foreground mr-1">
+                      ({numberToWords(finalPayPrice)} تومان)
                     </span>
                   </p>
-                  <p className="flex justify-between">
-                    <span className="text-xs">ساعت تخلیه:</span>
-                    <span className="font-semibold">
-                      {convertToPersianDigits(motelData.motel_checkout)}
-                    </span>
-                  </p>
-                  <p className="text-xs"></p>
+
+                  {motelData.motel_card_name && (
+                    <p className="text-right mt-2 text-sm">
+                      {motelData.motel_card_name}
+                    </p>
+                  )}
                 </div>
               </div>
+            )}
 
-              <div className="border border-gray-300 rounded-md p-3">
-                {motelData.motel_card && (
-                  <p className="flex justify-between items-center">
-                    <span className="text-xs">شماره کارت:</span>
-                    <span>{convertToPersianDigits(motelData.motel_card)}</span>
-                  </p>
-                )}
-                {motelData.motel_iban && (
-                  <p className="flex justify-between items-center mt-2">
-                    <span className="text-xs">شماره شبا:</span>
-                    <span>{convertToPersianDigits(motelData.motel_iban)}</span>
-                  </p>
-                )}
-                {motelData.motel_card_name && (
-                  <p className="text-right mt-2 text-sm">
-                    {motelData.motel_card_name}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Footer */}
             <div className="text-center text-sm mt-6 border-t pt-4">
               <p className="font-medium">از اعتماد شما سپاسگزاریم</p>
-              <p className="mt-1">
-                برای پشتیبانی: {convertToPersianDigits(motelData.motel_phone)}
-              </p>
+              {motelData.motel_phone && (
+                <p className="mt-1">
+                  پشتیبانی: {convertToPersianDigits(motelData.motel_phone)}
+                </p>
+              )}
             </div>
           </div>
 

@@ -7,6 +7,7 @@ import {
   CalendarDays,
   DoorClosed,
   Users,
+  FileText,
   DollarSign,
 } from "lucide-react";
 
@@ -68,6 +69,11 @@ const items = [
     url: "/dashboard/lodge",
     icon: Hotel,
   },
+  {
+    title: " فاکتور ساز ",
+    url: "/dashboard/invoice",
+    icon: FileText,
+  },
 ];
 
 export function AppSidebar() {
@@ -88,7 +94,7 @@ export function AppSidebar() {
             >
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="/assets/logo.png" alt="EghamatBan" />
+                  <AvatarImage src="/assets/logo.png" alt="اقامت بان" />
                   <AvatarFallback>EG</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col gap-0.5 leading-none">

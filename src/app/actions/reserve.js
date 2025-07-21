@@ -47,7 +47,6 @@ export async function editReservation(reserveData, reserveID) {
   if (!userId) return { error: "User ID is required" };
 
   try {
-    console.log(reserveData.checkIn, reserveData.checkOut);
     const { data, error } = await supabase
       .from("reservations")
       .update([

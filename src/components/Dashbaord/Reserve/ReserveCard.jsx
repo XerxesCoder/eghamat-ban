@@ -108,12 +108,14 @@ export default function ReserveCard({
           </div>
         </div>
 
-        {reservation.special_requests !== "" && (
-          <div className="mt-4">
-            <span className="text-gray-500 text-xs">یادداشت: </span>
-            <span className="text-sm">{reservation.special_requests}</span>
-          </div>
-        )}
+        <div className="mt-4">
+          <span className="text-gray-500 text-xs">یادداشت: </span>
+          <span className="text-sm">
+            {reservation.special_requests !== ""
+              ? reservation.special_requests
+              : "-"}
+          </span>
+        </div>
       </CardContent>
 
       <CardFooter className=" px-4">

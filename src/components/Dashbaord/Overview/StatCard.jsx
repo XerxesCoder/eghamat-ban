@@ -7,6 +7,7 @@ export default function StatCard({
   title,
   icon,
   value,
+  subval,
   description,
   cardIndex,
 }) {
@@ -40,9 +41,9 @@ export default function StatCard({
             className="text-2xl font-bold"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 + cardIndex * 0.1 }} // Extra delay for content
+            transition={{ delay: 0.3 + cardIndex * 0.1 }} 
           >
-            {convertToPersianDigits(value)}
+            {convertToPersianDigits(value)} <span className="text-xs text-muted-foreground font-normal">{subval}</span>
           </motion.h3>
           <motion.p
             className="text-xs text-muted-foreground mt-1"
