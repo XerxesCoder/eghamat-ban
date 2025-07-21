@@ -322,7 +322,7 @@ export default function InvoicePage() {
       >
         {/* Forms */}
         <motion.div
-          className="max-w-4xl mx-auto mb-8"
+          className="max-w-4xl w-full mx-auto mb-8"
           variants={fadeIn}
           initial="hidden"
           animate="visible"
