@@ -8,7 +8,7 @@ export default async function DashboardLayout({ children }) {
     <SidebarProvider defaultOpen>
       <AppSidebar />
       <MobileHeader />
-      <SidebarInset className=" bg-pearl-luster overflow-x-hidden">
+      <SidebarInset className=" bg-pearl-luster overflow-x-hidden"> 
         <Toaster
           richColors
           swipeDirections={"right"}

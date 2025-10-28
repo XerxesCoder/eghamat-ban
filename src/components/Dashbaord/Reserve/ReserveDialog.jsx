@@ -23,8 +23,9 @@ import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import transition from "react-element-popper/animations/transition";
+import { numberToWords } from "@persian-tools/persian-tools";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   checkRoomAvailability,
@@ -56,8 +57,11 @@ export default function ReserveDialog({
   const handleInputChange = useCallback((e) => {
     const onlyNumbers = e.target.value.replace(/\D/g, "");
     const { name, value } = e.target;
+
     if (name == "guestPhone") {
       setFormData((prev) => ({ ...prev, [name]: onlyNumbers }));
+    } else if (name == "addPrice" || name == "roomPrice") {
+      setFormData((prev) => ({ ...prev, [name]: Number(onlyNumbers) }));
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -70,6 +74,7 @@ export default function ReserveDialog({
     if (formData.checkIn == formData.checkOut) return 1;
     return getJalaliDateDifference(formData.checkIn, formData.checkOut);
   }, [formData.checkIn, formData.checkOut]);
+
   const calculateTotalAmount = (
     roomId,
     checkIn,
@@ -79,14 +84,14 @@ export default function ReserveDialog({
   ) => {
     const room = rooms.find((r) => String(r.id) === String(roomId));
     if (!room || !checkIn || !checkOut) return 0;
-    const roomPrice = room.price_per_night;
+    const roomPrice = formData.roomPrice;
 
     const nights =
       room.price_tag === "night"
         ? dateDifference
         : Number(adults) * dateDifference;
 
-    const total = nights * roomPrice;
+    const total = nights * roomPrice + formData.addPrice;
     const discounedAmount = (total * discount) / 100;
     const discountedTotal = total - discounedAmount;
 
@@ -97,6 +102,20 @@ export default function ReserveDialog({
     };
   };
 
+  const roomPrice = useMemo(() => {
+    const room = rooms.find((room) => room.id == formData.roomId);
+    if (!room)
+      return {
+        price: 0,
+        type: "-",
+      };
+
+    return {
+      price: room.price_per_night,
+      type: room.price_tag == "person" ? "به ازای هر نفر" : "به ازای هر شب",
+    };
+  }, [formData.roomId]);
+
   const totalAmount = useMemo(() => {
     const calcute = calculateTotalAmount(
       formData.roomId,
@@ -105,6 +124,7 @@ export default function ReserveDialog({
       formData.adults,
       formData.discount
     );
+
     return {
       total: calcute.total,
       discountedTotal: calcute.discountedTotal,
@@ -116,7 +136,9 @@ export default function ReserveDialog({
     formData.checkOut,
     formData.adults,
     formData.discount,
+    formData.addPrice,
   ]);
+  console.log(totalAmount);
   const todayDate = new DateObject({
     calendar: persian,
     locale: persian_fa,
@@ -188,6 +210,8 @@ export default function ReserveDialog({
         notes: formData.notes,
         status: formData.status,
         totalAmount: totalAmount.total,
+        addPrice: formData.addPrice,
+        addpricedesc: formData.addpriceDesc,
         discount: formData.discount,
         discounttotal: totalAmount.discountedTotal,
       };
@@ -282,6 +306,15 @@ export default function ReserveDialog({
     );
   };
 
+  useEffect(() => {
+    if (!editingReservation) {
+      setFormData((prev) => ({
+        ...prev,
+        roomPrice: roomPrice?.price,
+      }));
+    }
+  }, [formData.roomId]);
+
   return (
     <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
       {withButton && (
@@ -298,8 +331,9 @@ export default function ReserveDialog({
           </Button>
         </DialogTrigger>
       )}
+
       <DialogContent
-        className={"p-3 sm:p-6 sm:max-w-md"}
+        className={"p-3 sm:p-6 sm:max-w-xl max-h-[90dvh] overflow-y-auto"}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogHeader
@@ -312,7 +346,7 @@ export default function ReserveDialog({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-6 ">
+          <div className="grid grid-cols-2 gap-2 sm:gap-6">
             <div className="space-y-2">
               <Label htmlFor="guestName">نام مسافر</Label>
               <Input
@@ -336,8 +370,9 @@ export default function ReserveDialog({
               />
             </div>
           </div>
-          <div className="flex justify-start items-center gap-8">
-            <div className="space-y-2 w-full">
+
+          <div className="flex flex-row justify-start items-center gap-4">
+            <div className="space-y-2 w-full sm:w-48">
               <Label htmlFor="roomId">اتاق</Label>
               <Select
                 value={formData.roomId}
@@ -354,7 +389,6 @@ export default function ReserveDialog({
                     const roomType = roomTypes.find(
                       (type) => room.type === String(type.value).toUpperCase()
                     );
-
                     return (
                       <SelectItem
                         key={room.id}
@@ -374,7 +408,7 @@ export default function ReserveDialog({
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2 max-w-[90%] sm:w-full">
+            <div className=" space-y-2 w-full sm:max-w-[90%]">
               <Label htmlFor="adults">نفرات</Label>
               <Select
                 value={formData.adults}
@@ -404,9 +438,23 @@ export default function ReserveDialog({
               </Select>
             </div>
           </div>
-
-          <div className="flex justify-around gap-8 items-center">
+          {formData.roomId && (
             <div className="space-y-2">
+              <Label htmlFor="roomPrice">مبلغ ({roomPrice.type})</Label>
+              <Input
+                id="roomPrice"
+                name="roomPrice"
+                placeholder="0"
+                value={formData.roomPrice}
+                onChange={handleInputChange}
+                //required
+              />
+              <p>{numberToWords(formData.roomPrice)} تومان</p>
+            </div>
+          )}
+
+          <div className="flex flex-row justify-center gap-4  items-center">
+            <div className="space-y-2 flex-1">
               <Label htmlFor="checkIn">تاریخ ورود</Label>
               <DatePicker
                 minDate={todayDate}
@@ -420,9 +468,8 @@ export default function ReserveDialog({
                 render={<CustomDateInputEnter />}
               />
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 flex-1">
               <Label htmlFor="checkOut">تاریخ خروج</Label>
-
               <DatePicker
                 animations={[transition()]}
                 monthYearSeparator="|"
@@ -448,33 +495,35 @@ export default function ReserveDialog({
 
           <div className="space-y-2">
             <Label htmlFor="discount"> تخفیف % </Label>
-            <Input
-              id="discount"
-              name="discount"
-              placeholder="10"
-              type={"number"}
-              min={0}
-              max={100}
-              value={formData.discount}
-              onChange={handleInputChange}
-            />
-            <div className="flex justify-center items-center gap-2">
-              {[0, 10, 20, 30, 50, 100].map((num) => (
-                <Button
-                  key={num}
-                  size={"sm"}
-                  variant={"outline"}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setFormData((prev) => ({
-                      ...prev,
-                      ["discount"]: num,
-                    }));
-                  }}
-                >
-                  % {convertToPersianDigits(num.toString())}
-                </Button>
-              ))}
+            <div className="flex gap-1">
+              <Input
+                id="discount"
+                name="discount"
+                placeholder="10"
+                type={"number"}
+                min={0}
+                max={100}
+                value={formData.discount}
+                onChange={handleInputChange}
+              />
+              <div className="flex  justify-center items-center gap-1">
+                {[0, 20, 30, 50].map((num) => (
+                  <Button
+                    key={num}
+                    size={"sm"}
+                    variant={"outline"}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setFormData((prev) => ({
+                        ...prev,
+                        ["discount"]: num,
+                      }));
+                    }}
+                  >
+                    % {convertToPersianDigits(num.toString())}
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -494,6 +543,37 @@ export default function ReserveDialog({
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="addPrice">
+              مبلغ اضافه ({numberToWords(formData.addPrice || 0)} تومان)
+            </Label>
+            <Input
+              id="addPrice"
+              name="addPrice"
+              placeholder="0"
+              type={"number"}
+              min={0}
+              value={formData.addPrice}
+              onChange={handleInputChange}
+            />
+            <p></p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="addpriceDesc">توضیحات مبلغ اضافه</Label>
+            <Textarea
+              id="addpriceDesc"
+              value={formData.addpriceDesc}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  addpriceDesc: e.target.value,
+                }))
+              }
+              rows={3}
+              placeholder=" بابت ناهار یا شام "
+            />
+          </div>
+
           {formData.roomId &&
             formData.checkIn &&
             formData.checkOut &&
@@ -507,12 +587,7 @@ export default function ReserveDialog({
                       .price_tag == "night"
                       ? "شب"
                       : "نفر"}
-                    :{" "}
-                    {Number(
-                      rooms.find((r) => String(r.id) === formData.roomId)
-                        ?.price_per_night
-                    ).toLocaleString("fa-IR")}{" "}
-                    تومان
+                    : {Number(formData.roomPrice).toLocaleString("fa-IR")} تومان
                   </strong>
                 </p>
                 <p className="text-sm text-deep-ocean">
@@ -542,6 +617,17 @@ export default function ReserveDialog({
                     </strong>
                   </p>
                 )}
+                {formData.addPrice > 0 && (
+                  <p className="text-sm text-deep-ocean">
+                    <strong>
+                      مبلغ اضافه:{" "}
+                      <span className="font-medium">
+                        {Number(formData.addPrice).toLocaleString("fa-IR")}{" "}
+                        تومان
+                      </span>
+                    </strong>
+                  </p>
+                )}
                 <p className="text-base text-deep-ocean font-bold">
                   <strong>
                     مبلغ کل:{" "}
@@ -553,6 +639,7 @@ export default function ReserveDialog({
                 </p>
               </div>
             )}
+
           {editingReservation && (
             <Button
               type="button"
@@ -565,15 +652,14 @@ export default function ReserveDialog({
               کنسلی
             </Button>
           )}
-          <DialogFooter
-            className={
-              "border-t sm:justify-start  border-deep-ocean/30 pt-3 flex-col"
-            }
-          >
+
+          <DialogFooter className={"sm:flex-col"}>
             <Button
               type="submit"
               disabled={isAddingOrEditing}
-              className={"disabled:opacity-50 disabled:pointer-events-none"}
+              className={
+                "disabled:opacity-50 disabled:pointer-events-none w-full"
+              }
             >
               {editingReservation ? "ویرایش" : "ایجاد"}
             </Button>
@@ -581,6 +667,7 @@ export default function ReserveDialog({
               type="button"
               variant="destructive"
               onClick={() => setIsAddDialogOpen(false)}
+              className="w-full"
             >
               لغو
             </Button>

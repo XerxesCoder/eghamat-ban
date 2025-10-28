@@ -22,6 +22,7 @@ export async function createOrUpdateMotel(motelData) {
           motel_amenities: motelData.amenities,
           motel_checkin: motelData.checkInTime,
           motel_checkout: motelData.checkOutTime,
+          invoicenote: motelData.invoiceNote,
         },
       ])
       .select()

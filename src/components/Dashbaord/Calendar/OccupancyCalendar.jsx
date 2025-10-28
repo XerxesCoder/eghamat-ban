@@ -52,6 +52,9 @@ export default function OccupancyPage({ rooms, reservations }) {
     notes: "",
     status: "pending",
     discount: 0,
+    addPrice: 0,
+    addpriceDesc: "",
+    roomPrice: 0,
   });
 
   const resetForm = () => {
@@ -65,6 +68,9 @@ export default function OccupancyPage({ rooms, reservations }) {
       notes: "",
       status: "pending",
       discount: 0,
+      addPrice: 0,
+      addpriceDesc: "",
+      roomPrice: 0,
     });
   };
   const filteredRooms = useMemo(() => {
@@ -617,7 +623,7 @@ export default function OccupancyPage({ rooms, reservations }) {
                                           } else {
                                             if (room.status == "MAINTENANCE") {
                                               toast.error(
-                                                `اتاق ${room.room_number} در حال تعمیرات است`,
+                                                `اتاق ${room.room_number} در حال تعمیرات است`
                                               );
                                               return;
                                             }

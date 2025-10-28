@@ -40,6 +40,7 @@ export default function LodgeInfo({ userLodgeInfo }) {
     checkInTime: userLodgeInfo?.motel_checkin || "14:00",
     checkOutTime: userLodgeInfo?.motel_checkout || "12:00",
     cardName: userLodgeInfo?.motel_card_name || "",
+    invoiceNote: userLodgeInfo?.invoicenote || "",
   });
   const [newAmenity, setNewAmenity] = useState("");
 
@@ -289,7 +290,18 @@ export default function LodgeInfo({ userLodgeInfo }) {
                 rows={3}
               />
             </div>
-
+            <div className={"w-full  space-y-2"}>
+              <Label htmlFor="invoiceNote">توضیحات فاکتور</Label>
+              <Textarea
+                id="invoiceNote"
+                value={motelData.invoiceNote}
+                onChange={(e) =>
+                  handleInputChange("invoiceNote", e.target.value)
+                }
+                placeholder="اقامت ها به یک وعده صبحانه میباشد"
+                rows={3}
+              />
+            </div>
             <div className="flex flex-col md:flex-row justify-center items-center w-full gap-4 md:gap-5">
               <div className={"  space-y-2"}>
                 <Label htmlFor="checkInTime">ساعت ورود</Label>

@@ -77,6 +77,9 @@ export default function ReservationsPage({
     notes: "",
     status: "pending",
     discount: 0,
+    addPrice: 0,
+    addpriceDesc: "",
+    roomPrice: 0,
   });
 
   const filteredReservations = useMemo(() => {
@@ -119,6 +122,9 @@ export default function ReservationsPage({
       notes: "",
       status: "pending",
       discount: 0,
+      addPrice: 0,
+      addpriceDesc: "",
+      roomPrice: 0,
     });
   };
 
@@ -136,6 +142,9 @@ export default function ReservationsPage({
         (res) => res.value === String(reservation.status).toLowerCase()
       )?.value,
       discount: reservation.discount,
+      addPrice: reservation.addprice,
+      addpriceDesc: reservation.addpricedesc,
+      roomPrice: reservation.roomprice,
     });
     setIsAddDialogOpen(true);
   };
@@ -333,7 +342,7 @@ export default function ReservationsPage({
                     room?.room_number,
                     `${nights.toLocaleString("fa-IR")} `,
                     `${selectedReservation?.adults.toLocaleString("fa-IR")}`,
-                    `${room?.price_per_night.toLocaleString("fa-IR")}`,
+                    `${selectedReservation?.roomprice.toLocaleString("fa-IR")}`,
                     `${selectedReservation.total_price.toLocaleString(
                       "fa-IR"
                     )}`,
@@ -359,25 +368,37 @@ export default function ReservationsPage({
                     colSpan={7}
                     className="p-2 border-t border-black text-right"
                   >
-                    {selectedReservation.discount > 0 ? (
+                    {selectedReservation.discount > 0 && (
                       <div className="flex justify-center flex-col">
-                        <span className="font-medium">
-                          تخفیف:{" "}
+                        <p className="font-medium">
+                          تخفیف: %{" "}
                           {Number(selectedReservation.discount).toLocaleString(
                             "fa-IR"
                           )}{" "}
-                          درصد ({discountedAmount.toLocaleString("fa-IR")}{" "}
-                          تومان)
-                        </span>
-                        <span className="text-xs">
-                          تمامی قیمت ها به تومان می‌باشد
-                        </span>
+                          <span className="text-xs">
+                            {" "}
+                            ({discountedAmount.toLocaleString("fa-IR")} تومان)
+                          </span>
+                        </p>
                       </div>
-                    ) : (
-                      <span className="text-xs">
-                        تمامی قیمت ها به تومان می‌باشد
-                      </span>
                     )}
+                    {selectedReservation.addprice > 0 && (
+                      <div className="flex justify-center flex-col">
+                        <p className="font-medium">
+                          مبلغ اضافه:{" "}
+                          {selectedReservation.addprice.toLocaleString("fa-IR")}{" "}
+                          تومان{" "}
+                          {selectedReservation.addpricedesc && (
+                            <span className="text-xs">
+                              ({selectedReservation.addpricedesc})
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    )}
+                    <span className="text-xs">
+                      تمامی قیمت ها به تومان می‌باشد
+                    </span>
                   </td>
                 </tr>
               </tbody>
@@ -389,6 +410,11 @@ export default function ReservationsPage({
                   ? "مبلغ بر اساس تعداد شب‌های اقامت، تعداد نفرات و قیمت پایه هر نفر در هر شب محاسبه شده است."
                   : "مبلغ بر اساس تعداد شب‌های اقامت و قیمت پایه هر شب محاسبه شده است."}
               </p>
+
+              {motelData.invoicenote && (
+                <p className="font-bold">{motelData.invoicenote}</p>
+              )}
+
               <div className="flex justify-around mt-2 items-center">
                 <p className=" space-x-1">
                   <span className="text-xs">ساعت ورود:</span>
