@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import html2canvas from "html2canvas-pro";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,8 +19,24 @@ import DatePicker, { DateObject } from "react-multi-date-picker";
 import persian from "react-date-object/calendars/persian";
 import persian_fa from "react-date-object/locales/persian_fa";
 import transition from "react-element-popper/animations/transition";
-import { CalendarDays, Download, Copy, RefreshCcw } from "lucide-react";
+import {
+  CalendarDays,
+  Download,
+  Copy,
+  RefreshCcw,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { getUserLodge } from "@/app/actions/lodge";
 
 // Helper for copy-to-clipboard
 const copyToClipboard = (text) => {
@@ -55,6 +71,31 @@ const item = {
 
 export default function InvoicePage() {
   const invoiceRef = useRef(null);
+  const [isGettingInfo, setisGettingInfo] = useState(false);
+
+  const getUserLodgeInfo = async () => {
+    setisGettingInfo(true);
+    try {
+      const lodgeData = await getUserLodge();
+      if (lodgeData.success) {
+        const motelData = lodgeData.data[0];
+        console.log(motelData);
+        setMotel({
+          motel_name: motelData.motel_name,
+          motel_card: motelData.motel_card,
+          motel_iban: motelData.motel_iban,
+          motel_card_name: motelData.motel_card_name,
+          motel_phone: motelData.motel_phone,
+        });
+      } else {
+        console.log("Failed to fetch lodge data:", lodgeData);
+      }
+    } catch (error) {
+      console.error("Error fetching lodge info:", error);
+    } finally {
+      setisGettingInfo(false);
+    }
+  };
 
   const [reservation, setReservation] = useState({
     id:
@@ -68,11 +109,13 @@ export default function InvoicePage() {
     check_out: "",
     adults: 1,
     discount: 0,
+    description: "",
   });
 
   const [room, setRoom] = useState({
     room_number: "101",
     price: 1000000,
+    price_type: "night", // "night" or "person"
   });
 
   const [motel, setMotel] = useState({
@@ -82,6 +125,8 @@ export default function InvoicePage() {
     motel_card_name: "",
     motel_phone: "",
   });
+
+  const [additionalPrices, setAdditionalPrices] = useState([]);
 
   const [issueDate, setIssueDate] = useState(
     new DateObject({
@@ -98,13 +143,30 @@ export default function InvoicePage() {
       ? getJalaliDateDifference(reservation.check_in, reservation.check_out)
       : 1;
 
+  // Calculate price based on price type
   const basePrice = room.price;
-  const totalPrice = basePrice * nights;
+  let totalPrice = 0;
+
+  if (room.price_type === "night") {
+    totalPrice = basePrice * nights;
+  } else if (room.price_type === "person") {
+    totalPrice = basePrice * nights * reservation.adults;
+  }
+
+  // Calculate additional prices total
+  const additionalTotal = additionalPrices.reduce(
+    (sum, item) => sum + (Number(item.price) || 0),
+    0
+  );
+
+  const subtotal = totalPrice + additionalTotal;
+
   const discountAmount =
     reservation.discount > 0
-      ? Math.round((totalPrice * reservation.discount) / 100)
+      ? Math.round((subtotal * reservation.discount) / 100)
       : 0;
-  const finalPrice = totalPrice - discountAmount;
+
+  const finalPrice = subtotal - discountAmount;
 
   const todayDate = new DateObject({
     calendar: persian,
@@ -149,12 +211,40 @@ export default function InvoicePage() {
     }));
   };
 
+  const handlePriceTypeChange = (value) => {
+    setRoom((prev) => ({
+      ...prev,
+      price_type: value,
+    }));
+  };
+
   const handleMotelChange = (e) => {
     const { name, value } = e.target;
     setMotel((prev) => ({
       ...prev,
       [name]: value,
     }));
+  };
+
+  const addAdditionalPrice = () => {
+    setAdditionalPrices((prev) => [
+      ...prev,
+      { id: Date.now(), description: "", price: 0 },
+    ]);
+  };
+
+  const updateAdditionalPrice = (id, field, value) => {
+    setAdditionalPrices((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? { ...item, [field]: field === "price" ? Number(value) || 0 : value }
+          : item
+      )
+    );
+  };
+
+  const removeAdditionalPrice = (id) => {
+    setAdditionalPrices((prev) => prev.filter((item) => item.id !== id));
   };
 
   const validate = () => {
@@ -202,6 +292,7 @@ export default function InvoicePage() {
       const canvas = await html2canvas(invoiceRef.current, {
         backgroundColor: "#fff",
         scale: 2,
+        useCORS: true,
       });
       const url = canvas.toDataURL("image/png");
       const link = document.createElement("a");
@@ -214,6 +305,10 @@ export default function InvoicePage() {
       alert("خطا در ذخیره فاکتور");
     }
   };
+
+  useEffect(() => {
+    getUserLodgeInfo();
+  }, []);
 
   const resetForm = () => {
     setReservation({
@@ -228,16 +323,17 @@ export default function InvoicePage() {
       check_out: "",
       adults: 1,
       discount: 0,
+      description: "",
     });
-    setRoom({ room_number: "101", price: 1000000 });
+    setRoom({ room_number: "101", price: 1000000, price_type: "night" });
     setMotel({
       motel_name: "اقامتگاه نمونه",
-
       motel_card: "",
       motel_iban: "",
       motel_card_name: "",
       motel_phone: "",
     });
+    setAdditionalPrices([]);
     setIssueDate(todayDate);
     setErrors({});
   };
@@ -262,7 +358,7 @@ export default function InvoicePage() {
 
   return (
     <motion.div
-      className="py-20 sm:py-14 px-6 w-full min-h-screen container mx-auto"
+      className="py-20 sm:py-14 px-4 sm:px-6 w-full min-h-screen container mx-auto max-w-7xl"
       variants={container}
       initial="hidden"
       animate="visible"
@@ -274,7 +370,7 @@ export default function InvoicePage() {
       >
         <div>
           <motion.h1
-            className="text-3xl font-bold text-gray-900"
+            className="text-2xl sm:text-3xl font-bold text-gray-900"
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -282,7 +378,7 @@ export default function InvoicePage() {
             صدور فاکتور
           </motion.h1>
           <motion.p
-            className="text-gray-600 mt-1"
+            className="text-gray-600 mt-1 text-sm sm:text-base"
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.8 }}
@@ -291,12 +387,12 @@ export default function InvoicePage() {
           </motion.p>
         </div>
         <div
-          className="flex space-x-3 mt-4 sm:mt-0"
+          className="flex flex-wrap gap-2 mt-4 sm:mt-0"
           style={{ direction: "ltr" }}
         >
           <Button
             onClick={resetForm}
-            variant="destructive"
+            variant="outline"
             className="gap-2"
             type="button"
           >
@@ -305,7 +401,7 @@ export default function InvoicePage() {
           </Button>
           <Button
             onClick={exportInvoice}
-            className={"bg-aqua-spark text-deep-ocean hover:bg-aqua-spark/70"}
+            className={"bg-blue-600 text-white hover:bg-blue-700"}
             type="button"
           >
             <Download className="w-4 h-4" />
@@ -313,25 +409,27 @@ export default function InvoicePage() {
           </Button>
         </div>
       </motion.div>
+
       {/* Wrapper */}
       <motion.div
-        className="flex flex-col xl:flex-row justify-center items-center gap-5"
+        className="flex flex-col xl:flex-row gap-6"
         variants={container}
         initial="hidden"
         animate="visible"
       >
         {/* Forms */}
         <motion.div
-          className="max-w-4xl w-full mx-auto mb-8"
+          className="flex-1 max-w-4xl"
           variants={fadeIn}
           initial="hidden"
           animate="visible"
         >
           <Card>
             <CardContent className="space-y-8 py-8">
+              {/* اطلاعات رزرو */}
               <div className="space-y-4">
                 <h3 className="font-bold text-base flex items-center gap-2">
-                  <span className="bg-primary/10 p-1 rounded-full w-6 h-6 flex items-center justify-center text-primary">
+                  <span className="bg-blue-100 text-blue-600 p-1 rounded-full w-6 h-6 flex items-center justify-center text-xs">
                     ۱
                   </span>
                   اطلاعات رزرو
@@ -395,9 +493,26 @@ export default function InvoicePage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="space-y-1">
-                    <Label>تاریخ صدور </Label>
+                    <Label>نوع قیمت گذاری</Label>
+                    <Select
+                      value={room.price_type}
+                      onValueChange={handlePriceTypeChange}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="نوع قیمت" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="night">قیمت هر شب</SelectItem>
+                        <SelectItem value="person">
+                          قیمت هر نفر در شب
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>تاریخ صدور</Label>
                     <DatePicker
                       animations={[transition()]}
                       calendar={persian}
@@ -425,6 +540,7 @@ export default function InvoicePage() {
                       </p>
                     )}
                   </div>
+
                   <div className="space-y-1">
                     <Label>تاریخ خروج</Label>
                     <DatePicker
@@ -458,7 +574,7 @@ export default function InvoicePage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2  gap-4">
                   <div className="space-y-1">
                     <Label htmlFor="adults">تعداد نفرات</Label>
                     <Input
@@ -484,29 +600,53 @@ export default function InvoicePage() {
                   </div>
                 </div>
 
-                <div className="p-4 bg-muted/50 rounded-lg mt-2">
+                <div className="space-y-1">
+                  <Label htmlFor="description">توضیحات رزرو</Label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    placeholder="توضیحات مربوط به رزرو..."
+                    value={reservation.description}
+                    onChange={handleReservationChange}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="p-4 bg-gray-50 rounded-lg mt-2 border">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">
-                          قیمت پایه:
-                        </span>
+                        <span className="text-gray-600">قیمت پایه:</span>
                         <span>{basePrice.toLocaleString("fa-IR")} تومان</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">
-                          مدت اقامت:
-                        </span>
+                        <span className="text-gray-600">مدت اقامت:</span>
                         <span>{nights.toLocaleString("fa-IR")} شب</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">نوع محاسبه:</span>
+                        <span>
+                          {room.price_type === "night"
+                            ? "قیمت هر شب"
+                            : "قیمت هر نفر در شب"}
+                        </span>
                       </div>
                     </div>
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">مبلغ کل:</span>
+                        <span className="text-gray-600">مبلغ اقامت:</span>
                         <span>{totalPrice.toLocaleString("fa-IR")} تومان</span>
                       </div>
+                      {additionalTotal > 0 && (
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-600">خدمات اضافی:</span>
+                          <span>
+                            +{additionalTotal.toLocaleString("fa-IR")} تومان
+                          </span>
+                        </div>
+                      )}
                       {reservation.discount > 0 && (
-                        <div className="flex justify-between text-destructive">
+                        <div className="flex justify-between text-red-600">
                           <span>تخفیف:</span>
                           <span>
                             -{discountAmount.toLocaleString("fa-IR")} تومان
@@ -524,14 +664,100 @@ export default function InvoicePage() {
 
               <Separator />
 
+              {/* خدمات اضافی */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-base flex items-center gap-2">
+                    <span className="bg-green-100 text-green-600 p-1 rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                      ۲
+                    </span>
+                    خدمات اضافی
+                  </h3>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addAdditionalPrice}
+                    className="gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    افزودن خدمت
+                  </Button>
+                </div>
+
+                <AnimatePresence>
+                  {additionalPrices.map((item, index) => (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="grid grid-cols-1 md:grid-cols-5 gap-3 p-3 border rounded-lg bg-gray-50"
+                    >
+                      <div className="md:col-span-3">
+                        <Label>توضیحات خدمت</Label>
+                        <Input
+                          placeholder="مثال: ناهار، شام، صبحانه، خدمات لاندری و..."
+                          value={item.description}
+                          onChange={(e) =>
+                            updateAdditionalPrice(
+                              item.id,
+                              "description",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </div>
+                      <div>
+                        <Label>مبلغ (تومان)</Label>
+                        <Input
+                          type="number"
+                          value={item.price}
+                          onChange={(e) =>
+                            updateAdditionalPrice(
+                              item.id,
+                              "price",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </div>
+                      <div className="flex items-end">
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => removeAdditionalPrice(item.id)}
+                          className="gap-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          حذف
+                        </Button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+
+              <Separator />
+
               {/* اطلاعات اقامتگاه */}
               <div className="space-y-4">
-                <h3 className="font-bold text-base flex items-center gap-2">
-                  <span className="bg-primary/10 p-1 rounded-full w-6 h-6 flex items-center justify-center text-primary">
-                    ۲
-                  </span>
-                  اطلاعات اقامتگاه
-                </h3>
+                <div className="w-full flex justify-between items-center">
+                  <h3 className="font-bold text-base flex items-center gap-2">
+                    <span className="bg-purple-100 text-purple-600 p-1 rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                      ۳
+                    </span>
+                    اطلاعات اقامتگاه
+                  </h3>
+                  <Button
+                    disabled={isGettingInfo}
+                    size={"sm"}
+                    onClick={() => getUserLodgeInfo()}
+                  >
+                    اقامتگاه من
+                  </Button>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <Label htmlFor="motel_name">نام اقامتگاه</Label>
@@ -636,49 +862,62 @@ export default function InvoicePage() {
         >
           <motion.div
             ref={invoiceRef}
-            className="p-6 mx-auto border rounded-lg bg-white text-black shadow-sm"
+            className="p-6 mx-auto border border-gray-300 rounded-lg bg-white text-black shadow-sm"
             style={{
               width: "140mm",
-              maxHeight: "205mm",
+              minHeight: "205mm",
               direction: "rtl",
             }}
             variants={fadeIn}
           >
-            <div className="flex justify-between items-start mb-4 border-b pb-4">
+            {/* Header */}
+            <div className="flex justify-between items-start mb-4 border-b border-gray-300 pb-4">
               <div className="text-right">
-                <h1 className="text-xl font-bold"> {motel.motel_name}</h1>
-                <p className="text-sm text-muted-foreground mt-1">
+                <h1 className="text-xl font-bold text-black">
+                  اقامتگاه {motel.motel_name}
+                </h1>
+                <p className="text-sm text-gray-600 mt-1">
                   وب اپلیکشن اقامت بان (eghamatban.ir)
                 </p>
               </div>
-              <div className="text-left p-1 bg-muted/50 rounded-md px-3 py-2">
-                <p className="text-sm font-medium">
+              <div className="text-left p-1 bg-gray-100 rounded-md px-3 py-2">
+                <p className="text-sm font-medium text-black">
                   شماره: {reservation.id.slice(-6)}
                 </p>
-                <p className="text-sm">
+                <p className="text-sm text-black">
                   تاریخ: {convertToPersianDigits(issueDate.format("YYYY/M/D"))}
                 </p>
               </div>
             </div>
 
-            <div className="w-full border border-border mb-4 p-4 space-y-2 text-sm rounded-lg">
+            {/* Guest Info */}
+            <div className="w-full border border-gray-300 mb-4 p-4 space-y-2 text-sm rounded-lg">
               <div className="flex justify-between">
-                <p>
+                <p className="text-black">
                   <span className="font-semibold">مهمان:</span>{" "}
                   <span className="font-bold">{reservation.guest_name}</span>
                 </p>
-                <p>
+                <p className="text-black">
                   <span className="font-semibold">تلفن:</span>{" "}
                   <span className="font-bold dir-ltr text-left inline-block">
                     {convertToPersianDigits(reservation.guest_phone)}
                   </span>
                 </p>
               </div>
+              {reservation.description && (
+                <div className="border-t border-gray-200 pt-2 mt-2">
+                  <p className="text-black">
+                    <span className="font-semibold">توضیحات:</span>{" "}
+                    {reservation.description}
+                  </p>
+                </div>
+              )}
             </div>
 
-            <table className="w-full text-sm border border-border overflow-hidden">
+            {/* Main Table */}
+            <table className="w-full text-sm border border-gray-300 overflow-hidden mb-4">
               <thead>
-                <tr className="text-center text-xs border border-border bg-muted/50">
+                <tr className="text-center text-xs border-b border-gray-300 bg-gray-100">
                   {[
                     "ورود",
                     "خروج",
@@ -690,15 +929,15 @@ export default function InvoicePage() {
                   ].map((header, idx) => (
                     <th
                       key={idx}
-                      className={`p-2 ${
-                        idx !== 0 ? "border-r border-border" : ""
+                      className={`p-2 font-medium text-black ${
+                        idx !== 0 ? "border-r border-gray-300" : ""
                       }`}
                     >
                       {header}
                     </th>
                   ))}
                   <th
-                    className="p-2 font-bold border-r border-border bg-primary/10"
+                    className="p-2 font-bold border-r border-gray-300 bg-gray-200 text-black"
                     rowSpan="2"
                   >
                     قابل پرداخت
@@ -718,56 +957,82 @@ export default function InvoicePage() {
                   ].map((cell, idx) => (
                     <td
                       key={idx}
-                      className={`p-2 ${
-                        idx !== 0 ? "border-r border-border" : ""
+                      className={`p-2 text-black ${
+                        idx !== 0 ? "border-r border-gray-300" : ""
                       }`}
                     >
                       {cell}
                     </td>
                   ))}
                   <td
-                    className="p-2 font-bold border-r border-border bg-primary/10"
-                    rowSpan="3"
+                    className="p-2 font-bold border-r border-gray-300 bg-gray-200 text-black"
+                    rowSpan={
+                      additionalPrices.length > 0
+                        ? 3 + additionalPrices.length
+                        : 3
+                    }
                   >
                     {finalPrice.toLocaleString("fa-IR")}
                     <span className="text-xs font-normal block">تومان</span>
                   </td>
                 </tr>
-                <tr className="text-center">
-                  <td
-                    colSpan={7}
-                    className="p-2 border-t border-border text-right"
+
+                {/* Additional Services */}
+                {additionalPrices.map((service, index) => (
+                  <tr
+                    key={service.id}
+                    className="text-center border-t border-gray-200"
                   >
-                    {reservation.discount > 0 ? (
-                      <div className="flex justify-center flex-col">
+                    <td
+                      colSpan={7}
+                      className="p-2 text-black text-right pr-4 border-r border-gray-300"
+                    >
+                      <div className="flex justify-between items-center">
+                        <p className="text-xs text-gray-600">
+                          خدمات اضافی:{" "}
+                          <span className="text-sm text-black font-bold">
+                            {service.description}
+                          </span>
+                        </p>
+
                         <span className="font-medium">
-                          تخفیف: {reservation.discount.toLocaleString("fa-IR")}{" "}
-                          % ({discountAmount.toLocaleString("fa-IR")} تومان)
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          تمام قیمتها به تومان میباشد
+                          +{Number(service.price).toLocaleString("fa-IR")} تومان
                         </span>
                       </div>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">
+                    </td>
+                  </tr>
+                ))}
+
+                {/* Summary Row */}
+                <tr className="text-center border-t border-gray-300">
+                  <td colSpan={7} className="p-2 text-black text-right">
+                    <div className="flex justify-center flex-col">
+                      {reservation.discount > 0 && (
+                        <span className="font-medium text-black">
+                          تخفیف: {reservation.discount.toLocaleString("fa-IR")}%
+                          ({discountAmount.toLocaleString("fa-IR")} تومان)
+                        </span>
+                      )}
+                      <span className="text-xs text-gray-600 mt-1">
                         تمام قیمتها به تومان میباشد
                       </span>
-                    )}
+                    </div>
                   </td>
                 </tr>
               </tbody>
             </table>
 
+            {/* Payment Info */}
             {(motel.motel_card || motel.motel_iban) && (
               <div className="mt-4">
-                <div className="border border-border rounded-md p-4">
-                  <div className="space-y-1">
+                <div className="border border-gray-300 rounded-md p-4 bg-gray-50">
+                  <div className="space-y-2">
                     {motel.motel_card && (
                       <div className="flex justify-between items-center">
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-gray-600">
                           کارت ({getBankNameFromCardNumber(motel.motel_card)})
                         </span>
-                        <span className="font-mono">
+                        <span className="font-mono text-black">
                           {convertToPersianDigits(motel.motel_card)}
                         </span>
                       </div>
@@ -775,11 +1040,11 @@ export default function InvoicePage() {
 
                     {motel.motel_iban && (
                       <div className="flex justify-between items-center">
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-xs text-gray-600">
                           شبا (
                           {getShebaInfo("IR" + motel.motel_iban)?.persianName})
                         </span>
-                        <span className="font-mono">
+                        <span className="font-mono text-black">
                           {convertToPersianDigits(
                             motel.motel_iban.replace("IR", "")
                           )}
@@ -787,19 +1052,19 @@ export default function InvoicePage() {
                       </div>
                     )}
 
-                    <Separator />
+                    <Separator className="bg-gray-300" />
 
-                    <p className="text-sm">
+                    <p className="text-sm text-black">
                       <span className="font-bold">
                         {finalPrice.toLocaleString("fa-IR")} تومان
                       </span>
-                      <span className="text-xs text-muted-foreground mr-1">
+                      <span className="text-xs text-gray-600 mr-1">
                         ({numberToWords(finalPrice)} تومان)
                       </span>
                     </p>
 
                     {motel.motel_card_name && (
-                      <p className="text-sm font-medium">
+                      <p className="text-sm font-medium text-black">
                         {motel.motel_card_name}
                       </p>
                     )}
@@ -808,10 +1073,11 @@ export default function InvoicePage() {
               </div>
             )}
 
-            <div className="text-center text-sm mt-6 border-t pt-4">
-              <p className="font-medium">از اعتماد شما سپاسگزاریم</p>
+            {/* Footer */}
+            <div className="text-center text-sm mt-6 border-t border-gray-300 pt-4">
+              <p className="font-medium text-black">از اعتماد شما سپاسگزاریم</p>
               {motel.motel_phone && (
-                <p className="mt-1 text-muted-foreground">
+                <p className="mt-1 text-gray-600">
                   پشتیبانی: {convertToPersianDigits(motel.motel_phone)}
                 </p>
               )}
