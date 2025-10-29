@@ -50,6 +50,8 @@ import {
   numberToWords,
 } from "@persian-tools/persian-tools";
 import { Separator } from "@/components/ui/separator";
+import ReserveWholeLodgeDialog from "./ReserveWholeLodgeDialog";
+import GroupedReserveCard from "./GroupedReserveCard";
 
 export default function ReservationsPage({
   rooms,
@@ -64,9 +66,9 @@ export default function ReservationsPage({
   const [editingReservation, setEditingReservation] = useState(null);
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
-
+  const [isWholeLodgeDialogOpen, setIsWholeLodgeDialogOpen] = useState(false);
   const invoiceRef = useRef(null);
-
+  const [editingGroup, setEditingGroup] = useState(null);
   const [formData, setFormData] = useState({
     roomId: "",
     guestName: "",
@@ -111,6 +113,60 @@ export default function ReservationsPage({
     return sortByCheckInDateDesc(filtered);
   }, [rooms, searchTerm, statusFilter, roomFilter, reservations]);
 
+  const groupReservations = useMemo(() => {
+    const grouped = [];
+    const processedIds = new Set();
+
+    filteredReservations.forEach((reservation) => {
+      if (processedIds.has(reservation.id)) return;
+
+      if (reservation.isall) {
+        const sameGroup = filteredReservations.filter(
+          (r) =>
+            r.isall &&
+            r.guest_name === reservation.guest_name &&
+            r.guest_phone === reservation.guest_phone &&
+            r.check_in === reservation.check_in &&
+            r.check_out === reservation.check_out &&
+            new Date(r.created_at).toDateString() ===
+              new Date(reservation.created_at).toDateString()
+        );
+
+        // Add all IDs to processed set
+        sameGroup.forEach((r) => processedIds.add(r.id));
+
+        if (sameGroup.length > 1) {
+          grouped.push({
+            ...reservation,
+            isGrouped: true,
+            groupedReservations: sameGroup,
+            room_count: sameGroup.length,
+            total_group_price: sameGroup.reduce(
+              (sum, r) => sum + (r.discounttotal || r.total_price),
+              0
+            ),
+            price_type: "night",
+            total_adults: sameGroup.reduce(
+              (sum, r) => sum + Number(r.adults || 0),
+              0
+            ),
+            rooms: sameGroup
+              .map((r) =>
+                rooms.find((room) => String(room.id) === String(r.room_id))
+              )
+              .filter(Boolean),
+          });
+        } else {
+          grouped.push(reservation);
+        }
+      } else {
+        grouped.push(reservation);
+      }
+    });
+
+    return grouped;
+  }, [filteredReservations]);
+
   const resetForm = () => {
     setFormData({
       roomId: "",
@@ -149,6 +205,11 @@ export default function ReservationsPage({
     setIsAddDialogOpen(true);
   };
 
+  const handleEditGroup = (groupReservation) => {
+    setEditingGroup(groupReservation);
+    setIsWholeLodgeDialogOpen(true);
+  };
+
   const handleDelete = async (reservation) => {
     toast.warning(
       `آیا از حذف رزرواسیون ${reservation.guest_name} اطمینان دارید؟`,
@@ -164,6 +225,38 @@ export default function ReservationsPage({
                   return `رزرواسیون ${reservation.guest_name} با موفقیت حذف شد`;
                 },
                 error: "خطا در حذف رزرواسیون",
+              }
+            );
+          },
+        },
+        cancel: {
+          label: "انصراف",
+          onClick: () => {},
+        },
+        duration: 10000,
+      }
+    );
+  };
+
+  const handleDeleteGroup = async (groupReservation) => {
+    toast.warning(
+      `آیا از حذف رزرو کامل اقامتگاه برای ${groupReservation.guest_name} اطمینان دارید؟ `,
+      {
+        action: {
+          label: "حذف همه",
+          onClick: async () => {
+            toast.promise(
+              Promise.all(
+                groupReservation.groupedReservations.map((reservation) =>
+                  deleteReservation(reservation.id, reservation.room_id)
+                )
+              ),
+              {
+                loading: `در حال حذف ...`,
+                success: () => {
+                  return `رزرو کامل اقامتگاه ${groupReservation.guest_name} با موفقیت حذف شد `;
+                },
+                error: "خطا در حذف رزروهای اقامتگاه",
               }
             );
           },
@@ -233,30 +326,55 @@ export default function ReservationsPage({
 
   const InvoiceDialog = () => {
     if (!selectedReservation) return null;
+
     const motelData = userLodgeInfo;
-    const room = rooms.find(
-      (r) => String(r.id) === selectedReservation.room_id
-    );
+
+    // Check if this is a grouped reservation
+    const isGroupedReservation = selectedReservation.isGrouped;
+
     const checkInDate = selectedReservation.check_in;
     const checkOutDate = selectedReservation.check_out;
     const nights = getJalaliDateDifference(checkInDate, checkOutDate);
-    const roomPriceType = room?.price_tag === "night" ? "شبانه" : "نفر";
-    const finalPayPrice =
-      selectedReservation?.discounttotal >= 0
-        ? selectedReservation.discounttotal
-        : selectedReservation.total_price;
-    const discountedAmount =
-      selectedReservation.discount > 0
-        ? selectedReservation.total_price - selectedReservation.discounttotal
-        : 0;
 
+    const roomPriceType = isGroupedReservation
+      ? selectedReservation.allpricetype
+      : rooms.find((r) => String(r.id) === selectedReservation.room_id)
+          ?.price_tag === "night"
+      ? "شبانه"
+      : "نفر";
+
+    const finalPayPrice = isGroupedReservation
+      ? selectedReservation.total_group_price
+      : selectedReservation?.discounttotal >= 0
+      ? selectedReservation.discounttotal
+      : selectedReservation.total_price;
+
+    const discountedAmount = isGroupedReservation
+      ? selectedReservation.total_group_price - finalPayPrice
+      : selectedReservation.discount > 0
+      ? selectedReservation.total_price - selectedReservation.discounttotal
+      : 0;
+
+    const totalAddPrice = isGroupedReservation
+      ? selectedReservation.groupedReservations.reduce(
+          (sum, r) => sum + (r.addprice || 0),
+          0
+        )
+      : selectedReservation.addprice || 0;
+
+    const totalAdults = isGroupedReservation
+      ? selectedReservation.total_adults
+      : selectedReservation.adults;
+
+    const roomCount = isGroupedReservation ? selectedReservation.room_count : 1;
+    console.log(selectedReservation);
     return (
       <Dialog open={isInvoiceDialogOpen} onOpenChange={setIsInvoiceDialogOpen}>
         <DialogContent className="min-w-full sm:min-w-[650px] max-h-[90vh] overflow-y-auto p-3 no-print">
           <DialogHeader>
             <DialogTitle className="flex items-center">
               <FileText className="w-5 h-5 ml-2" />
-              پیش فاکتور
+              پیش فاکتور {isGroupedReservation && "(رزرو کامل)"}
             </DialogTitle>
           </DialogHeader>
 
@@ -303,9 +421,26 @@ export default function ReservationsPage({
                   </span>
                 </p>
               </div>
+              {/*               {isGroupedReservation && (
+                <div className="flex justify-between items-center mt-2">
+                  <p>
+                    <span className="font-semibold">تعداد اتاق‌ها:</span>{" "}
+                    <span className="font-bold">
+                      {roomCount.toLocaleString("fa-IR")}
+                    </span>
+                  </p>
+                  <p>
+                    <span className="font-semibold">تعداد نفرات کل:</span>{" "}
+                    <span className="font-bold">
+                      {totalAdults.toLocaleString("fa-IR")}
+                    </span>
+                  </p>
+                </div>
+              )} */}
             </div>
 
-            <table className="w-full text-sm border border-black  overflow-hidden">
+            {/* Single Table for both individual and grouped reservations */}
+            <table className="w-full text-sm border border-black overflow-hidden">
               <thead>
                 <tr className="text-center text-xs border border-black">
                   {[
@@ -339,13 +474,24 @@ export default function ReservationsPage({
                   {[
                     convertToPersianDigits(checkInDate),
                     convertToPersianDigits(checkOutDate),
-                    room?.room_number,
-                    `${nights.toLocaleString("fa-IR")} `,
-                    `${selectedReservation?.adults.toLocaleString("fa-IR")}`,
-                    `${selectedReservation?.roomprice.toLocaleString("fa-IR")}`,
-                    `${selectedReservation.total_price.toLocaleString(
-                      "fa-IR"
-                    )}`,
+                    isGroupedReservation
+                      ? "کل اقامتگاه"
+                      : rooms.find(
+                          (r) => String(r.id) === selectedReservation.room_id
+                        )?.room_number,
+                    `${nights.toLocaleString("fa-IR")} شب`,
+                    `${totalAdults.toLocaleString("fa-IR")} نفر`,
+                    `${
+                      selectedReservation.roomprice?.toLocaleString("fa-IR") ||
+                      "0"
+                    }`,
+                    isGroupedReservation
+                      ? `${selectedReservation.total_group_price.toLocaleString(
+                          "fa-IR"
+                        )}`
+                      : `${selectedReservation.total_price.toLocaleString(
+                          "fa-IR"
+                        )}`,
                   ].map((cell, idx) => (
                     <td
                       key={idx}
@@ -360,7 +506,7 @@ export default function ReservationsPage({
                     className="p-2 font-bold border-r border-black"
                     rowSpan="2"
                   >
-                    {finalPayPrice.toLocaleString("fa-IR")}{" "}
+                    {finalPayPrice.toLocaleString("fa-IR")} تومان
                   </td>
                 </tr>
                 <tr className="text-center">
@@ -376,17 +522,15 @@ export default function ReservationsPage({
                             "fa-IR"
                           )}{" "}
                           <span className="text-xs">
-                            {" "}
                             ({discountedAmount.toLocaleString("fa-IR")} تومان)
                           </span>
                         </p>
                       </div>
                     )}
-                    {selectedReservation.addprice > 0 && (
+                    {totalAddPrice > 0 && (
                       <div className="flex justify-center flex-col">
                         <p className="font-medium">
-                          مبلغ اضافه:{" "}
-                          {selectedReservation.addprice.toLocaleString("fa-IR")}{" "}
+                          مبلغ اضافه: {totalAddPrice.toLocaleString("fa-IR")}{" "}
                           تومان{" "}
                           {selectedReservation.addpricedesc && (
                             <span className="text-xs">
@@ -404,7 +548,12 @@ export default function ReservationsPage({
               </tbody>
             </table>
 
-            <div className="text-sm mt-3 p-2 rounded-md border">
+            <div className="text-sm mt-3  p-2 rounded-md border">
+              {isGroupedReservation && (
+                <p className="fon mb-2t-bold">
+                  این فاکتور مربوط به رزرو کامل اقامتگاه می‌باشد
+                </p>
+              )}
               <p>
                 {roomPriceType !== "شبانه"
                   ? "مبلغ بر اساس تعداد شب‌های اقامت، تعداد نفرات و قیمت پایه هر نفر در هر شب محاسبه شده است."
@@ -412,17 +561,17 @@ export default function ReservationsPage({
               </p>
 
               {motelData.invoicenote && (
-                <p className="font-bold">{motelData.invoicenote}</p>
+                <p className="font-bold mt-1">{motelData.invoicenote}</p>
               )}
 
               <div className="flex justify-around mt-2 items-center">
-                <p className=" space-x-1">
+                <p className="space-x-1">
                   <span className="text-xs">ساعت ورود:</span>
                   <span className="font-semibold">
                     {convertToPersianDigits(motelData.motel_checkin)}
                   </span>
                 </p>
-                <p className=" space-x-1">
+                <p className="space-x-1">
                   <span className="text-xs">ساعت تخلیه:</span>
                   <span className="font-semibold">
                     {convertToPersianDigits(motelData.motel_checkout)}
@@ -430,6 +579,7 @@ export default function ReservationsPage({
                 </p>
               </div>
             </div>
+
             {(motelData.motel_card || motelData.motel_iban) && (
               <div className="mt-3 gap-4">
                 <div className="border border-gray-300 rounded-md p-3">
@@ -545,6 +695,15 @@ export default function ReservationsPage({
             resetForm={resetForm}
             withButton={true}
           />
+          <ReserveWholeLodgeDialog
+            isWholeLodgeDialogOpen={isWholeLodgeDialogOpen}
+            setIsWholeLodgeDialogOpen={setIsWholeLodgeDialogOpen}
+            reservations={reservations}
+            rooms={rooms}
+            withButton={true}
+            setEditingGroup={setEditingGroup}
+            editingGroup={editingGroup}
+          />
         </div>
       </motion.div>
       <AnimatePresence mode="wait">
@@ -613,7 +772,25 @@ export default function ReservationsPage({
           animate="visible"
           exit="hidden"
         >
-          {filteredReservations.map((reservation, index) => {
+          {groupReservations.map((reservation, index) => {
+            if (reservation.isGrouped) {
+              return (
+                <motion.div
+                  key={`group-${reservation.id}`}
+                  variants={item}
+                  custom={index}
+                >
+                  <GroupedReserveCard
+                    groupReservation={reservation}
+                    handleDelete={handleDeleteGroup}
+                    handleEdit={handleEdit}
+                    handlePrintInvoice={handlePrintInvoice}
+                    handleEditGroup={handleEditGroup}
+                  />
+                </motion.div>
+              );
+            }
+
             return (
               <motion.div key={reservation.id} variants={item} custom={index}>
                 <ReserveCard

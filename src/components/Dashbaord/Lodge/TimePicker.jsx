@@ -5,17 +5,15 @@ import persian_fa from "react-date-object/locales/persian_fa";
 
 export default function PersianTimeInput({ value, onChange }) {
   return (
-<DatePicker 
-  disableDayPicker
-  format="HH"
-  value={value}
-  locale={persian_fa}
-  onChange={(date) => {
-    console.log(date?.format("HH:mm")); // logs 14:30
-  }}
-  plugins={[
-    <TimePicker hideSeconds  />
-  ]} 
-/>
+    <DatePicker
+      disableDayPicker
+      format="HH"
+      value={value}
+      locale={persian_fa}
+      onChange={(date) => {
+        console.log(date?.format("HH:mm"));
+      }}
+      plugins={[<TimePicker hideSeconds />]}
+    />
   );
 }

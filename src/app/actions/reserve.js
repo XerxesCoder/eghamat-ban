@@ -27,6 +27,8 @@ export async function addNewReserve(reserveData) {
           addprice: reserveData.addPrice,
           addpricedesc: reserveData.addpricedesc,
           roomprice: reserveData.roomPrice,
+          isall: reserveData.isAll,
+          allpricetype: reserveData.allPriceType,
           owner_id: userId,
         },
       ])
@@ -69,6 +71,7 @@ export async function editReservation(reserveData, reserveID) {
           addprice: reserveData.addPrice,
           addpricedesc: reserveData.addpricedesc,
           roomprice: reserveData.roomPrice,
+          allpricetype: reserveData.allPriceType,
         },
       ])
       .eq("owner_id", userId)

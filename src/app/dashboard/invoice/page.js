@@ -79,7 +79,7 @@ export default function InvoicePage() {
       const lodgeData = await getUserLodge();
       if (lodgeData.success) {
         const motelData = lodgeData.data[0];
-        console.log(motelData);
+
         setMotel({
           motel_name: motelData.motel_name,
           motel_card: motelData.motel_card,

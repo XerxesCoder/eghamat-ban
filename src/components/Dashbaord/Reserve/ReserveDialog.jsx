@@ -138,7 +138,7 @@ export default function ReserveDialog({
     formData.discount,
     formData.addPrice,
   ]);
-  console.log(totalAmount);
+
   const todayDate = new DateObject({
     calendar: persian,
     locale: persian_fa,
@@ -214,6 +214,8 @@ export default function ReserveDialog({
         addpricedesc: formData.addpriceDesc,
         discount: formData.discount,
         discounttotal: totalAmount.discountedTotal,
+        isAll: false,
+        roomPrice: formData.roomPrice,
       };
 
       if (editingReservation) {
